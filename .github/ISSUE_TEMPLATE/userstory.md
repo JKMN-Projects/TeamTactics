@@ -8,11 +8,11 @@ assignees: ''
 ---
 
 ### Story
-| Story | Aktør |
+| | Aktør |
 |--------|--------|
-| Jeg som | [Rolle] |
-| Vil gerne | [Behov] |
-| For at | [Resultat] | 
+| Jeg som | [ROLLE] |
+| Vil gerne | [BEHOV] |
+| For at | [RESULTAT] | 
 
 ### Accept kriterier
 - [ ] Accept kriteria 1.
