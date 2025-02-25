@@ -8,14 +8,11 @@ assignees: ''
 ---
 
 ### Story
-#Jeg som
-[Rolle]
-
-# Vil gerne
-[Aktion]
-
-# For at
-[Benefit]
+| Story | Aktør |
+|--------|--------|
+| Jeg som | [Rolle] |
+| Vil gerne | [Behov] |
+| For at | [Resultat] | 
 
 ### Accept kriterier
 - [ ] Accept kriteria 1.
