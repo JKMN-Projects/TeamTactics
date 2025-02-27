@@ -5,6 +5,10 @@ jobs:
   generate_plantuml:
     runs-on: ubuntu-latest
     name: plantuml
+    env: 
+      PLANTUML_JAR_PATH: docs/plantuml.jar
+      DIAGRAM_PATH: docs/**.puml
+      OUTPUT_PATH: docs/Rendered
     steps:
       - name: Install Dependencies
         run: |
@@ -12,9 +16,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Process Diagrams
-        run: java -jar docs/plantuml.jar -v -tsvg -r -o "${{ github.workspace }}/docs/Rendered" "docs/**.puml"
+        run: java -jar ${{ env.PLANTUML_JAR_PATH }} -v -tsvg -r -o "${{ github.workspace }}/${{ env.OUTPUT_PATH }}" "${{ env.DIAGRAM_PATH }}"
       - name: Display Diagrams
-        run: pwd && ls output
+        run: pwd && ls ${{ env.OUTPUT_PATH }}
       - name: Commit Diagrams
         run: |
           git config --local user.email "action@github.com"
