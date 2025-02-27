@@ -5,6 +5,8 @@ jobs:
   generate_plantuml:
     runs-on: ubuntu-latest
     name: plantuml
+    permissions:
+      contents: write
     env: 
       PLANTUML_JAR_PATH: docs/plantuml.jar
       DIAGRAM_PATH: docs/**.puml
