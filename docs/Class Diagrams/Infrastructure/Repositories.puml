@@ -14,9 +14,9 @@ interface ICRUDRepository<T, TId> {
 IRepository <|-- ICRUDRepository : extends
 
 interface IUserRepository {
-    Task<IEnumerable<User>> GetUserUserAsync(int userId)
+    Task<int> CreateUserAsync(User user, string passwordHash)
 }
-ICRUDRepository <|-- IUserRepository : extends, T=User, TId=int
+IRepository <|-- IUserRepository : extends, T=User, TId=int
 
 interface ITeamRepository {
     Task<IEnumerable<Team>> GetUserTeamAsync(int userId)
