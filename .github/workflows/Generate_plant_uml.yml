@@ -11,6 +11,7 @@ jobs:
       PLANTUML_JAR_PATH: docs/plantuml.jar
       DIAGRAM_PATH: docs/**.puml
       OUTPUT_PATH: docs/Rendered
+      COMMIT_MSG: ":rocket: adding generated diagrams"
     steps:
       - name: Install Dependencies
         run: |
@@ -26,7 +27,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m ":rocket: adding generated diagrams" || exit 0
+          git commit -m "${{ evn.COMMIT_MSG }}" || exit 0
       - name: Push Diagrams
         uses: ad-m/github-push-action@master
         with:
