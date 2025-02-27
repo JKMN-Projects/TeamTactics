@@ -1,0 +1,35 @@
+@startuml Repositories
+skinparam groupInheritance 2
+
+interface IRepository<T, TId> {
+    Task<IEnumerable<T>> GetAllAsync()
+    Task<T?> GetByIdAsync(TId id)
+}
+
+interface ICRUDRepository<T, TId> {
+    Task<TId> CreateAsync(T model)
+    Task UpdateAsync(T model)
+    Task RemoveAsync(TId id)
+}
+IRepository <|-- ICRUDRepository : extends
+
+interface ITeamRepository {
+    Task<IEnumerable<Team>> GetUserTeamAsync(int userId)
+}
+ICRUDRepository <|-- ITeamRepository : extends, T=Team, TId=int
+
+interface IPlayerRepository {
+    Task<IEnumerable<Player>> GetPlayersNotInTeamAsync(int teamId, string nameQuery = null, int positionId = 0, int clubId = 0)
+}
+ICRUDRepository <|-- IPlayerRepository : extends, T=Player, TId=int
+
+interface IClubRepository {
+    Task<IEnumerable<Club>> GetClubsInCompetitionAsync(int competitionId)
+}
+ICRUDRepository <|-- IClubRepository : extends, T=Club, TId=int
+
+interface ICompetitionRepository {
+}
+ICRUDRepository <|-- ICompetitionRepository : extends, T=Competition, TId=int
+
+@enduml

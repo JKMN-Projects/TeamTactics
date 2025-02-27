@@ -1,0 +1,11 @@
+@startuml User
+skinparam Linetype Ortho
+
+package UserAggregate <<Rectangle>> {
+    class User <<AggregateRoot>> {
+        +int Id
+        +string UserName
+        +string Email
+    }
+}
+@enduml

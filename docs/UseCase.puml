@@ -1,0 +1,53 @@
+@startuml Must Have usecases
+left to right direction
+
+actor :Bruger: as User
+actor :Hold Administrator: as HoldAdministrator
+User <|- HoldAdministrator
+actor :Turneringsarrangør: as TurneyPlanner
+User <|-- TurneyPlanner
+actor :Turneringsdeltager: as TurneyAttendeee
+User <|-- TurneyAttendeee
+TurneyAttendeee <|- TurneyPlanner
+
+package "Bruger håndtering" {
+    usecase "Login" as (Login)
+    usecase "Register" as (Register)
+    usecase "Logud" as (Logout)
+}
+User --> (Login)
+User --> (Register)
+User --> (Logout)
+
+package "Hold Builder" {
+    usecase "Opret hold" as (createTeam)
+    usecase "Slet hold" as (deleteTeam)
+    usecase "Tilfæj Spiller til hold" as (addTeamPlayer)
+    usecase "Vælg hold kaptajner" as (pickTeamCaptain)
+    usecase "Fjern spiller fra hold" as (removeTeamPlayer)
+    usecase "Skift formation" as (changeFormation)
+    usecase "Lås hold" as (lockTeam)
+}
+User --> (createTeam)
+HoldAdministrator --> (deleteTeam)
+HoldAdministrator --> (addTeamPlayer)
+HoldAdministrator --> (pickTeamCaptain)
+HoldAdministrator --> (removeTeamPlayer)
+HoldAdministrator --> (changeFormation)
+HoldAdministrator --> (lockTeam)
+
+package "Privat turnering" {
+    usecase "Opret turnering" as (createTournament)
+    usecase "Inviter til turnering" as (inviteToTournament)
+    usecase "Slet turnering" as (deleteTournament)
+}
+User --> (createTournament)
+TurneyPlanner --> (inviteToTournament)
+TurneyPlanner --> (deleteTournament)
+
+package "Turneringsopslagstavle" {
+    usecase "Opret opslag" as (createBulletin)
+}
+TurneyAttendeee --> (createBulletin)
+
+@enduml

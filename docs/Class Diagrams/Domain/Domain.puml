@@ -1,0 +1,12 @@
+@startuml Domain
+skinparam Linetype Ortho
+
+!include Player.puml
+!include Tournament.puml
+!include Team.puml
+!include User.puml
+
+show members
+hide enum methods
+
+@enduml

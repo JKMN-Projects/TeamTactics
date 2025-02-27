@@ -1,0 +1,26 @@
+@startuml Tournament
+skinparam Linetype Ortho
+
+package TournamentAggregate <<Rectangle>> {
+    class Tournament <<AggregateRoot>> {
+        +int Id
+        +string Name
+        +int CompetitionId
+        +int CreatedByUserId
+        -List<Bulletin> _bulletins
+        +IReadOnlyList<Bulletin> Bulletins
+
+        +void AddBulletin(string content, int createdByUserId)
+    }
+
+    class Bulletin {
+        int Id
+        string Text
+        DateTime CreatedAt
+        int CreatedByUserId
+    }
+
+    Tournament *-- "Many" Bulletin
+}
+
+@enduml

@@ -1,0 +1,12 @@
+@startuml Player
+
+package PlayerAggregate <<Rectangle>> {
+    class Player <<AggregateRoot>> {
+        +int Id
+        +string Name
+        +int ClubId
+        +int PositionId
+    }
+}
+
+@enduml

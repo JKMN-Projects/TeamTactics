@@ -1,0 +1,45 @@
+@startuml Team
+hide enum methods
+skinparam Linetype Ortho
+
+package TeamAggregate <<Rectangle>> {
+    class Team <<AggregateRoot>> {
+        +int Id
+        +string Name
+        +TeamStatus Status
+        +int UserId
+        -List<TeamPlayer> _players
+        +IReadOnlyCollection<TeamPlayer> Players
+
+        +void AddPlayer(Player player)
+        +void RemovePlater(int playerId)
+        +void SetCaptain()
+        +void Lock()
+        +void EnrollInTournament(Tournament tournament)
+    }
+
+    enum TeamStatus {
+        Draft
+        Locked
+    }
+
+    class TeamPlayer {
+        +int PlayerId 
+        +bool IsCaptain   
+    }
+
+    class TournamentEnrollments {
+        +int TournamentId
+    }
+
+    Team o-- TeamStatus
+    Team *-- "0..11" TeamPlayer
+    Team *-- "many" TournamentEnrollments
+}
+
+Team - Player
+Team - Tournament
+
+hide Player members
+hide Tournament members
+@enduml
