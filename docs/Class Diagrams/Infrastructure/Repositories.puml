@@ -2,8 +2,8 @@
 skinparam groupInheritance 2
 
 interface IRepository<T, TId> {
-    Task<IEnumerable<T>> GetAllAsync()
-    Task<T?> GetByIdAsync(TId id)
+    Task<IEnumerable<T>> FindAllAsync()
+    Task<T?> FindByIdAsync(TId id)
 }
 
 interface ICRUDRepository<T, TId> {
@@ -15,21 +15,24 @@ IRepository <|-- ICRUDRepository : extends
 
 interface IUserRepository {
     Task<int> CreateUserAsync(User user, string passwordHash)
+    Task UpdateAsync(User user)
+    Task RemoveAsync(int id)
+    Task<bool> CheckPasswordAsync(string passwordHash)
 }
 IRepository <|-- IUserRepository : extends, T=User, TId=int
 
 interface ITeamRepository {
-    Task<IEnumerable<Team>> GetUserTeamAsync(int userId)
+    Task<IEnumerable<Team>> FindUserTeamAsync(int userId)
 }
 ICRUDRepository <|-- ITeamRepository : extends, T=Team, TId=int
 
 interface IPlayerRepository {
-    Task<IEnumerable<Player>> GetPlayersNotInTeamAsync(int teamId, string nameQuery = null, int positionId = 0, int clubId = 0)
+    Task<IEnumerable<Player>> FindPlayersNotInTeamAsync(int teamId, string nameQuery = null, int positionId = 0, int clubId = 0)
 }
 ICRUDRepository <|-- IPlayerRepository : extends, T=Player, TId=int
 
 interface IClubRepository {
-    Task<IEnumerable<Club>> GetClubsInCompetitionAsync(int competitionId)
+    Task<IEnumerable<Club>> FindClubsInCompetitionAsync(int competitionId)
 }
 ICRUDRepository <|-- IClubRepository : extends, T=Club, TId=int
 
