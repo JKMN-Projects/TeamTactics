@@ -9,4 +9,4 @@ package PlayerAggregate <<Rectangle>> {
     }
 }
 
-@enduml
+@enduml 

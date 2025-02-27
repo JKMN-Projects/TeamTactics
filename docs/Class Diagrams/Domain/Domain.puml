@@ -7,6 +7,6 @@ skinparam Linetype Ortho
 !include User.puml
 
 show members
-hide enum methods
+hide enum methods 
 
 @enduml

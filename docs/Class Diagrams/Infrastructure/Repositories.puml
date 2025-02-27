@@ -37,4 +37,4 @@ interface ICompetitionRepository {
 }
 ICRUDRepository <|-- ICompetitionRepository : extends, T=Competition, TId=int
 
-@enduml
+@enduml 

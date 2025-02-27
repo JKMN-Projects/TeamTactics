@@ -50,4 +50,4 @@ package "Turneringsopslagstavle" {
 }
 TurneyAttendeee --> (createBulletin)
 
-@enduml
+@enduml 

@@ -8,4 +8,4 @@ package UserAggregate <<Rectangle>> {
         +string Email
     }
 }
-@enduml
+@enduml 
