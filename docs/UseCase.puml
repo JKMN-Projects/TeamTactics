@@ -23,7 +23,7 @@ package "Hold Builder" {
     usecase "Opret hold" as (createTeam)
     usecase "Slet hold" as (deleteTeam)
     usecase "Tilfæj Spiller til hold" as (addTeamPlayer)
-    usecase "Vælg hold kaptajner" as (pickTeamCaptain)
+    usecase "Vælg hold kaptajn" as (pickTeamCaptain)
     usecase "Fjern spiller fra hold" as (removeTeamPlayer)
     usecase "Skift formation" as (changeFormation)
     usecase "Lås hold" as (lockTeam)
