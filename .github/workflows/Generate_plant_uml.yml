@@ -27,7 +27,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "${{ evn.COMMIT_MSG }}" || exit 0
+          git commit -m "${{ env.COMMIT_MSG }}" || exit 0
       - name: Push Diagrams
         uses: ad-m/github-push-action@master
         with:
