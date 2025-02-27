@@ -25,5 +25,5 @@ jobs:
         file: ./src/TeamTactics.Api/Dockerfile
         push: true
         tags: |
-          docker.pkg.github.com/jkmn-projects/teamtactics:${{ github.run_number }}
-          docker.pkg.github.com/jkmn-projects/teamtactics:latest
+          ghcr.io/jkmn-projects/teamtactics:${{ github.run_number }}
+          ghcr.io/jkmn-projects/teamtactics:latest
