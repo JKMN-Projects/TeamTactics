@@ -1,4 +1,4 @@
-name: generate plantuml
+name: Generate PlantUML
 on: 
   push:
     paths:
