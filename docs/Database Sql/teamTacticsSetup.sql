@@ -10,7 +10,6 @@ DROP TABLE IF EXISTS player_user_team CASCADE;
 DROP TABLE IF EXISTS player CASCADE;
 DROP TABLE IF EXISTS club CASCADE;
 DROP TABLE IF EXISTS player_position CASCADE;
-DROP TABLE IF EXISTS player_position CASCADE;
 DROP TABLE IF EXISTS user_team_user_tournament CASCADE;
 DROP TABLE IF EXISTS user_team CASCADE;
 DROP TABLE IF EXISTS user_tournament CASCADE;
@@ -20,17 +19,17 @@ DROP TABLE IF EXISTS user_account CASCADE;
 -- User and account tables
 CREATE TABLE user_account (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    first_name      varchar(100) NOT NULL,
-    last_name       varchar(100) NOT NULL,
-    username        varchar(100) NOT NULL,
-    email           varchar(100) NOT NULL,
-    password_hash   varchar(100) NOT NULL
+    first_name      text NOT NULL,
+    last_name       text NOT NULL,
+    username        text NOT NULL,
+    email           text NOT NULL,
+    password_hash   text NOT NULL
 );
 
 -- Competition related tables
 CREATE TABLE competition (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(100) NOT NULL,
+    name            text NOT NULL,
     start_date      date,
     end_date        date,
     external_id     varchar(10) NOT NULL
@@ -38,8 +37,8 @@ CREATE TABLE competition (
 
 CREATE TABLE user_tournament (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(100) NOT NULL,
-    description     varchar(250),
+    name            text NOT NULL,
+    description     text,
     user_account_id int NOT NULL REFERENCES user_account(id),
     competition_id  int NOT NULL REFERENCES competition(id),
     invite_code     varchar(6) NOT NULL
@@ -47,7 +46,7 @@ CREATE TABLE user_tournament (
 
 CREATE TABLE user_team (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(100) NOT NULL,
+    name            text NOT NULL,
     status          int NOT NULL,
     user_account_id int NOT NULL REFERENCES user_account(id),
     competition_id  int NOT NULL REFERENCES competition(id),
@@ -64,18 +63,18 @@ CREATE TABLE user_team_user_tournament (
 -- Player and club related tables
 CREATE TABLE player_position (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(250) NOT NULL
+    name            text NOT NULL
 );
 
 CREATE TABLE club (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(250) NOT NULL,
+    name            text NOT NULL,
     external_id     varchar(10) NOT NULL
 );
 
 CREATE TABLE player (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(250) NOT NULL,
+    name            text NOT NULL,
     external_id     varchar(10) NOT NULL,
     club_id         int NOT NULL REFERENCES club(id),
     position_id     int NOT NULL REFERENCES player_position(id)
@@ -114,7 +113,7 @@ CREATE TABLE match_result (
 
 CREATE TABLE point_category (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name            varchar(250) NOT NULL,
+    name            text NOT NULL,
     point_amount    int NOT NULL,
     active          boolean NOT NULL
 );
