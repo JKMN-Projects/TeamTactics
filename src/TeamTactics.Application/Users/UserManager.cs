@@ -32,10 +32,8 @@ namespace TeamTactics.Application.Users
             ArgumentException.ThrowIfNullOrWhiteSpace(userName);
             ArgumentException.ThrowIfNullOrWhiteSpace(email);
             ArgumentException.ThrowIfNullOrWhiteSpace(password);
-            if (!ValidatePassword(password))
-            {
-                throw new ArgumentException("Password does not meet security requirements", nameof(password));
-            }
+            var validationResult = ValidatePassword(password);
+            validationResult.ValidateOrThrow();
             
             var existingUser = await _userRepository.FindByEmail(email);
             if (existingUser is not null)
@@ -54,13 +52,21 @@ namespace TeamTactics.Application.Users
             _logger.LogInformation("User '{userName}' created with id {userId}", userName, userId);
         }
 
-        private bool ValidatePassword(string password)
+        private ValidationResult ValidatePassword(string password)
         {
-            if(_passwordSecurityOptions.RequireLowercase)
+            ValidationResult validationResult = new ValidationResult([]);
+            if (password.Length < _passwordSecurityOptions.MinimumPasswordLength)
+            {
+                validationResult = validationResult
+                    .WithError(nameof(password), $"Password must be a minimum of {_passwordSecurityOptions.MinimumPasswordLength} characters");
+            }
+
+            if (_passwordSecurityOptions.RequireLowercase)
             {
                 if (!password.Any(char.IsLower))
                 {
-                    return false;
+                    validationResult = validationResult
+                        .WithError(nameof(password),"Password must contain a lowercase character");
                 }
             }
 
@@ -68,7 +74,8 @@ namespace TeamTactics.Application.Users
             {
                 if (!password.Any(char.IsUpper))
                 {
-                    return false;
+                    validationResult = validationResult
+                        .WithError(nameof(password), "Password must contain an uppercase character");
                 }
             }
 
@@ -76,7 +83,8 @@ namespace TeamTactics.Application.Users
             {
                 if (!password.Any(char.IsDigit))
                 {
-                    return false;
+                    validationResult = validationResult
+                        .WithError(nameof(password), "Password must contain a digit");
                 }
             }
 
@@ -84,11 +92,12 @@ namespace TeamTactics.Application.Users
             {
                 if (!password.Any(_passwordSecurityOptions.AlphanumricalCharacters.Contains))
                 {
-                    return false;
+                    validationResult = validationResult
+                        .WithError(nameof(password), "Password must contain an alphanumeric character");
                 }
             }
 
-            return true;
+            return validationResult;
         }
     }
 }

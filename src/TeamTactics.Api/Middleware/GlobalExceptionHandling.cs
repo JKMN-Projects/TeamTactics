@@ -40,6 +40,11 @@ namespace TeamTactics.Api.Middleware
                         validationErrors.Add(argEx.ParamName, [argEx.Message]);
                     }
                     break;
+                case ValidationException validationEx:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    errorMessage = "Validation error occurred.";
+                    validationErrors = validationEx.Errors.ToDictionary();
+                    break;
             }
 
 

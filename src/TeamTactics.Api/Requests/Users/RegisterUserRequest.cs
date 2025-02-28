@@ -1,4 +1,9 @@
-﻿namespace TeamTactics.Api.Requests.Users
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TeamTactics.Api.Requests.Users
 {
-    public sealed record RegisterUserRequest(string UserName, string Email, string Password);
+    public sealed record RegisterUserRequest(
+        [property:Required] string UserName,
+        [property:Required] string Email,
+        [property:Required] string Password);
 }
