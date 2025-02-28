@@ -55,6 +55,84 @@ namespace TeamTactics.Application.UnitTests.Users
                 await _userRepositoryMock.Received(1)
                     .InsertAsync(Arg.Any<User>(), Arg.Is<string>(x => x != password));
             }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            [InlineData(" ")]
+            public async Task Should_ThrowArgumentException_When_UserNameIsNullOrWhiteSpace(string? username)
+            {
+                // Arrange
+                string email = new Faker().Internet.Email();
+                string password = new Faker().Internet.Password();
+
+                // Act
+                async Task Act() => await _sut.CreateUserAsync(username!, email, password);
+
+                // Assert
+                var argEx = await Assert.ThrowsAsync<ArgumentException>(Act);
+                Assert.Equal("userName", argEx.ParamName);
+            }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            [InlineData(" ")]
+            [InlineData("someInvalidEmail")]
+            [InlineData("someInvalid@Email")]
+            [InlineData("someInvalidEmail.com")]
+            [InlineData("some@Invalid@Email.com")]
+            public async Task Should_ThrowArgumentException_When_EmailIsInvalid(string? email)
+            {
+                // Arrange
+                string username = new Faker().Internet.UserName();
+                string password = new Faker().Internet.Password();
+
+                // Act
+                async Task Act() => await _sut.CreateUserAsync(username, email!, password);
+
+                // Assert
+                var argEx = await Assert.ThrowsAsync<ArgumentException>(Act);
+                Assert.Equal("email", argEx.ParamName);
+            }
+
+            [Theory]
+            [InlineData(null)]
+            [InlineData("")]
+            [InlineData(" ")]
+            public async Task Should_ThrowArgumentException_When_PasswordIsInvalid(string? password)
+            {
+                // Arrange
+                string username = new Faker().Internet.UserName();
+                string email = new Faker().Internet.Email();
+
+                // Act
+                async Task Act() => await _sut.CreateUserAsync(username, email, password!);
+
+                // Assert
+                var argEx = await Assert.ThrowsAsync<ArgumentException>(Act);
+                Assert.Equal("password", argEx.ParamName);
+            }
+
+            [Theory]
+            [InlineData("short")]
+            [InlineData("longerpass")]
+            [InlineData("LongerPassword")]
+            [InlineData("longerp4ssword")]
+            [InlineData("longerp@ssword")]
+            public async Task Should_ThrowValidationException_When_PasswordIsInvalid(string? password)
+            {
+                // Arrange
+                string username = new Faker().Internet.UserName();
+                string email = new Faker().Internet.Email();
+
+                // Act
+                async Task Act() => await _sut.CreateUserAsync(username, email, password!);
+
+                // Assert
+                var valEx = await Assert.ThrowsAsync<ValidationException>(Act);
+                Assert.True(valEx.Errors.ContainsKey("password"));
+            }
         }
     }
 }

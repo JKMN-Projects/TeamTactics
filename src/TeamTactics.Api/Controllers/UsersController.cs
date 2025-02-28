@@ -19,7 +19,7 @@ namespace TeamTactics.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> CreateUserAsync([FromBody] RegisterUserRequest request)
         {
-            await _userManager.CreateUserAsync(request.UserName, request.Email, request.Password);
+            await _userManager.CreateUserAsync(request.Username, request.Email, request.Password);
             return Ok();
         }
     }
