@@ -1,7 +1,9 @@
 name: Generate PlantUML
 on: 
   push:
-    branches: [ "main", "HovaUseles-patch-1" ]
+    branches: [ "main" ]
+    paths:
+      - 'docs/**.puml'
 jobs:
   generate_plantuml:
     runs-on: ubuntu-latest
