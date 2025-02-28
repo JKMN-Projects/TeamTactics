@@ -1,0 +1,9 @@
+@startjson Register User Request
+
+{
+  "username": "string",
+  "email": "string",
+  "password": "string"
+}
+
+@endjson
