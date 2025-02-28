@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
+    <ProjectReference Include="..\TeamTactics.Infrastructure\TeamTactics.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
