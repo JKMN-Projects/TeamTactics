@@ -2,8 +2,6 @@ name: Generate PlantUML
 on: 
   push:
     branches: [ "main" ]
-    paths:
-      - 'docs/**.puml'
 jobs:
   generate_plantuml:
     runs-on: ubuntu-latest
@@ -12,7 +10,7 @@ jobs:
       contents: write
     env: 
       PLANTUML_JAR_PATH: docs/plantuml.jar
-      DIAGRAM_PATH: docs/**.puml
+      DIAGRAM_PATH: docs
       OUTPUT_PATH: docs/Rendered
       COMMIT_MSG: ":rocket: adding generated diagrams"
     steps:
@@ -21,8 +19,12 @@ jobs:
           sudo apt-get install graphviz
       - name: Checkout Repository
         uses: actions/checkout@v2
-      - name: Process Diagrams
-        run: java -jar ${{ env.PLANTUML_JAR_PATH }} -v -tsvg -r -o "${{ github.workspace }}/${{ env.OUTPUT_PATH }}" "${{ env.DIAGRAM_PATH }}"
+      - name: Process Class Diagrams
+        run: java -jar ${{ env.PLANTUML_JAR_PATH }} -v -tsvg -r -o "${{ github.workspace }}/${{ env.OUTPUT_PATH }}/Class Diagrams" "${{ env.DIAGRAM_PATH }}/Class Diagrams/**.puml"
+      - name: Process JSON Contracts
+        run: java -jar ${{ env.PLANTUML_JAR_PATH }} -v -tsvg -r -o "${{ github.workspace }}/${{ env.OUTPUT_PATH }}/JSON Contracts" "${{ env.DIAGRAM_PATH }}/JSON Contracts/**.puml"
+      - name: Process Use Case diagrams
+        run: java -jar ${{ env.PLANTUML_JAR_PATH }} -v -tsvg -r -o "${{ github.workspace }}/${{ env.OUTPUT_PATH }}/Use Case Diagrams" "${{ env.DIAGRAM_PATH }}/Use Case Diagrams/**.puml"
       - name: Display Diagrams
         run: pwd && ls ${{ env.OUTPUT_PATH }}
       - name: Commit Diagrams
