@@ -1,6 +1,6 @@
 ﻿namespace TeamTactics.Application.Common.Models
 {
-    internal record ValidationResult
+    public record ValidationResult
     {
         private readonly List<ValidationFailure> _errors = [];
         public IEnumerable<ValidationFailure> Errors => _errors;
@@ -17,4 +17,6 @@
             return this;
         }
     }
+
+    public record ValidationFailure(string PropertyName, string ErrorMessage);
 }

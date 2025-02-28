@@ -11,6 +11,9 @@ public static class DependencyInjection
         // Managers
         services.AddScoped<UserManager>();
 
+        // Validators
+        services.AddSingleton<PasswordValidator>();
+
         return services;
     }
 }
