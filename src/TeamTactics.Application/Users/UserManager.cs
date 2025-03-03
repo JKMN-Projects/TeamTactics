@@ -101,5 +101,15 @@ namespace TeamTactics.Application.Users
 
             return await _tokenProvider.GenerateTokenAsync(user);
         }
+        public async Task<ProfileDto> GetProfileAsync(int id)
+        {
+            ProfileDto profile = await _userRepository.GetProfileAsync(id);
+            if(profile is not null)
+            {
+                return profile;
+            }
+            //TODO: EntityNotFound exception
+            throw new ArgumentException("No profile information exist");
+        }
     }
 }

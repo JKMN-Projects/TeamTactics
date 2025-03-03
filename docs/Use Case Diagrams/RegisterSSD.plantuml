@@ -1,0 +1,16 @@
+@startuml Register
+skinparam sequenceMessageAlign center
+actor       User
+participant WebClient
+participant WebApi
+database    Database
+User -> WebClient : Register
+WebClient -> WebApi : POST /api/Authentication/Register
+WebApi -> Database : User exist
+WebApi <- Database : Return false
+group Alternative [User exist]
+    WebApi <- Database: Return true
+    WebClient <- WebApi: User already exists
+end
+WebApi -> WebClient : 200 OK "User created"
+@enduml
