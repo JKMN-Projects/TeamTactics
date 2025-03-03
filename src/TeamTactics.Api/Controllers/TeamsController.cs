@@ -29,7 +29,7 @@ namespace TeamTactics.Api.Controllers
             //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
         }
 
-        [HttpPut("{id}/players/add")]
+        [HttpPut("{id:int}/players/add")]
         [Authorize]
         public async Task<IActionResult> AddPlayerToTeam(int id, [FromBody] AddPlayerToTeamRequest request)
         {
