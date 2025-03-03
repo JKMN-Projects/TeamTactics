@@ -1,0 +1,19 @@
+@startuml Login
+skinparam sequenceMessageAlign center
+actor       User
+participant WebClient
+participant WebApi
+database    Database
+User -> WebClient : Login
+WebClient -> WebApi : POST /api/Authentication/Login
+WebApi -> Database : Get User
+WebApi <- Database : Return User
+group Alternative [User does not exists]
+    WebApi <- Database: Return Null
+    WebClient <- WebApi: Authentication failed
+end
+group Alternative [invalid login details]
+    WebClient <- WebApi: Authentication failed
+end
+WebApi -> WebClient : Return JWT
+@enduml
