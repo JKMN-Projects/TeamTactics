@@ -7,11 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Database\" />
+    <Compile Remove="Database\**" />
+    <EmbeddedResource Remove="Database\**" />
+    <None Remove="Database\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Database Repo\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
   </ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Sql/*.sql" />
+	</ItemGroup>
 
 </Project>

@@ -11,12 +11,17 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
     <ProjectReference Include="..\TeamTactics.Infrastructure\TeamTactics.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>
