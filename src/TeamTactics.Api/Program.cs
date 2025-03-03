@@ -1,6 +1,7 @@
 using TeamTactics.Api.Middleware;
 using TeamTactics.Application;
 using TeamTactics.Application.Common.Options;
+using TeamTactics.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandling>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddApplication();
-
+builder.Services.AddInfrastructure();
 // Options
 builder.Services.AddOptions<PasswordSecurityOptions>()
     .Bind(builder.Configuration.GetSection("PasswordSecurity"))
