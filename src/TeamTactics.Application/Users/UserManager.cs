@@ -51,5 +51,14 @@ namespace TeamTactics.Application.Users
             int userId = await _userRepository.InsertAsync(user, passwordHashString);
             _logger.LogInformation("User '{userName}' created with id {userId}", userName, userId);
         }
+        public async Task<ProfileDto> GetProfileAsync(int id)
+        {
+            ProfileDto profile = await _userRepository.GetProfile(id);
+            if(profile is not null)
+            {
+                return profile;
+            }
+            throw new ArgumentException("No profile information exist");
+        }
     }
 }

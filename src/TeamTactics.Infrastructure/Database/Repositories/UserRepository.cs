@@ -26,6 +26,11 @@ internal class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
+    public Task<ProfileDto> GetProfileAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<int> InsertAsync(User user, string passwordHash)
     {
         throw new NotImplementedException();
