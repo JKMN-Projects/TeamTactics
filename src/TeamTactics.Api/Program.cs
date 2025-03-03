@@ -62,3 +62,5 @@ finally
 
 
 
+
+public partial class Program;

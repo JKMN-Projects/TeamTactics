@@ -24,8 +24,4 @@
     <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
   </ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Include="Sql/*.sql" />
-	</ItemGroup>
-
 </Project>
