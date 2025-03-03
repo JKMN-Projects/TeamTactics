@@ -7,7 +7,7 @@ namespace TeamTactics.Application.Common.Exceptions
         public IReadOnlyDictionary<string, List<string>> Errors => _errors;
 
 
-        public ValidationException() : base("Validation error occured.")
+        public ValidationException() : base("One or more validation errors occured.")
         {
             _errors = new Dictionary<string, List<string>>();
         }

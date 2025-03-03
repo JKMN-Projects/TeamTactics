@@ -11,7 +11,7 @@ namespace TeamTactics.Domain.Users
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(userName);
             ArgumentException.ThrowIfNullOrWhiteSpace(email);
-            if (email.Contains('@') is false || email.Contains('.') is false) 
+            if (email.Contains('@') is false || email.Count('@'.Equals) > 1 || email.Contains('.') is false) 
                 throw new ArgumentException("Must be a valid e-mail adress", nameof(email));
 
             UserName = userName;
