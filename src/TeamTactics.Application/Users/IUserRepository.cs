@@ -12,5 +12,6 @@ namespace TeamTactics.Application.Users
 
         public Task<bool> CheckPasswordAsync(string passwordHash);
         public Task<User?> FindByEmail(string email);
+        public Task<string?> GetUserSaltAsync(int userId);
     }
 }

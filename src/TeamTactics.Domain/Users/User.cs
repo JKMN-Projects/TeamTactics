@@ -6,16 +6,20 @@ namespace TeamTactics.Domain.Users
         public int Id { get; private set; }
         public string UserName { get; private set; }
         public string Email { get; private set; }
+        public SecurityInfo SecurityInfo { get; private set; }
 
-        public User(string userName, string email)
+        public User(string userName, string email, SecurityInfo securityInfo)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(userName);
             ArgumentException.ThrowIfNullOrWhiteSpace(email);
-            if (email.Contains('@') is false || email.Count('@'.Equals) > 1 || email.Contains('.') is false) 
+            if (email.Contains('@') is false || email.Count('@'.Equals) > 1 || email.Contains('.') is false)
                 throw new ArgumentException("Must be a valid e-mail adress", nameof(email));
 
             UserName = userName;
             Email = email;
+            SecurityInfo = securityInfo;
         }
     }
+
+    public sealed record SecurityInfo(string Salt);
 }

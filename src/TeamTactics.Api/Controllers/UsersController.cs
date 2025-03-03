@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TeamTactics.Api.Requests.Users;
 using TeamTactics.Application.Users;
 
@@ -17,7 +16,7 @@ namespace TeamTactics.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> CreateUserAsync([FromBody] RegisterUserRequest request)
+        public async Task<IActionResult> CreateUser([FromBody] RegisterUserRequest request)
         {
             await _userManager.CreateUserAsync(request.Username, request.Email, request.Password);
             return Ok();
