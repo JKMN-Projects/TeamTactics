@@ -86,7 +86,7 @@ namespace TeamTactics.Application.Users
             var user = await _userRepository.FindByEmail(email);
             if (user is null)
             {
-                throw EntityNotFoundException.ForEntity<User>(email, nameof(email));
+                throw EntityNotFoundException.ForEntity<User>(email, nameof(User.Email));
             }
 
             var passwordHash = _hashingService.Hash(

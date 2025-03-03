@@ -3,7 +3,6 @@ using TeamTactics.Api.Requests.Authentication;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Common.Models;
 using TeamTactics.Application.Users;
-using TeamTactics.Infrastructure.Tokens;
 
 namespace TeamTactics.Api.Controllers
 {
@@ -17,7 +16,6 @@ namespace TeamTactics.Api.Controllers
         {
             _userManager = userManager;
         }
-
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
