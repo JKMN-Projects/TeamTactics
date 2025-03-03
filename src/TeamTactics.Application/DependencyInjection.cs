@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TeamTactics.Application.Services.Implementation;
-using TeamTactics.Application.Services.Interfaces;
+using TeamTactics.Application.Users;
 
 namespace TeamTactics.Application;
 
@@ -8,7 +7,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddScoped<IHealthCheckService, HealthCheckService>();
+        // Managers
+        services.AddScoped<UserManager>();
+
+        // Validators
+        services.AddSingleton<PasswordValidator>();
+
         return services;
     }
 }
