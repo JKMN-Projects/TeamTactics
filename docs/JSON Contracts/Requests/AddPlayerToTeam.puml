@@ -1,0 +1,8 @@
+@startuml Add player to team request
+
+json "AddPlayerToTeam\nPUT: /api/teams/add-player" as addPlayerToTeamRequest {
+    "teamId": 0,
+    "playerId": 0
+}
+
+@enduml

@@ -28,5 +28,13 @@ namespace TeamTactics.Api.Controllers
             return Created(); // TODO: Return CreatedAtAction
             //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
         }
+
+        [HttpPut("{id}/players/add")]
+        [Authorize]
+        public async Task<IActionResult> AddPlayerToTeam(int id, [FromBody] AddPlayerToTeamRequest request)
+        {
+            await _teamManager.AddPlayerToTeam(id, request.PlayerId);
+            return NoContent();
+        }
     }
 }

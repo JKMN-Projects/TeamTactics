@@ -1,4 +1,7 @@
 ﻿
+using TeamTactics.Domain.Players;
+using TeamTactics.Domain.Teams.Exceptions;
+
 namespace TeamTactics.Domain.Teams
 {
     public class Team
@@ -21,18 +24,24 @@ namespace TeamTactics.Domain.Teams
             Status = TeamStatus.Draft;
         }
 
-        public void AddPlayer(int playerId)
+        public void AddPlayer(Player player)
         {
-            _players.Add(new TeamPlayer(playerId, isCaptain: false));
+            if (_players.Any(p => p.PlayerId == player.Id))
+            {
+                throw new PlayerAlreadyInTeamException(player);
+            }
+
+            _players.Add(new TeamPlayer(player.Id, isCaptain: false));
         }
 
         public void RemovePlayer(int playerId)
         {
             var player = _players.FirstOrDefault(p => p.PlayerId == playerId);
-            if (player != null)
+            if (player == null)
             {
-                _players.Remove(player);
+                throw new PlayerNotOnTeamException(playerId);
             }
+            _players.Remove(player);
         }
 
         public void SetCaptain(int playerId)
@@ -40,7 +49,7 @@ namespace TeamTactics.Domain.Teams
             var player = _players.FirstOrDefault(p => p.PlayerId == playerId);
             if (player == null)
             {
-                throw new InvalidOperationException("Player not found in team");
+                throw new PlayerNotOnTeamException(playerId);
             }
 
             var currentCaptain = _players.FirstOrDefault(p => p.IsCaptain);
@@ -63,7 +72,7 @@ namespace TeamTactics.Domain.Teams
         {
             if (Status == TeamStatus.Locked)
             {
-                throw new InvalidOperationException("Cannot enroll a locked team.");
+                throw new TeamLockedException();
             }
 
             _enrollments.Add(new TournamentEnrollments(tournamentId));

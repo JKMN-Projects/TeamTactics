@@ -1,6 +1,9 @@
-﻿namespace TeamTactics.Application.Players;
+﻿using TeamTactics.Application.Common.Interfaces;
+using TeamTactics.Domain.Players;
 
-public interface IPlayerRepository
+namespace TeamTactics.Application.Players;
+
+public interface IPlayerRepository : IRepository<Player, int>
 {
     public Task<IEnumerable<PlayerDto>> GetPlayersAsync(int? competitionId = null);
 }
