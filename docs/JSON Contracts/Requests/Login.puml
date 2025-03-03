@@ -1,0 +1,13 @@
+@startuml Login request
+allowmixing
+
+agent "URI: /login"
+stack {
+  json "Login interface" as J {
+    "email": "string",
+    "password": "string"
+  }
+}
+
+"URI: /login" -> J 
+@enduml

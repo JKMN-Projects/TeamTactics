@@ -1,9 +1,14 @@
-@startjson Register User Request
+@startuml Register user request
+allowmixing
 
-{
-  "username": "string",
-  "email": "string",
-  "password": "string"
+agent "URI: /register"
+stack {
+  json "Register user interface" as J {
+    "username": "string",
+    "email": "string",
+    "password": "string"
+  }
 }
 
-@endjson
+"URI: /register" -> J 
+@enduml

@@ -1,0 +1,12 @@
+@startuml Create team request
+allowmixing
+
+agent "URI: /create_team"
+stack {
+  json "Team interface" as J {
+    "name": "string"
+  }
+}
+
+"URI: /create_team" -> J 
+@enduml

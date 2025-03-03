@@ -1,0 +1,13 @@
+@startuml Create tournament request
+allowmixing
+
+agent "URI: /create_tournament"
+stack {
+  json "Tournament interface" as J {
+    "name": "string",
+    "tournament_id": "int"
+  }
+}
+
+"URI: /create_tournament" -> J 
+@enduml
