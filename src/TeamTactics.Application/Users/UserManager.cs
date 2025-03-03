@@ -53,7 +53,7 @@ namespace TeamTactics.Application.Users
         }
         public async Task<ProfileDto> GetProfileAsync(int id)
         {
-            ProfileDto profile = await _userRepository.GetProfile(id);
+            ProfileDto profile = await _userRepository.GetProfileAsync(id);
             if(profile is not null)
             {
                 return profile;
