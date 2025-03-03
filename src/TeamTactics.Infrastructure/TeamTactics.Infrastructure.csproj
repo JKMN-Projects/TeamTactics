@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Database\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
   </ItemGroup>
 
