@@ -1,9 +1,9 @@
-@startjson Register User Request
+@startuml Register User Request
 
-{
+json "/api/users/register" as registerUserRequest {
   "username": "string",
   "email": "string",
   "password": "string"
 }
 
-@endjson
+@enduml

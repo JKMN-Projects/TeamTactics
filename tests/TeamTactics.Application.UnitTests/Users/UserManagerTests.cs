@@ -2,18 +2,23 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text;
+using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Common.Interfaces;
+using TeamTactics.Application.Common.Models;
 using TeamTactics.Application.Common.Options;
 using TeamTactics.Application.Users;
 using TeamTactics.Domain.Users;
+using TeamTactics.Fixtures;
+using TeamTactics.Infrastructure.Tokens;
 
 namespace TeamTactics.Application.UnitTests.Users
 {
-    public class UserManagerTests : TestBase
+    public abstract class UserManagerTests : TestBase
     {
         private readonly IUserRepository _userRepositoryMock;
         private readonly IHashingService _hashingServiceMock;
         private readonly PasswordValidator _passwordValidatorMock;
+        private readonly IAuthTokenProvider _authTokenProviderMock;
         private readonly ILogger<UserManager> _logger;
         private readonly UserManager _sut;
 
@@ -24,12 +29,14 @@ namespace TeamTactics.Application.UnitTests.Users
             PasswordSecurityOptions passwordSecurityOptions = new PasswordSecurityOptions();
             IOptions<PasswordSecurityOptions> passwordSecurityOptionsMock = Options.Create(passwordSecurityOptions);
             _passwordValidatorMock = Substitute.For<PasswordValidator>(passwordSecurityOptionsMock);
+            _authTokenProviderMock = Substitute.For<IAuthTokenProvider>();
             _logger = Substitute.For<ILogger<UserManager>>();
 
             _sut = new UserManager(
                 _userRepositoryMock,
                 _hashingServiceMock,
                 _passwordValidatorMock,
+                _authTokenProviderMock,
                 _logger);
         }
 
@@ -71,7 +78,7 @@ namespace TeamTactics.Application.UnitTests.Users
 
                 // Assert
                 var argEx = await Assert.ThrowsAnyAsync<ArgumentException>(Act);
-                Assert.Equal("userName", argEx.ParamName);
+                Assert.Equal("username", argEx.ParamName);
             }
 
             [Theory]
@@ -132,6 +139,62 @@ namespace TeamTactics.Application.UnitTests.Users
                 // Assert
                 var valEx = await Assert.ThrowsAnyAsync<ValidationException>(Act);
                 Assert.True(valEx.Errors.ContainsKey("password"));
+            }
+        }
+
+        public sealed class GetAuthenticationTokenAsync : UserManagerTests
+        {
+            [Fact]
+            public async Task Should_ReturnAuthenticationToken_When_UserExists()
+            {
+                // Arrange
+                var userFaker = new UserFaker();
+                User user = userFaker.Generate();
+                _userRepositoryMock.FindByEmail(user.Email)
+                    .Returns(user);
+                _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>())
+                    .Returns(true);
+                _authTokenProviderMock.GenerateTokenAsync(user)
+                    .Returns(new AuthenticationToken(_faker.Random.Guid().ToString(), "JWT", 3600));
+
+                // Act
+                AuthenticationToken token = await _sut.GetAuthenticationTokenAsync(user.Email, _faker.Internet.Password() );
+
+                // Assert
+                Assert.NotNull(token);
+                Assert.Equal("JWT", token.TokenType);
+                Assert.Equal(3600, token.ExpiresIn);
+            }
+
+            [Fact]
+            public async Task Should_ThrowEntityNotFoundException_When_UserDoesNotExist()
+            {
+                // Arrange
+                string email = new Faker().Internet.Email();
+                _userRepositoryMock.FindByEmail(email)
+                    .Returns((User?)null);
+                // Act
+                async Task Act() => await _sut.GetAuthenticationTokenAsync(email, _faker.Internet.Password());
+                // Assert
+                var ex = await Assert.ThrowsAnyAsync<EntityNotFoundException>(Act);
+                Assert.Equal(email, ex.Key);
+                Assert.Equal(nameof(User.Email), ex.KeyName);
+            }
+
+            [Fact]
+            public async Task Should_ThrowUnauthorizedException_When_PasswordIsInvalid()
+            {
+                // Arrange
+                var userFaker = new UserFaker();
+                User user = userFaker.Generate();
+                _userRepositoryMock.FindByEmail(user.Email)
+                    .Returns(user);
+                _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>())
+                    .Returns(false);
+                // Act
+                async Task Act() => await _sut.GetAuthenticationTokenAsync(user.Email, _faker.Internet.Password());
+                // Assert
+                await Assert.ThrowsAnyAsync<UnauthorizedException>(Act);
             }
         }
     }
