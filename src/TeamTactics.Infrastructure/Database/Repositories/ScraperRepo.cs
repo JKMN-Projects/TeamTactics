@@ -5,11 +5,11 @@ using TeamTactics.Domain.Players;
 
 namespace TeamTactics.Infrastructure.Database.Repositories
 {
-    public class ScrapperRepo
+    public class ScraperRepo
     {
         private DbConnection _dbConnection;
 
-        public ScrapperRepo(DbConnection dbConnection)
+        public ScraperRepo(DbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
