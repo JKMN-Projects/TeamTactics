@@ -1,0 +1,9 @@
+@startuml Authentication Token Response
+
+json "/api/authentication/login" as authenticationTokenResponse {
+    "token": "string",
+    "tokenType": "string",
+    "expiresIn": 0
+}
+
+@enduml
