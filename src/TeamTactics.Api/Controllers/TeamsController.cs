@@ -5,6 +5,7 @@ using System.Security.Claims;
 using TeamTactics.Api.Requests.Teams;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
+using TeamTactics.Domain.Teams.Exceptions;
 
 namespace TeamTactics.Api.Controllers
 {
@@ -42,9 +43,47 @@ namespace TeamTactics.Api.Controllers
 
         [HttpPut("{id:int}/players/add")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> AddPlayerToTeam(int id, [FromBody] AddPlayerToTeamRequest request)
         {
-            await _teamManager.AddPlayerToTeam(id, request.PlayerId);
+            try
+            {
+                await _teamManager.AddPlayerToTeam(id, request.PlayerId);
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (PlayerAlreadyInTeamException ex)
+            {
+                return Problem(
+                    title: "Player already added to the team.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+            catch (TeamFullException ex)
+            {
+                return Problem(
+                    title: "The team is full.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (MaximumPlayersFromSameClubReachedException ex)
+            {
+                return Problem(
+                    title: "The team is full.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
             return NoContent();
         }
     }

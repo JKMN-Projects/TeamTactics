@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Domain.Common.Exceptions;
 
 namespace TeamTactics.Api.Middleware
 {
@@ -28,12 +29,13 @@ namespace TeamTactics.Api.Middleware
 
             int statusCode = StatusCodes.Status500InternalServerError;
             string errorMessage = "An error occurred while processing your request.";
+            string? errorDescription = null;
             Dictionary<string, List<string>> validationErrors = [];
 
             // Check if the exception is a known type and shaping response to reflect that
             switch (exception)
             {
-                case ArgumentException argEx:
+                case ArgumentException argEx: // TODO: Might leak sensitive information
                     statusCode = StatusCodes.Status400BadRequest;
                     errorMessage = exception.Message;
                     if (argEx.ParamName is not null)
@@ -54,14 +56,20 @@ namespace TeamTactics.Api.Middleware
                     statusCode = StatusCodes.Status404NotFound;
                     errorMessage = "Entity not found.";
                     break;
+                case DomainException domainEx:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    errorMessage = domainEx.Message;
+                    errorDescription = domainEx.Description;
+                    break;
             }
 
 
             // Build the response object
             ProblemDetails problemDetails = _problemDetailsFactory.CreateProblemDetails(
                 httpContext, 
-                statusCode, 
-                title: errorMessage);
+                statusCode: statusCode, 
+                title: errorMessage,
+                detail: errorDescription);
 
             if (validationErrors.Count != 0)
             {
