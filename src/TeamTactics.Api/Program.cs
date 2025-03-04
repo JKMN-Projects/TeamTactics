@@ -12,8 +12,6 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    
-
     var builder = WebApplication.CreateBuilder(args);
 
     try
@@ -26,9 +24,19 @@ try
     }
     catch { }
 
-    // Add services to the container.
+    // Serilog to ASPNET
     builder.Services.AddSerilog();
 
+    // Health Checks
+    var conString = builder.Configuration.GetConnectionString("Postgres");
+    if (string.IsNullOrEmpty(conString))
+    {
+        throw new InvalidOperationException("Connection string not found");
+    }
+    builder.Services.AddHealthChecks()
+        .AddNpgSql(conString);
+
+    // Add services to the container.
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
