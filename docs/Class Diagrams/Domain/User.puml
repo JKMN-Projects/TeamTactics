@@ -6,6 +6,13 @@ package UserAggregate <<Rectangle>> {
         +int Id
         +string UserName
         +string Email
+        +SecurityInfo SecurityInfo
     }
+
+    class SecurityInfo <<ValueObject>> {
+        +string Salt
+    }
+
+    User *- "1" SecurityInfo 
 }
 @enduml 

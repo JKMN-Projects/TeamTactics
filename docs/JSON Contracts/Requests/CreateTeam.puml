@@ -1,0 +1,7 @@
+@startuml Create team request
+
+json "CreateTeam\nPOST: /api/teams" as createTeamRequest {
+    "name": "string"
+}
+
+@enduml

@@ -18,6 +18,7 @@ interface IUserRepository {
     Task UpdateAsync(User user)
     Task RemoveAsync(int id)
     Task<bool> CheckPasswordAsync(string passwordHash)
+    Task<string> GetUserSaltAsync(int userId)
 }
 IRepository <|-- IUserRepository : extends, T=User, TId=int
 
