@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\TeamTactics.Webscraper\TeamTactics.Webscraper.csproj" />
     <ProjectReference Include="..\TeamTactics.Domain\TeamTactics.Domain.csproj" />
   </ItemGroup>
 

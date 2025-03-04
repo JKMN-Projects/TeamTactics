@@ -32,6 +32,7 @@ try
     builder.Services.AddHealthChecks()
         .AddNpgSql(connString);
 
+
     // Add services to the container.
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
@@ -42,6 +43,17 @@ try
 
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
+
+
+
+
+    // Run Get Clubs once
+    // Run Get Players once
+    // Run Get fixtures every 1 day
+    // Run Get Player Stats every new fixture
+
+
+
 
     // Options
     builder.Services.AddOptions<PasswordSecurityOptions>()

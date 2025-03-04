@@ -21,4 +21,9 @@ public class PlayersController : ControllerBase
         var players = await _playerManager.GetPlayersAsync(competitionId);
         return Ok(players);
     }
+
+    public async Task<IActionResult> StartPlayerPopulation()
+    {
+
+    }
 }
