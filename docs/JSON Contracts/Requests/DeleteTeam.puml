@@ -1,0 +1,7 @@
+@startuml Delete team Request
+
+json "DeleteTeamRequest\nDELETE: /api/teams/{teamId}" as deleteTeamRequest {
+    
+}
+
+@enduml
