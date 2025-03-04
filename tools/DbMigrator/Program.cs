@@ -1,7 +1,6 @@
-﻿using System.Reflection;
+﻿using DbUp;
+using System.Reflection;
 using System.Text;
-using System.Transactions;
-using DbUp;
 
 namespace DbMigrator
 {
