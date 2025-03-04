@@ -22,11 +22,15 @@ namespace TeamTactics.Application.Teams
             _logger = logger;
         }
 
-        public async Task<int> CreateTeamAsync(string name, int userId)
+        public async Task<int> CreateTeamAsync(string name, int userId, int competitionId)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+            ArgumentOutOfRangeException.ThrowIfLessThan(userId, 1, nameof(userId));
+            ArgumentOutOfRangeException.ThrowIfLessThan(competitionId, 1, nameof(competitionId));
 
-            var team = new Team(name, userId);
+            // TODO: Check if competition exists, might be checked on foreign key constraint
+
+            var team = new Team(name, userId, competitionId);
             return await _teamRepository.InsertAsync(team);
         }
 
@@ -44,8 +48,11 @@ namespace TeamTactics.Application.Teams
                 throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
             }
 
+            // TODO: Should check if the player is available to play in the competition matching the team. Might need the check inside the add player method in the domain.
+
             team.AddPlayer(player);
             await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Player '{playerId}' added to team '{teamId}'", playerId, teamId);
         }
     }
 }

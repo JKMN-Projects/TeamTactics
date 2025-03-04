@@ -8,6 +8,7 @@ package TeamAggregate <<Rectangle>> {
         +string Name
         +TeamStatus Status
         +int UserId
+        +int CompetitionId
         -List<TeamPlayer> _players
         +IReadOnlyCollection<TeamPlayer> Players
 

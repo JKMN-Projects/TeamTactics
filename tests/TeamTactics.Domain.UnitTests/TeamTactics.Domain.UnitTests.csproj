@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeamTactics.Domain\TeamTactics.Domain.csproj" />
+    <ProjectReference Include="..\TeamTactics.Fixtures\TeamTactics.Fixtures.csproj" />
   </ItemGroup>
 
   <ItemGroup>

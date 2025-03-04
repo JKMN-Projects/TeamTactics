@@ -25,7 +25,7 @@ namespace TeamTactics.Api.Controllers
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? throw new UnauthorizedException("User not logged in."));
-            int teamId = await _teamManager.CreateTeamAsync(request.Name, userId);
+            int teamId = await _teamManager.CreateTeamAsync(request.Name, userId, request.competitionId);
             return Created(); // TODO: Return CreatedAtAction
             //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
         }
