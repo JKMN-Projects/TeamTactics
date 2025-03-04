@@ -86,5 +86,38 @@ namespace TeamTactics.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpPatch("{id:int}/lock")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> LockTeam(int id)
+        {
+            try
+            {
+                await _teamManager.LockTeam(id);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is already locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (TeamNotFullException ex)
+            {
+                return Problem(
+                    title: "The team is not full.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (NoCaptainException ex)
+            {
+                return Problem(
+                    title: "The team does not have a captain.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+        }
     }
 }

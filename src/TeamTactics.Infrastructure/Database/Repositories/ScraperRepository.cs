@@ -144,10 +144,10 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                     var ids = (await _dbConnection.QueryAsync<int>(sql, parameters, transaction)).ToList();
 
                     // Assign IDs to the original contract objects
-                    for (int j = 0; j < contractsList.Count; j++)
-                    {
-                        contractsList[j].Id = ids[j];
-                    }
+                    //for (int j = 0; j < contractsList.Count; j++)
+                    //{
+                    //    contractsList[j].Id = ids[j];
+                    //}
 
                     transaction.Commit();
                     return contractsList;
