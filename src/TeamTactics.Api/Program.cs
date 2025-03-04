@@ -41,6 +41,7 @@ try
 
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure();
+
     // Options
     builder.Services.AddOptions<PasswordSecurityOptions>()
         .Bind(builder.Configuration.GetSection("PasswordSecurity"))
