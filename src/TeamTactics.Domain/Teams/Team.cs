@@ -53,12 +53,12 @@ namespace TeamTactics.Domain.Teams
                 throw new TeamFullException();
             }
 
-            if (_players.Where(p => p.ClubId == player.ClubId).Count() >= MaxPlayersPerClub)
+            if (_players.Where(p => p.ClubId == player.ActivePlayerContract.ClubId).Count() >= MaxPlayersPerClub)
             {
-                throw new MaximumPlayersFromSameClubReachedException(player.ClubId);
+                throw new MaximumPlayersFromSameClubReachedException(player.ActivePlayerContract.ClubId);
             }
 
-            _players.Add(new TeamPlayer(player.Id, player.ClubId));
+            _players.Add(new TeamPlayer(player.Id, player.ActivePlayerContract.ClubId));
         }
 
         public void RemovePlayer(int playerId)
