@@ -77,7 +77,7 @@ namespace TeamTactics.Domain.UnitTests.Teams
             public void ShouldThrow_TeamLockedException_When_TeamIsLocked()
             {
                 // Arrange
-                Team team = new TeamFaker(playerCount: 5).Generate();
+                Team team = new TeamFaker(playerCount: 11).Generate();
                 team.Lock();
 
                 Player player = new PlayerFaker()
@@ -154,7 +154,7 @@ namespace TeamTactics.Domain.UnitTests.Teams
             public void ShouldThrow_TeamLockedExceotion_When_TeamIsLocked()
             {
                 // Arrange
-                Team team = new TeamFaker(playerCount: 5).Generate();
+                Team team = new TeamFaker(playerCount: 11).Generate();
                 team.Lock();
                 int playerId = team.Players.First().PlayerId;
 
@@ -200,7 +200,7 @@ namespace TeamTactics.Domain.UnitTests.Teams
             public void ShouldThrow_TeamLockedException_When_TeamIsLocked()
             {
                 // Arrange
-                Team team = new TeamFaker(playerCount: 5).Generate();
+                Team team = new TeamFaker(playerCount: 11).Generate();
                 team.Lock();
                 int playerId = team.Players.First().PlayerId;
 
