@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 using System.Transactions;
 using DbUp;
 
@@ -31,7 +32,7 @@ namespace DbMigrator
                 DeployChanges.To
                              .PostgresqlDatabase(connectionString)
                              .WithTransactionAlwaysRollback()
-                             .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                             .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), encoding: Encoding.UTF8)
                              .LogToConsole()
                              .Build();
             }
@@ -41,7 +42,7 @@ namespace DbMigrator
                 DeployChanges.To
                              .PostgresqlDatabase(connectionString)
                              .WithTransactionPerScript()
-                             .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                             .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), encoding: Encoding.UTF8)
                              .LogToConsole()
                              .Build();
             }
@@ -71,6 +72,7 @@ namespace DbMigrator
                 Console.WriteLine("Verification successful - all migrations can be applied!");
             else
                 Console.WriteLine("Áll migrations applied!");
+
             Console.ResetColor();
 
             return 0;

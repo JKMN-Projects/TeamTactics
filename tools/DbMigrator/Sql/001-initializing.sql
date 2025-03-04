@@ -2,22 +2,22 @@
 CREATE SCHEMA IF NOT EXISTS team_tactics;
 
 -- Drop tables in reverse order of dependencies
-DROP TABLE IF EXISTS team_tactics.coach_attribute CASCADE;
-DROP TABLE IF EXISTS team_tactics.bulletin CASCADE;
-DROP TABLE IF EXISTS team_tactics.match_player_point CASCADE;
-DROP TABLE IF EXISTS team_tactics.point_category CASCADE;
-DROP TABLE IF EXISTS team_tactics.match_result CASCADE;
-DROP TABLE IF EXISTS team_tactics.club_competition CASCADE;
-DROP TABLE IF EXISTS team_tactics.player_contract CASCADE;
-DROP TABLE IF EXISTS team_tactics.player_user_team CASCADE;
-DROP TABLE IF EXISTS team_tactics.player CASCADE;
-DROP TABLE IF EXISTS team_tactics.club CASCADE;
-DROP TABLE IF EXISTS team_tactics.player_position CASCADE;
-DROP TABLE IF EXISTS team_tactics.user_team_user_tournament CASCADE;
-DROP TABLE IF EXISTS team_tactics.user_team CASCADE;
-DROP TABLE IF EXISTS team_tactics.user_tournament CASCADE;
-DROP TABLE IF EXISTS team_tactics.competition CASCADE;
-DROP TABLE IF EXISTS team_tactics.user_account CASCADE;
+--DROP TABLE IF EXISTS team_tactics.coach_attribute CASCADE;
+--DROP TABLE IF EXISTS team_tactics.bulletin CASCADE;
+--DROP TABLE IF EXISTS team_tactics.match_player_point CASCADE;
+--DROP TABLE IF EXISTS team_tactics.point_category CASCADE;
+--DROP TABLE IF EXISTS team_tactics.match_result CASCADE;
+--DROP TABLE IF EXISTS team_tactics.club_competition CASCADE;
+--DROP TABLE IF EXISTS team_tactics.player_contract CASCADE;
+--DROP TABLE IF EXISTS team_tactics.player_user_team CASCADE;
+--DROP TABLE IF EXISTS team_tactics.player CASCADE;
+--DROP TABLE IF EXISTS team_tactics.club CASCADE;
+--DROP TABLE IF EXISTS team_tactics.player_position CASCADE;
+--DROP TABLE IF EXISTS team_tactics.user_team_user_tournament CASCADE;
+--DROP TABLE IF EXISTS team_tactics.user_team CASCADE;
+--DROP TABLE IF EXISTS team_tactics.user_tournament CASCADE;
+--DROP TABLE IF EXISTS team_tactics.competition CASCADE;
+--DROP TABLE IF EXISTS team_tactics.user_account CASCADE;
 
 -- User and account tables
 CREATE TABLE team_tactics.user_account (
@@ -53,16 +53,9 @@ CREATE TABLE team_tactics.user_team (
     id              int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name            text NOT NULL,
     status          int NOT NULL,
+    locked_date     date,
     user_account_id int NOT NULL REFERENCES team_tactics.user_account(id),
-    competition_id  int NOT NULL REFERENCES team_tactics.competition(id),
-    locked_date     date
-);
-
-CREATE TABLE team_tactics.user_team_user_tournament (
-    id                  int NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    accept              boolean,
-    user_team_id        int REFERENCES team_tactics.user_team(id),
-    user_tournament_id  int REFERENCES team_tactics.user_tournament(id)
+    user_tournament_id  int NOT NULL REFERENCES team_tactics.user_tournament(id)
 );
 
 -- Player and club related tables
