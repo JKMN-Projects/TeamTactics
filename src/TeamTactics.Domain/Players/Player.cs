@@ -8,8 +8,11 @@ public class Player
     public int ClubId { get; private set; }
     public int PositionId { get; private set; }
 
-    public Player(string name, string externalId)
+    public Player(string name, string externalId, int clubId, int positionId)
     {
-        
+        Name = name;
+        ExternalId = externalId;
+        ClubId = clubId;
+        PositionId = positionId;
     }
 }

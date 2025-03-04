@@ -15,15 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TeamTactics.Api\TeamTactics.Api.csproj" />
+    <ProjectReference Include="..\..\src\TeamTactics.Domain\TeamTactics.Domain.csproj" />
+    <ProjectReference Include="..\TeamTactics.Fixtures\TeamTactics.Fixtures.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Configuration\" />
   </ItemGroup>
 
 </Project>
