@@ -90,6 +90,33 @@ namespace TeamTactics.Domain.UnitTests.Teams
                 // Assert
                 Assert.Throws<TeamLockedException>(act);
             }
+
+            [Fact]
+            public void ShouldThrow_MaximumPlayersFromClubReachedException_When_PlayerPerClubLimitIsReached()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 0).Generate();
+                Player player = new PlayerFaker()
+                    .RuleFor(x => x.Id, 10)
+                    .RuleFor(x => x.ClubId, 29)
+                    .Generate();
+                Player preExistingPlayer = new PlayerFaker()
+                    .RuleFor(x => x.Id, 6)
+                    .RuleFor(x => x.ClubId, player.ClubId)
+                    .Generate();
+                Player preExistingPlayer2 = new PlayerFaker()
+                    .RuleFor(x => x.Id, 7)
+                    .RuleFor(x => x.ClubId, player.ClubId)
+                    .Generate();
+                team.AddPlayer(preExistingPlayer);
+                team.AddPlayer(preExistingPlayer2);
+
+                // Act
+                Action act = () => team.AddPlayer(player);
+
+                // Assert
+                Assert.Throws<MaximumPlayersFromSameClubReachedException>(act);
+            }
         }
 
         public sealed class RemovePlayer : TeamTests

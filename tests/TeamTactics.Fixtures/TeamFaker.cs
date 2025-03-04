@@ -28,7 +28,7 @@ namespace TeamTactics.Fixtures
         {
             if (playerCount == 0) return;
 
-            int captainIndex = f.Random.Int(0, playerCount - 1);
+            int captainIndex = 0; // f.Random.Int(0, playerCount - 1);
             for (int i = 0; i < playerCount; i++)
             {
                 Player player = new PlayerFaker()

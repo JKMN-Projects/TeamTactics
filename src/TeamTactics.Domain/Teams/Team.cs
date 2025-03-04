@@ -6,6 +6,8 @@ namespace TeamTactics.Domain.Teams
 {
     public class Team
     {
+        private const int MaxPlayersPerClub = 2;
+
         public int Id { get; private set; }
         public string Name { get; private set; }
         public TeamStatus Status { get; private set; }
@@ -26,6 +28,14 @@ namespace TeamTactics.Domain.Teams
             Status = TeamStatus.Draft;
         }
 
+        /// <summary>
+        /// Add a player to the team
+        /// </summary>
+        /// <param name="player">The player to be added</param>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerAlreadyInTeamException"></exception>
+        /// <exception cref="TeamFullException"></exception>
+        /// <exception cref="MaximumPlayersFromSameClubReachedException"></exception>
         public void AddPlayer(Player player)
         {
             if (Status == TeamStatus.Locked)
@@ -43,7 +53,12 @@ namespace TeamTactics.Domain.Teams
                 throw new TeamFullException();
             }
 
-            _players.Add(new TeamPlayer(player.Id, isCaptain: false));
+            if (_players.Where(p => p.ClubId == player.ClubId).Count() >= MaxPlayersPerClub)
+            {
+                throw new MaximumPlayersFromSameClubReachedException(player.ClubId);
+            }
+
+            _players.Add(new TeamPlayer(player.Id, player.ClubId));
         }
 
         public void RemovePlayer(int playerId)
@@ -83,12 +98,10 @@ namespace TeamTactics.Domain.Teams
             var currentCaptain = _players.FirstOrDefault(p => p.IsCaptain);
             if (currentCaptain != null)
             {
-                int currentCaptainIndex = _players.IndexOf(currentCaptain);
-                _players[currentCaptainIndex] = new TeamPlayer(currentCaptain.PlayerId, isCaptain: false);
+                currentCaptain.UnsetCaptain();
             }
 
-            int index = _players.IndexOf(player);
-            _players[index] = new TeamPlayer(player.PlayerId, isCaptain: true);
+            player.SetCaptain();
         }
 
         public void Lock()
