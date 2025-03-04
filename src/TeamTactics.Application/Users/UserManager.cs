@@ -31,7 +31,7 @@ namespace TeamTactics.Application.Users
         }
 
         /// <summary>
-        /// 
+        /// Creates a new user with the given username, email and password.
         /// </summary>
         /// <param name="username"></param>
         /// <param name="email"></param>
@@ -69,7 +69,7 @@ namespace TeamTactics.Application.Users
         }
 
         /// <summary>
-        /// 
+        /// Gets an authentication token for the user with the given email and password.
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
