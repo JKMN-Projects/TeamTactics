@@ -1,0 +1,53 @@
+name: .NET CI with Test Reporting
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'  # Update this to your specific .NET version
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --no-restore
+    
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+    
+    - name: Convert TRX to JUnit format
+      if: always()
+      run: |
+        dotnet tool install -g trx2junit
+        find . -name "*.trx" | xargs -L 1 trx2junit
+    
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()    # run this step even if previous step failed
+      with:
+        name: XUnit Tests            # Name of the check run which will be created
+        path: '**/TestResults/*.xml' # Path to test results
+        reporter: java-junit        # Format of test results
+        fail-on-error: true         # Fail the workflow when test failures are found
+    
+    # Optional: Upload the original test results as an artifact
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          **/*.trx
+          **/*.xml
