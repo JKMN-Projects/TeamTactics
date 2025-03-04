@@ -9,6 +9,10 @@ namespace DbMigrator
         static int Main(string[] args)
         {
             string? connectionString = args.FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new Exception("ConnectionString empty");
+
             bool verifyOnly = args.Length > 1 && args[1] == "--verify";
 
             return DatabaseMigrator.MigrateDatabase(connectionString, verifyOnly);
@@ -22,8 +26,8 @@ namespace DbMigrator
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new Exception("ConnectionString empty");
 
-            DbUp.Engine.UpgradeEngine? upgrader = null;
-            DbUp.Engine.DatabaseUpgradeResult? result = null;
+            DbUp.Engine.UpgradeEngine? upgrader;
+            DbUp.Engine.DatabaseUpgradeResult? result;
 
             if (verifyOnly)
             {
