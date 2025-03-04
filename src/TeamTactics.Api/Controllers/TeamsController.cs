@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TeamTactics.Api.Requests.Teams;
-using TeamTactics.Application.Players;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
 
@@ -30,6 +29,7 @@ namespace TeamTactics.Api.Controllers
             return Created(); // TODO: Return CreatedAtAction
             //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
         }
+
         [HttpGet("{teamId}/Points")]
         [Authorize]
         [ProducesResponseType<TeamPointsDto>(StatusCodes.Status200OK)]
