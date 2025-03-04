@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using TeamTactics.Application.Common.Exceptions;
 
 namespace TeamTactics.Api.Middleware
 {
@@ -44,6 +45,14 @@ namespace TeamTactics.Api.Middleware
                     statusCode = StatusCodes.Status400BadRequest;
                     errorMessage = "Validation error occurred.";
                     validationErrors = validationEx.Errors.ToDictionary();
+                    break;
+                case UnauthorizedException unauthEx:
+                    statusCode = StatusCodes.Status401Unauthorized;
+                    errorMessage = "Unauthorized.";
+                    break;
+                case EntityNotFoundException entityNotFoundEx:
+                    statusCode = StatusCodes.Status404NotFound;
+                    errorMessage = "Entity not found.";
                     break;
             }
 

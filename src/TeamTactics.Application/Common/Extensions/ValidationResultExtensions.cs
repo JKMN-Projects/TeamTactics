@@ -2,7 +2,7 @@
 {
     internal static class ValidationResultExtensions
     {
-        public static void ValidateOrThrow(this ValidationResult validationResult)
+        public static void ThrowIfInvalid(this ValidationResult validationResult)
         {
             if (validationResult.IsValid)
             {

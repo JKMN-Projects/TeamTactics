@@ -6,14 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.6.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />
+    <PackageReference Include="Bogus" Version="35.6.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
+    <ProjectReference Include="..\..\src\TeamTactics.Domain\TeamTactics.Domain.csproj" />
   </ItemGroup>
 
 </Project>

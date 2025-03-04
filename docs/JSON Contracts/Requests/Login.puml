@@ -1,0 +1,8 @@
+@startuml Login Request
+
+ json "/api/authentication/login" as loginRequest {
+    "email": "string",
+    "password": "string"
+}
+
+@enduml

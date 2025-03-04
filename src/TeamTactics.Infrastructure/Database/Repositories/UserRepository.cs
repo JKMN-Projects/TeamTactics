@@ -31,6 +31,11 @@ internal class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
+    public Task<string?> GetUserSaltAsync(int userId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<int> InsertAsync(User user, string passwordHash)
     {
         throw new NotImplementedException();

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Application.Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Infrastructure.IntegrationTests", "tests\TeamTactics.Infrastructure.IntegrationTests\TeamTactics.Infrastructure.IntegrationTests.csproj", "{09D328F8-A831-47BD-856B-0A0AAC452C93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Fixtures", "tests\TeamTactics.Fixtures\TeamTactics.Fixtures.csproj", "{98BF4A8E-A883-4639-AC32-5A982217464C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{09D328F8-A831-47BD-856B-0A0AAC452C93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09D328F8-A831-47BD-856B-0A0AAC452C93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09D328F8-A831-47BD-856B-0A0AAC452C93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98BF4A8E-A883-4639-AC32-5A982217464C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98BF4A8E-A883-4639-AC32-5A982217464C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98BF4A8E-A883-4639-AC32-5A982217464C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98BF4A8E-A883-4639-AC32-5A982217464C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{4D7D6443-F740-49A1-ADBC-85BC199AFC7A} = {651D9187-8CB0-45F5-8233-DFBC822FC4CC}
 		{866E51D5-2657-404E-A58D-3EAC90C74CC6} = {651D9187-8CB0-45F5-8233-DFBC822FC4CC}
 		{09D328F8-A831-47BD-856B-0A0AAC452C93} = {651D9187-8CB0-45F5-8233-DFBC822FC4CC}
+		{98BF4A8E-A883-4639-AC32-5A982217464C} = {651D9187-8CB0-45F5-8233-DFBC822FC4CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39391A7A-343C-40CB-906E-41E454D33FFC}
