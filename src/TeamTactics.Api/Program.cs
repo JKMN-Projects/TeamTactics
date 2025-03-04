@@ -21,12 +21,8 @@ try
         throw new InvalidOperationException("Connection string not found");
     }
 
-    try
-    {
-        if (DatabaseMigrator.MigrateDatabase(conString, true) == 0)
-            DatabaseMigrator.MigrateDatabase(conString);
-    }
-    catch { }
+    if (DatabaseMigrator.MigrateDatabase(conString, true) == 0)
+        DatabaseMigrator.MigrateDatabase(conString);
 
     // Serilog to ASPNET
     builder.Services.AddSerilog();
