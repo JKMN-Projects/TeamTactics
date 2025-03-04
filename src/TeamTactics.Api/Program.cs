@@ -14,13 +14,17 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    string? conString = builder.Configuration.GetConnectionString("Postgres");
+
+    if (string.IsNullOrWhiteSpace(conString))
+    {
+        throw new InvalidOperationException("Connection string not found");
+    }
+
     try
     {
-        string? connectionString = builder.Configuration["LocalConnectionString"];
-
-        if (connectionString != null)
-            if (DbMigrator.DatabaseMigrator.MigrateDatabase(connectionString, true) == 0)
-                DbMigrator.DatabaseMigrator.MigrateDatabase(connectionString);
+        if (DatabaseMigrator.MigrateDatabase(conString, true) == 0)
+            DatabaseMigrator.MigrateDatabase(conString);
     }
     catch { }
 
@@ -28,11 +32,6 @@ try
     builder.Services.AddSerilog();
 
     // Health Checks
-    var conString = builder.Configuration.GetConnectionString("Postgres");
-    if (string.IsNullOrEmpty(conString))
-    {
-        throw new InvalidOperationException("Connection string not found");
-    }
     builder.Services.AddHealthChecks()
         .AddNpgSql(conString);
 
