@@ -1,11 +1,16 @@
 ﻿
+using System.Data.Common;
 using TeamTactics.Application.Users;
 using TeamTactics.Domain.Users;
+using Dapper;
+using System.Data;
 
 namespace TeamTactics.Infrastructure.Database.Repositories;
 
-internal class UserRepository : IUserRepository
+internal class UserRepository(IDbConnection dbConnection) : IUserRepository
 {
+    private IDbConnection _dbConnection = dbConnection;
+
     public Task<bool> CheckPasswordAsync(string passwordHash)
     {
         throw new NotImplementedException();
