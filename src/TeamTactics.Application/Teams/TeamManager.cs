@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using TeamTactics.Application.Players;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
+using TeamTactics.Domain.Teams.Exceptions;
 
 namespace TeamTactics.Application.Teams
 {
@@ -39,6 +40,17 @@ namespace TeamTactics.Application.Teams
             return team;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerAlreadyInTeamException"></exception>
+        /// <exception cref="TeamFullException"></exception>
+        /// <exception cref="MaximumPlayersFromSameClubReachedException"></exception>
         public async Task AddPlayerToTeam(int teamId, int playerId)
         {
             var player = await _playerRepository.FindById(playerId);
@@ -56,6 +68,7 @@ namespace TeamTactics.Application.Teams
             // TODO: Should check if the player is available to play in the competition matching the team. Might need the check inside the add player method in the domain.
 
             team.AddPlayer(player);
+
             await _teamRepository.UpdateAsync(team);
             _logger.LogInformation("Player '{playerId}' added to team '{teamId}'", playerId, teamId);
         }
