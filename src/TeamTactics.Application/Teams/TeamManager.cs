@@ -33,6 +33,11 @@ namespace TeamTactics.Application.Teams
             var team = new Team(name, userId, competitionId);
             return await _teamRepository.InsertAsync(team);
         }
+        public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
+        {
+            var team = await _teamRepository.FindTeamPointsAsync(teamId);
+            return team;
+        }
 
         public async Task AddPlayerToTeam(int teamId, int playerId)
         {

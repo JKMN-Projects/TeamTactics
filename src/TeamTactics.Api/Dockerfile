@@ -14,6 +14,8 @@ WORKDIR /src
 COPY ["TeamTactics.sln", "./"]
 COPY ["src/", "./src/"]
 COPY ["tests/","./tests/"]
+COPY ["tools/","./tools/"]
+
 
 RUN dotnet restore "TeamTactics.sln"
 
