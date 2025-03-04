@@ -9,10 +9,9 @@ namespace TeamTactics.Fixtures
         {
             Faker faker = new Faker();
             string externalId = new Guid().ToString().Substring(0, 8);
-            int clubId = faker.Random.Int(1, 100);
             int positionId = faker.Random.Int(1, 100);
 
-            CustomInstantiator(f => new Player(f.Person.FullName, externalId, clubId, positionId));
+            CustomInstantiator(f => new Player(f.Person.FirstName, f.Person.LastName, DateOnly.FromDateTime(f.Person.DateOfBirth), externalId, positionId));
         }
     }
 }
