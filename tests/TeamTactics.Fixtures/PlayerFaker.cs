@@ -12,7 +12,7 @@ namespace TeamTactics.Fixtures
             int clubId = faker.Random.Int(1, 100);
             int positionId = faker.Random.Int(1, 100);
 
-            CustomInstantiator(f => new Player(f.Person.FullName, externalId, clubId, positionId));
+            CustomInstantiator(f => new Player(f.Person.FirstName, f.Person.LastName, DateOnly.FromDateTime(f.Person.DateOfBirth), externalId, clubId, positionId));
         }
     }
 }
