@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TeamTactics.Api.Requests.Teams;
+using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
 
 namespace TeamTactics.Api.Controllers
@@ -23,7 +24,7 @@ namespace TeamTactics.Api.Controllers
         public async Task<IActionResult> CreateTeam([FromBody] CreateTeamRequest request)
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? throw new Exception("Unauthorized")); // TODO: Throw unauthorized exception
+                ?? throw new UnauthorizedException("User not logged in."));
             int teamId = await _teamManager.CreateTeamAsync(request.Name, userId);
             return Created(); // TODO: Return CreatedAtAction
             //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
