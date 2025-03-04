@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TeamTactics.Api.Requests.Teams;
+using TeamTactics.Application.Players;
 using TeamTactics.Application.Teams;
 
 namespace TeamTactics.Api.Controllers
@@ -27,6 +28,15 @@ namespace TeamTactics.Api.Controllers
             int teamId = await _teamManager.CreateTeamAsync(request.Name, userId);
             return Created(); // TODO: Return CreatedAtAction
             //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
+        }
+        [HttpGet("{teamId}/Points")]
+        [Authorize]
+        [ProducesResponseType<TeamPointsDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTeamPoints(int teamId)
+        {
+            var team = await _teamManager.GetTeamPointsAsync(teamId);
+            return Ok(team);
         }
     }
 }
