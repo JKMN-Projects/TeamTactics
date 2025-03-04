@@ -1,4 +1,4 @@
-@startuml Authentication Token Response
+@startuml Team Points Response
 
 json "/api/Teams/{teamId}/points" as TeamPoints {
     "totalPoints": "int"
