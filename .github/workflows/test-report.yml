@@ -13,6 +13,7 @@ jobs:
     permissions:
       pull-requests: write
       actions: read
+      checks: write
 
     runs-on: ubuntu-latest
 
