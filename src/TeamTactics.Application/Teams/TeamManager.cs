@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using TeamTactics.Application.Players;
+using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 
 namespace TeamTactics.Application.Teams
@@ -34,13 +35,13 @@ namespace TeamTactics.Application.Teams
             var player = await _playerRepository.FindById(playerId);
             if (player == null)
             {
-                throw new InvalidOperationException("Player not found"); // TODO: Throw not found exception
+                throw EntityNotFoundException.ForEntity<Player>(playerId, nameof(Player.Id));
             }
 
             var team = await _teamRepository.FindById(teamId);
             if (team == null)
             {
-                throw new InvalidOperationException("Team not found"); // TODO: Throw not found exception
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
             }
 
             team.AddPlayer(player);

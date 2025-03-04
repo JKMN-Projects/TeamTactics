@@ -108,8 +108,8 @@ namespace TeamTactics.Application.Users
             {
                 return profile;
             }
-            //TODO: EntityNotFound exception
-            throw new ArgumentException("No profile information exist");
+
+            throw EntityNotFoundException.ForEntity<User>(id, nameof(User.Id));
         }
     }
 }
