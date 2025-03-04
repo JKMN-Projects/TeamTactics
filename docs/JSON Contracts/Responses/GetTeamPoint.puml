@@ -1,9 +1,7 @@
 @startuml Authentication Token Response
 
-json "/api/authentication/login" as authenticationTokenResponse {
-    "token": "string",
-    "tokenType": "string",
-    "expiresIn": 0
+json "/api/Teams/{teamId}/points" as TeamPoints {
+    "totalPoints": "int"
 }
 
 @enduml

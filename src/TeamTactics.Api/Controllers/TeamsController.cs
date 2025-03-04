@@ -31,7 +31,7 @@ namespace TeamTactics.Api.Controllers
         }
         [HttpGet("{teamId}/Points")]
         [Authorize]
-        [ProducesResponseType<PlayerDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType<TeamPointsDto>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetTeamPoints(int teamId)
         {
