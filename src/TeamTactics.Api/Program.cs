@@ -4,10 +4,7 @@ using TeamTactics.Application.Common.Options;
 using TeamTactics.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddUserSecrets<Program>();
-}
+
 // Health Checks
 var conString = builder.Configuration.GetConnectionString("Postgres");
 if (string.IsNullOrEmpty(conString))
