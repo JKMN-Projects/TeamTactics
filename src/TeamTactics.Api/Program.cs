@@ -4,6 +4,18 @@ using TeamTactics.Application.Common.Options;
 using TeamTactics.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+// Health Checks
+var conString = builder.Configuration.GetConnectionString("Postgres");
+if (string.IsNullOrEmpty(conString))
+{
+    throw new InvalidOperationException("Connection string not found");
+}
+builder.Services.AddHealthChecks()
+    .AddNpgSql(conString);
 
 // Add services to the container.
 
@@ -28,7 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.MapHealthChecks("/health");
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
