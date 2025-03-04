@@ -13,7 +13,7 @@ public class PlayersController : ControllerBase
     {
         _playerManager = playerManager;
     }
-    [HttpGet("Players/{competitionId?}")]
+    [HttpGet]
     [ProducesResponseType<PlayerDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPlayers([FromQuery]int? competitionId = null)

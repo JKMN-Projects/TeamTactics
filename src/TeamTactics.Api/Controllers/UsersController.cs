@@ -21,8 +21,8 @@ namespace TeamTactics.Api.Controllers
             await _userManager.CreateUserAsync(request.Username, request.Email, request.Password);
             return Ok();
         }
-        [HttpGet("Profile")]
-        public async Task<IActionResult> GetProfile([FromQuery] int userId)
+        [HttpGet("{userId}/Profile")]
+        public async Task<IActionResult> GetProfile(int userId)
         {
             var user = await _userManager.GetProfileAsync(userId);
             return Ok(user);
