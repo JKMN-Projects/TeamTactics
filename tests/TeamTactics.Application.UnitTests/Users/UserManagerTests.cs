@@ -152,7 +152,7 @@ namespace TeamTactics.Application.UnitTests.Users
                 User user = userFaker.Generate();
                 _userRepositoryMock.FindByEmail(user.Email)
                     .Returns(user);
-                _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>())
+                _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>(), Arg.Any<string>())
                     .Returns(true);
                 _authTokenProviderMock.GenerateTokenAsync(user)
                     .Returns(new AuthenticationToken(_faker.Random.Guid().ToString(), "JWT", 3600));
@@ -189,7 +189,7 @@ namespace TeamTactics.Application.UnitTests.Users
                 User user = userFaker.Generate();
                 _userRepositoryMock.FindByEmail(user.Email)
                     .Returns(user);
-                _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>())
+                _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>(), Arg.Any<string>())
                     .Returns(false);
                 // Act
                 async Task Act() => await _sut.GetAuthenticationTokenAsync(user.Email, _faker.Internet.Password());
