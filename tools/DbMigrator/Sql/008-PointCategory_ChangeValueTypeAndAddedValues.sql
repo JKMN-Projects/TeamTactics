@@ -1,6 +1,6 @@
 CREATE UNIQUE INDEX idx_point_category_name_active
-ON team_tactics.point_category (name)
-WHERE active = true;
+    ON team_tactics.point_category (name)
+    WHERE active = true;
 
 ALTER TABLE team_tactics.point_category
     ALTER COLUMN point_amount TYPE decimal(6,3);

@@ -64,8 +64,8 @@ namespace TeamTactics.Application.Users
                 email,
                 new SecurityInfo(Convert.ToBase64String(salt)));
             
-            int userId = await _userRepository.InsertAsync(user, passwordHashString);
-            _logger.LogInformation("User '{username}' created with id {userId}", username, userId);
+            User newUser = await _userRepository.InsertAsync(user, passwordHashString);
+            _logger.LogInformation("User '{username}' created with id {userId}", newUser.Username, newUser.Id);
         }
 
         /// <summary>
