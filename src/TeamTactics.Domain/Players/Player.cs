@@ -22,4 +22,12 @@ public class Player
         ExternalId = externalId;
         PositionId = positionId;
     }
+
+    public void SignContract(int clubId)
+    {
+        _playerContracts.ForEach(pc => pc.DeactivateContract());
+
+        PlayerContract playerContract = new PlayerContract(clubId, Id);
+        _playerContracts.Add(playerContract);
+    }
 }

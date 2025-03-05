@@ -1,0 +1,7 @@
+@startuml Set team captain Request
+
+json "SetTeamCaptain\nPUT: /api/teams/{teamId}/players/{playerId}/set-captain" as setTeamCaptainRequest {
+    
+}
+
+@enduml
