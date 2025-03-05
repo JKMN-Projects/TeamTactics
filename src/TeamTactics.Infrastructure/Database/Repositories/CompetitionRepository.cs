@@ -1,21 +1,15 @@
 ﻿using Dapper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeamTactics.Application.Players;
+using TeamTactics.Application.Competitions;
 using TeamTactics.Domain.Competitions;
-using TeamTactics.Domain.Users;
 
 namespace TeamTactics.Infrastructure.Database.Repositories;
 
-internal class CompetitionRepository(IDbConnection dbConnection)
+internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionRepository
 {
     private IDbConnection _dbConnection = dbConnection;
 
-    public async Task<IEnumerable<Competition>> GetAllCompetitionsAsync()
+    public async Task<IEnumerable<Competition>> FindAllAsync()
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
@@ -25,6 +19,11 @@ internal class CompetitionRepository(IDbConnection dbConnection)
         var competitions = await _dbConnection.QueryAsync<Competition>(sql);
 
         return competitions;
+    }
+
+    public Task<Competition?> FindById(int id)
+    {
+        throw new NotImplementedException();
     }
 
 }
