@@ -1,10 +1,6 @@
-﻿
-using System.Net.Http.Headers;
+﻿namespace TeamTactics.Application.Users;
 
-namespace TeamTactics.Application.Users;
-
-public record ProfileDto(string Username, string FirstName, string LastName, string Email, List<ProfileDto.Competition> Competitions)
+public record ProfileDto(string Username, string Email, List<ProfileDto.Tournament> Competitions)
 {
-    public record Competition(int Id, string Name);
-
+    public record Tournament(int Id, string Name);
 }

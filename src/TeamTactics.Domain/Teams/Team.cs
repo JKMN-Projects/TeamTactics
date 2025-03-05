@@ -4,11 +4,9 @@ using TeamTactics.Domain.Teams.Exceptions;
 
 namespace TeamTactics.Domain.Teams
 {
-    public class Team
+    public class Team : Entity
     {
         private const int MAX_PLAYERS_PER_CLUB = 2;
-
-        public int Id { get; private set; }
         public string Name { get; private set; }
         public TeamStatus Status { get; private set; }
         public int UserId { get; private set; }
@@ -61,6 +59,12 @@ namespace TeamTactics.Domain.Teams
             _players.Add(new TeamPlayer(player.Id, player.ActivePlayerContract.ClubId));
         }
 
+        /// <summary>
+        /// Remove a player from the team
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
         public void RemovePlayer(int playerId)
         {
             if (Status == TeamStatus.Locked)
@@ -77,6 +81,13 @@ namespace TeamTactics.Domain.Teams
             _players.Remove(player);
         }
 
+        /// <summary>
+        /// Set a player as captain of the team
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
+        /// <exception cref="PlayerAlreadyCaptainException"></exception>
         public void SetCaptain(int playerId)
         {
             if (Status == TeamStatus.Locked)

@@ -9,10 +9,10 @@ namespace TeamTactics.Infrastructure.Database;
 
 public interface ITransactionManager
 {
-    Task<IDbTransaction> BeginTransactionAsync();
-    Task CommitAsync();
-    Task RollbackAsync();
+    IDbTransaction BeginTransactionAsync();
+    void CommitAsync();
+    void RollbackAsync();
     bool HasActiveTransaction { get; }
-    IDbConnection Connection { get; }
+    IDbConnection? Connection { get; }
 }
 

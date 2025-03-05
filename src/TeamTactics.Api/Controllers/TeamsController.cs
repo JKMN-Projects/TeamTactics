@@ -49,11 +49,12 @@ namespace TeamTactics.Api.Controllers
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> AddPlayerToTeam(int id, [FromBody] AddPlayerToTeamRequest request)
+        public async Task<IActionResult> AssignPlayer(int id, [FromBody] AssignPlayerRequest request)
         {
             try
             {
                 await _teamManager.AddPlayerToTeamAsync(id, request.PlayerId);
+                return NoContent();
             }
             catch (TeamLockedException ex)
             {
@@ -83,8 +84,32 @@ namespace TeamTactics.Api.Controllers
                     detail: ex.Description,
                     statusCode: StatusCodes.Status400BadRequest);
             }
+        }
 
-            return NoContent();
+        [HttpPut("{teamId:int}/players/{playerId:int}/remove")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> RemovePlayerFromTeam(int teamId, int playerId)
+        {
+            try
+            {
+                await _teamManager.RemovePlayerFromTeamAsync(teamId, playerId);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (PlayerNotOnTeamException ex)
+            {
+                return Problem(
+                    title: "Player is not on the team.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status404NotFound);
+            }
         }
 
         [HttpDelete("{id:int}")]
@@ -99,6 +124,44 @@ namespace TeamTactics.Api.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id:int}/players/{playerId:int}/set-captain")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> SetCaptain(int id, int playerId)
+        {
+            try
+            {
+                await _teamManager.SetTeamCaptain(id, playerId);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (PlayerNotOnTeamException ex)
+            {
+                return Problem(
+                    title: "Player is not on the team.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status404NotFound);
+            }
+            catch (PlayerAlreadyCaptainException ex)
+            {
+                return Problem(
+                    title: "Player is already the captain.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+        }
+
         [HttpPatch("{id:int}/lock")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -110,7 +173,7 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.LockTeam(id);
+                await _teamManager.LockTeamAsync(id);
                 return NoContent();
             }
             catch (TeamLockedException ex)

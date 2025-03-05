@@ -1,8 +1,7 @@
 ﻿namespace TeamTactics.Domain.Players;
 
-public class PlayerContract
+public class PlayerContract : Entity
 {
-    public int Id { get; private set; }
     public int ClubId { get; private set; }
     public bool Active { get; private set; }
     public int PlayerId { get; private set; }
