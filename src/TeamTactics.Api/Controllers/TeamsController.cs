@@ -49,7 +49,7 @@ namespace TeamTactics.Api.Controllers
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> AddPlayerToTeam(int id, [FromBody] AssignPlayerRequest request)
+        public async Task<IActionResult> AssignPlayer(int id, [FromBody] AssignPlayerRequest request)
         {
             try
             {

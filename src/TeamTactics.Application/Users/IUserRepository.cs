@@ -6,11 +6,11 @@ namespace TeamTactics.Application.Users;
 
 public interface IUserRepository : IRepository<User, int>
 {
-    public Task<int> InsertAsync(User user, string passwordHash);
+    public Task<User> InsertAsync(User user, string passwordHash);
     public Task UpdateAsync(User user);
     public Task RemoveAsync(User user);
 
-    public Task<bool> CheckPasswordAsync(string passwordHash);
+    public Task<bool> CheckPasswordAsync(string emailOrUsername, string passwordHash);
     public Task<User?> FindByEmail(string email);
     public Task<string?> GetUserSaltAsync(int userId);
     public Task<ProfileDto> GetProfileAsync(int id);

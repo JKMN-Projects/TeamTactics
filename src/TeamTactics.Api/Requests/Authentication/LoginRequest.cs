@@ -1,4 +1,8 @@
-﻿namespace TeamTactics.Api.Requests.Authentication
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TeamTactics.Api.Requests.Authentication
 {
-    public record LoginRequest(string Email, string Password);
+    public record LoginRequest(
+        [Required] string Email, 
+        [Required] string Password);
 }
