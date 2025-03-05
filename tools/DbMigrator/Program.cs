@@ -21,7 +21,7 @@ namespace DbMigrator
             }
             catch (Exception)
             {
-                throw new Exception(connectionString);
+                throw new Exception("Hej");
             }
             
         }
