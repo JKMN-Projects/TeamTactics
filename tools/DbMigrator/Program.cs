@@ -10,12 +10,20 @@ namespace DbMigrator
         {
             string? connectionString = args.FirstOrDefault();
 
-            if (string.IsNullOrWhiteSpace(connectionString))
-                throw new Exception("ConnectionString empty");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(connectionString))
+                    throw new Exception("ConnectionString empty");
 
-            bool verifyOnly = args.Length > 1 && args[1] == "--verify";
+                bool verifyOnly = args.Length > 1 && args[1] == "--verify";
 
-            return DatabaseMigrator.MigrateDatabase(connectionString, verifyOnly);
+                return DatabaseMigrator.MigrateDatabase(connectionString, verifyOnly);
+            }
+            catch (Exception)
+            {
+                throw new Exception(connectionString);
+            }
+            
         }
     }
 
