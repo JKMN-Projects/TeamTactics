@@ -90,5 +90,28 @@ namespace TeamTactics.Application.Teams
             await _teamRepository.RemoveAsync(teamId);
             _logger.LogInformation("Team '{teamId}' deleted", teamId);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="TeamNotFullException"></exception>
+        /// <exception cref="NoCaptainException"></exception>
+        public async Task LockTeam(int teamId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            team.Lock();
+
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Team '{teamId}' locked", teamId);
+        }
     }
 }
