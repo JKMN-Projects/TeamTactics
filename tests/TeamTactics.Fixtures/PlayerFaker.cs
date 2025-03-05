@@ -20,7 +20,7 @@ namespace TeamTactics.Fixtures
             {
                 for (int i = 0; i < playerContracts; i++)
                 {
-                    int clubId = faker.Random.Int(1, 100);
+                    int clubId = faker.Random.Int(playerId * 100, playerId * 100 + 99);
                     p.SignContract(clubId);
                 }
             });
