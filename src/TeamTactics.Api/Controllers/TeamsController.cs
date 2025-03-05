@@ -54,6 +54,7 @@ namespace TeamTactics.Api.Controllers
             try
             {
                 await _teamManager.AddPlayerToTeamAsync(id, request.PlayerId);
+                return NoContent();
             }
             catch (TeamLockedException ex)
             {
@@ -83,8 +84,32 @@ namespace TeamTactics.Api.Controllers
                     detail: ex.Description,
                     statusCode: StatusCodes.Status400BadRequest);
             }
+        }
 
-            return NoContent();
+        [HttpPut("{teamId:int}/players/{playerId:int}/remove")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> RemovePlayerFromTeam(int teamId, int playerId)
+        {
+            try
+            {
+                await _teamManager.RemovePlayerFromTeamAsync(teamId, playerId);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (PlayerNotOnTeamException ex)
+            {
+                return Problem(
+                    title: "Player is not on the team.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status404NotFound);
+            }
         }
 
         [HttpDelete("{id:int}")]
@@ -110,7 +135,7 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.LockTeam(id);
+                await _teamManager.LockTeamAsync(id);
                 return NoContent();
             }
             catch (TeamLockedException ex)

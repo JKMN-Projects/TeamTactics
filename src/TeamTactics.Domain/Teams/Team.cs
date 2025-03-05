@@ -61,6 +61,12 @@ namespace TeamTactics.Domain.Teams
             _players.Add(new TeamPlayer(player.Id, player.ActivePlayerContract.ClubId));
         }
 
+        /// <summary>
+        /// Remove a player from the team
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
         public void RemovePlayer(int playerId)
         {
             if (Status == TeamStatus.Locked)
