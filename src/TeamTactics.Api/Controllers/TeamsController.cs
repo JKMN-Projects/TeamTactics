@@ -53,7 +53,7 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.AddPlayerToTeam(id, request.PlayerId);
+                await _teamManager.AddPlayerToTeamAsync(id, request.PlayerId);
                 return NoContent();
             }
             catch (TeamLockedException ex)
@@ -93,7 +93,7 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.RemovePlayerFromTeam(teamId, playerId);
+                await _teamManager.RemovePlayerFromTeamAsync(teamId, playerId);
                 return NoContent();
             }
             catch (TeamLockedException ex)
@@ -110,8 +110,6 @@ namespace TeamTactics.Api.Controllers
                     detail: ex.Description,
                     statusCode: StatusCodes.Status404NotFound);
             }
-        }
-            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -137,7 +135,7 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.LockTeam(id);
+                await _teamManager.LockTeamAsync(id);
                 return NoContent();
             }
             catch (TeamLockedException ex)

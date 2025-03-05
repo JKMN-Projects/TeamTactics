@@ -100,7 +100,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="TeamLockedException"></exception>
         /// <exception cref="TeamNotFullException"></exception>
         /// <exception cref="NoCaptainException"></exception>
-        public async Task LockTeam(int teamId)
+        public async Task LockTeamAsync(int teamId)
         {
             var team = await _teamRepository.FindById(teamId);
             if (team == null)
@@ -123,7 +123,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="EntityNotFoundException"></exception>
         /// <exception cref="TeamLockedException"></exception>
         /// <exception cref="PlayerNotOnTeamException"></exception>
-        public async Task RemovePlayerFromTeam(int teamId, int playerId)
+        public async Task RemovePlayerFromTeamAsync(int teamId, int playerId)
         {
             var team = await _teamRepository.FindById(teamId);
             if (team == null)
