@@ -2,6 +2,6 @@
 
 namespace TeamTactics.Api.Requests.Teams
 {
-    public record AddPlayerToTeamRequest(
-        [property: Required] int PlayerId);
+    public record AssignPlayerRequest(
+        [Required] int PlayerId);
 }

@@ -1,9 +1,10 @@
 using TeamTactics.Api.Middleware;
 using TeamTactics.Application;
-using TeamTactics.Application.Common.Options;
 using TeamTactics.Infrastructure;
 using Serilog;
 using DbMigrator;
+using TeamTactics.Infrastructure.Tokens;
+using TeamTactics.Api.Configurations;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -32,10 +33,9 @@ try
     builder.Services.AddHealthChecks()
         .AddNpgSql(connString);
 
-    // Add services to the container.
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.SetupSwagger();
 
     builder.Services.AddExceptionHandler<GlobalExceptionHandling>();
     builder.Services.AddProblemDetails();
@@ -43,17 +43,24 @@ try
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
 
-    // Options
-    builder.Services.AddOptions<PasswordSecurityOptions>()
-        .Bind(builder.Configuration.GetSection("PasswordSecurity"))
-        .ValidateDataAnnotations();
+    builder.SetupOptions();
+
+    builder.Services.SetupJwt(builder.Configuration.GetRequiredSection("JWT").Get<JwtOptions>()
+        ?? throw new InvalidOperationException("Unable to get Jwt options."));
+
+    builder.Services.SetupCors();
 
     var app = builder.Build();
+
+    app.UseCors(CorsSetup.CORS_POLICY);
 
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/V1/swagger.json", "TeamTactics API");
+        });
     }
 
     app.MapHealthChecks("/api/health");
@@ -61,6 +68,7 @@ try
     app.UseExceptionHandler();
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
