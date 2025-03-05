@@ -161,6 +161,7 @@ namespace TeamTactics.Api.Controllers
                     statusCode: StatusCodes.Status409Conflict);
             }
         }
+
         [HttpPatch("{id:int}/lock")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
