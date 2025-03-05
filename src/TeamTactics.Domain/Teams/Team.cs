@@ -83,6 +83,13 @@ namespace TeamTactics.Domain.Teams
             _players.Remove(player);
         }
 
+        /// <summary>
+        /// Set a player as captain of the team
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
+        /// <exception cref="PlayerAlreadyCaptainException"></exception>
         public void SetCaptain(int playerId)
         {
             if (Status == TeamStatus.Locked)

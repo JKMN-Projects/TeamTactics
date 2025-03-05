@@ -124,6 +124,44 @@ namespace TeamTactics.Api.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id:int}/players/{playerId:int}/set-captain")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> SetCaptain(int id, int playerId)
+        {
+            try
+            {
+                await _teamManager.SetTeamCaptain(id, playerId);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (PlayerNotOnTeamException ex)
+            {
+                return Problem(
+                    title: "Player is not on the team.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status404NotFound);
+            }
+            catch (PlayerAlreadyCaptainException ex)
+            {
+                return Problem(
+                    title: "Player is already the captain.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+        }
+
         [HttpPatch("{id:int}/lock")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
