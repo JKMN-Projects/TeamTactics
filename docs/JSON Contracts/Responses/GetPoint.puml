@@ -1,0 +1,12 @@
+@startuml Get point response
+allowmixing
+
+agent "GET response \nURI: /api/points"
+  json "Point" as J {
+    "name": "string",
+    "description": "string",
+    "pointAmount": "number"
+  }
+
+"GET response \nURI: /api/points" -> J 
+@enduml

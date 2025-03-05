@@ -1,0 +1,13 @@
+@startuml Get competition response
+allowmixing
+
+agent "GET response \nURI: /api/competitions"
+  json "Competition" as J {
+    "id": "number",
+    "name": "string",
+    "startDate": "string",
+    "endDate": "string"
+  }
+
+"GET response \nURI: /api/competitions" -> J 
+@enduml

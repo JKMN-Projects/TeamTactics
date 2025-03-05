@@ -1,0 +1,16 @@
+@startuml Get tournament response
+allowmixing
+
+agent "GET response \nURI: /api/tournaments/{tournamentId}"
+  json "Tournament" as J {
+    "id": "number",
+    "name": "string",
+    "description": "string",
+    "inviteCode": "string",
+    "competitionName": "string",
+    "ownerUsername": "string",
+    "ownerUserId": "number"
+  }
+
+"GET response \nURI: /api/tournaments/{tournamentId}" -> J 
+@enduml

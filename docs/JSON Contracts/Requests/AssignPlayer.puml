@@ -1,0 +1,10 @@
+@startuml Assign player request
+allowmixing
+
+agent "PUT request \nURI: /api/teams/{teamId}/players/add"
+  json "AssignPlayer" as J {
+    "playerId": "number"
+  }
+
+"PUT request \nURI: /api/teams/{teamId}/players/add" -> J 
+@enduml

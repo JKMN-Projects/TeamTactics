@@ -1,0 +1,10 @@
+@startuml Assign captain request
+allowmixing
+
+agent "PUT request \nURI: /api/teams/{teamId}/players/add/captain"
+  json "AssignCaptain" as J {
+    "playerId": "number"
+  }
+
+"PUT request \nURI: /api/teams/{teamId}/players/add/captain" -> J 
+@enduml

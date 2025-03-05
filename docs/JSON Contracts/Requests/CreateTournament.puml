@@ -1,0 +1,13 @@
+@startuml Create tournament request
+allowmixing
+
+agent "POST request \nURI: /api/tournaments"
+  json "CreateTournament" as J {
+    "name": "string",
+    "description": "string",
+    "competitionId": "number",
+    "userId": "number"
+  }
+
+"POST request \nURI: /api/tournaments" -> J 
+@enduml
