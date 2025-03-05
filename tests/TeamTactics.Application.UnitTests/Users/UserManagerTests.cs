@@ -49,11 +49,14 @@ namespace TeamTactics.Application.UnitTests.Users
                 var faker = new Faker();
                 string username = faker.Internet.UserName();
                 string email = faker.Internet.Email();
-                string password = new Faker().Internet.Password(prefix: "1aA!");
+                string password = faker.Internet.Password(prefix: "1aA!");
                 Byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
                 _hashingServiceMock.GenerateSalt().Returns(faker.Random.Bytes(32));
                 _hashingServiceMock.Hash(Arg.Any<byte[]>(), Arg.Any<byte[]>()).Returns(faker.Random.Bytes(32));
+
+                var expectedUser = new User(username, email, new SecurityInfo(""));
+                _userRepositoryMock.InsertAsync(Arg.Any<User>(), Arg.Any<string>()).Returns(expectedUser);
 
                 // Act
                 await _sut.CreateUserAsync(username, email, password);
