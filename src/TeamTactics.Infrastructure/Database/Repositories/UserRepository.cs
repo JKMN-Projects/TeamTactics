@@ -42,14 +42,12 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        // SQL for inserting a single user with password hash
         string sql = @"SELECT * FROM team_tactics.user_account
 	WHERE email = @Email";
 
         var parameters = new DynamicParameters();
         parameters.Add("Email", email);
 
-        // Execute query and get the generated ID
         User? user = await _dbConnection.QuerySingleOrDefaultAsync<User?>(sql, parameters);
 
         return user;
@@ -60,14 +58,12 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        // SQL for inserting a single user with password hash
         string sql = @"SELECT * FROM team_tactics.user_account
 	WHERE id = @ID";
 
         var parameters = new DynamicParameters();
         parameters.Add("ID", id);
 
-        // Execute query and get the generated ID
         User? user = await _dbConnection.QuerySingleOrDefaultAsync<User?>(sql, parameters);
 
         return user;
@@ -114,14 +110,12 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        // SQL for inserting a single user with password hash
         string sql = @"SELECT salt FROM team_tactics.user_account
 	WHERE id = @UserId";
 
         var parameters = new DynamicParameters();
         parameters.Add("UserId", userId);
 
-        // Execute query and get the generated ID
         string? userSalt = await _dbConnection.QuerySingleOrDefaultAsync<string?>(sql, parameters);
 
         return userSalt;

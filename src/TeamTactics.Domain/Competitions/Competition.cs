@@ -1,8 +1,16 @@
 ﻿
-namespace TeamTactics.Domain.Competitions
+namespace TeamTactics.Domain.Competitions;
+
+public class Competition : Entity
 {
-    public class Competition
+    public string Name { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
+
+    public Competition(int id, string name, DateOnly startDate, DateOnly endDate) : base(id)
     {
-        public int Id { get; private set; }
+        Name = name;
+        StartDate = startDate;
+        EndDate = endDate;
     }
 }
