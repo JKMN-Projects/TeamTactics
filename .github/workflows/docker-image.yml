@@ -13,6 +13,7 @@ jobs:
 
     environment: production
     steps:
+    - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -22,9 +23,7 @@ jobs:
       run: dotnet restore
 
     - name: Run Migration Verification
-      run: dotnet run --project tools/DbMigrator 
-      env: 
-        Connectionstrings__Postgres: ${{ secrets.DB_CONNECTION }}
+      run: dotnet run --project tools/DbMigrator "${{ secrets.DB_CONNECTION }}"
 
     - uses: actions/checkout@v4
     - name: Login to GitHub Container Registry

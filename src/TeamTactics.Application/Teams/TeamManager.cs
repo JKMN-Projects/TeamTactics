@@ -7,7 +7,7 @@ using TeamTactics.Domain.Teams.Exceptions;
 
 namespace TeamTactics.Application.Teams
 {
-    public class TeamManager
+    public sealed class TeamManager
     {
         private readonly ITeamRepository _teamRepository;
         private readonly IPlayerRepository _playerRepository;
@@ -23,6 +23,16 @@ namespace TeamTactics.Application.Teams
             _logger = logger;
         }
 
+        /// <summary>
+        /// Create a new team with the given name, user and competition.
+        /// </summary>
+        /// <param name="name">The name of the team. Must be unique in the tournament.</param>
+        /// <param name="userId">The user id of the user creating the team.</param>
+        /// <param name="competitionId">The id of the competition the team is based on.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException" />
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="ArgumentOutOfRangeException" />
         public async Task<int> CreateTeamAsync(string name, int userId, int competitionId)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
@@ -41,17 +51,17 @@ namespace TeamTactics.Application.Teams
         }
 
         /// <summary>
-        /// 
+        /// Add player to team if both player and team exists. Throws <see cref="EntityNotFoundException"/> if either player or team does not exist."/>
         /// </summary>
-        /// <param name="teamId"></param>
-        /// <param name="playerId"></param>
+        /// <param name="teamId">The id of the team to add the player to.</param>
+        /// <param name="playerId">The id of the player to be added to the team.</param>
         /// <returns></returns>
         /// <exception cref="EntityNotFoundException" />
         /// <exception cref="TeamLockedException"></exception>
         /// <exception cref="PlayerAlreadyInTeamException"></exception>
         /// <exception cref="TeamFullException"></exception>
         /// <exception cref="MaximumPlayersFromSameClubReachedException"></exception>
-        public async Task AddPlayerToTeam(int teamId, int playerId)
+        public async Task AddPlayerToTeamAsync(int teamId, int playerId)
         {
             var player = await _playerRepository.FindById(playerId);
             if (player == null)
@@ -71,6 +81,94 @@ namespace TeamTactics.Application.Teams
 
             await _teamRepository.UpdateAsync(team);
             _logger.LogInformation("Player '{playerId}' added to team '{teamId}'", playerId, teamId);
+        }
+
+        /// <summary>
+        /// Delete a team.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />
+        public async Task DeleteTeamAsync(int teamId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            await _teamRepository.RemoveAsync(teamId);
+            _logger.LogInformation("Team '{teamId}' deleted", teamId);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="TeamNotFullException"></exception>
+        /// <exception cref="NoCaptainException"></exception>
+        public async Task LockTeamAsync(int teamId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            team.Lock();
+
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Team '{teamId}' locked", teamId);
+        }
+
+        /// <summary>
+        /// Remove a player from a team.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
+        public async Task RemovePlayerFromTeamAsync(int teamId, int playerId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+         
+            team.RemovePlayer(playerId);
+            
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Player '{playerId}' removed from team '{teamId}'", playerId, teamId);
+        }
+
+        /// <summary>
+        /// Set the team captain to the player with the given id.
+        /// Throws <see cref="EntityNotFoundException"/> if either team does not exist.
+        /// </summary>
+        /// <param name="teamId">The id of the team to change the id.</param>
+        /// <param name="playerId">The id of the player.</param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
+        /// <exception cref="PlayerAlreadyCaptainException"></exception>
+        public async Task SetTeamCaptain(int teamId, int playerId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            team.SetCaptain(playerId);
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Player '{playerId}' set as captain of team '{teamId}'", playerId, teamId);
         }
     }
 }
