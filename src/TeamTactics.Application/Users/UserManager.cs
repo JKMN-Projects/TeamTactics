@@ -93,7 +93,7 @@ namespace TeamTactics.Application.Users
                 Encoding.UTF8.GetBytes(password),
                 Encoding.UTF8.GetBytes(user.SecurityInfo.Salt));
 
-            if (!await _userRepository.CheckPasswordAsync(Convert.ToBase64String(passwordHash)))
+            if (!await _userRepository.CheckPasswordAsync(email, Convert.ToBase64String(passwordHash)))
             {
                 _logger.LogInformation("User with Id '{userId}' failed to login", user.Id);
                 throw new UnauthorizedException("Invalid password");
