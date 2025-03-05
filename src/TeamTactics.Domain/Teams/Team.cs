@@ -4,11 +4,9 @@ using TeamTactics.Domain.Teams.Exceptions;
 
 namespace TeamTactics.Domain.Teams
 {
-    public class Team
+    public class Team : Entity
     {
         private const int MAX_PLAYERS_PER_CLUB = 2;
-
-        public int Id { get; private set; }
         public string Name { get; private set; }
         public TeamStatus Status { get; private set; }
         public int UserId { get; private set; }

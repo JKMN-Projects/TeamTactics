@@ -1,13 +1,11 @@
 ﻿namespace TeamTactics.Domain.Players;
 
-public class PlayerPosition
+public class PlayerPosition : Entity
 {
-    public int Id { get; set; }
     public string Name { get; set; }
 
-    public PlayerPosition(int id, string name)
+    public PlayerPosition(int id, string name) : base(id)
     {
-        Id = id;
         Name = name;
     }
 }
