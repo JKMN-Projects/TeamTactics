@@ -1,0 +1,5 @@
+@startuml Delete tournament request
+
+json "DELETE request \nURI: /api/tournaments/{tournamentId} \nDeleteTournament" as DeleteTournament {}
+
+@enduml

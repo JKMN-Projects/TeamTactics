@@ -1,0 +1,12 @@
+@startuml Get tournament team response
+allowmixing
+
+agent "GET response \nURI: /api/tournaments/{tournamentId}/teams"
+  json "TournamentTeam" as J {
+    "teamId": "number",
+    "teamName": "string",
+    "totalPoints": "string"
+  }
+
+"GET response \nURI: /api/tournaments/{tournamentId}/teams" -> J 
+@enduml

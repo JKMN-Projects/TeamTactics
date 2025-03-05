@@ -1,8 +1,11 @@
 @startuml Create team request
+allowmixing
 
-json "CreateTeam\nPOST: /api/teams" as createTeamRequest {
+agent "POST request \nURI: /api/teams"
+  json "CreateTeam" as J {
     "name": "string",
-    "competitionId": 0
-}
+    "competitionId": "number"
+  }
 
+"POST request \nURI: /api/teams" -> J 
 @enduml

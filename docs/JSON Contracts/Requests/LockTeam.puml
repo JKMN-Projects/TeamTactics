@@ -1,7 +1,5 @@
-@startuml Lock team Request
+@startuml Lock team request
 
-json "LockTeamRequest\nPATCH: /api/teams/{teamId}/lock" as lockTeamRequest {
-    
-}
+json "PATCH request \nURI: /api/teams/{teamId}/lock \nLockTeam" as LockTeam {}
 
 @enduml

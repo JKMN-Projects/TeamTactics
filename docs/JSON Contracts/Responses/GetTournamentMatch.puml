@@ -1,0 +1,13 @@
+@startuml Get tournament match response
+allowmixing
+
+agent "GET response \nURI: /api/tournaments/{tournamentId}/match"
+  json "TournamentMatch" as J {
+    "homeClubName": "string",
+    "awayClubName": "string",
+    "competitionName": "string",
+    "utcTimestamp": "number"
+  }
+
+"GET response \nURI: /api/tournaments/{tournamentId}/match" -> J 
+@enduml

@@ -1,0 +1,11 @@
+@startuml Patch tournament request
+allowmixing
+
+agent "PATCH request \nURI: /api/tournaments/{tournamentId}"
+  json "PatchTournament" as J {
+    "name": "string",
+    "description": "string"
+  }
+
+"PATCH request \nURI: /api/tournaments/{tournamentId}" -> J 
+@enduml
