@@ -6,7 +6,7 @@ namespace TeamTactics.Domain.Teams
 {
     public class Team
     {
-        private const int MaxPlayersPerClub = 2;
+        private const int MAX_PLAYERS_PER_CLUB = 2;
 
         public int Id { get; private set; }
         public string Name { get; private set; }
@@ -53,12 +53,12 @@ namespace TeamTactics.Domain.Teams
                 throw new TeamFullException();
             }
 
-            if (_players.Where(p => p.ClubId == player.ClubId).Count() >= MaxPlayersPerClub)
+            if (_players.Where(p => p.ClubId == player.ActivePlayerContract.ClubId).Count() >= MAX_PLAYERS_PER_CLUB)
             {
-                throw new MaximumPlayersFromSameClubReachedException(player.ClubId);
+                throw new MaximumPlayersFromSameClubReachedException(player.ActivePlayerContract.ClubId);
             }
 
-            _players.Add(new TeamPlayer(player.Id, player.ClubId));
+            _players.Add(new TeamPlayer(player.Id, player.ActivePlayerContract.ClubId));
         }
 
         /// <summary>
@@ -110,8 +110,28 @@ namespace TeamTactics.Domain.Teams
             player.SetCaptain();
         }
 
+        /// <summary>
+        /// Lock the team and prevent any further mutations.
+        /// </summary>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="TeamNotFullException"></exception>
+        /// <exception cref="NoCaptainException"></exception>
         public void Lock()
         {
+            if (Status == TeamStatus.Locked) {
+                throw new TeamLockedException();
+            }
+
+            if (_players.Count < TeamNotFullException.REQUIRED_NUMBER_OF_PLAYERS)
+            {
+                throw new TeamNotFullException(_players.Count);
+            }
+
+            if (_players.Count(p => p.IsCaptain) != 1)
+            {
+                throw new NoCaptainException();
+            }
+
             Status = TeamStatus.Locked;
         }
 

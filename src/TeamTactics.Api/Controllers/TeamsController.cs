@@ -111,5 +111,56 @@ namespace TeamTactics.Api.Controllers
                     statusCode: StatusCodes.Status404NotFound);
             }
         }
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteTeam(int id)
+        {
+            await _teamManager.DeleteTeamAsync(id);
+            return NoContent();
+        }
+
+        [HttpPatch("{id:int}/lock")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> LockTeam(int id)
+        {
+            try
+            {
+                await _teamManager.LockTeam(id);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is already locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (TeamNotFullException ex)
+            {
+                return Problem(
+                    title: "The team is not full.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (NoCaptainException ex)
+            {
+                return Problem(
+                    title: "The team does not have a captain.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+        }
     }
 }

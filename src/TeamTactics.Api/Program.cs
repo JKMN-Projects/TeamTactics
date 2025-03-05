@@ -14,22 +14,23 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    string? conString = builder.Configuration.GetConnectionString("Postgres");
+    string? connString = builder.Configuration.GetConnectionString("Postgres");
 
-    if (string.IsNullOrWhiteSpace(conString))
+    if (string.IsNullOrWhiteSpace(connString))
     {
         throw new InvalidOperationException("Connection string not found");
     }
 
-    if (DatabaseMigrator.MigrateDatabase(conString, true) == 0)
-        DatabaseMigrator.MigrateDatabase(conString);
+    if (builder.Environment.IsDevelopment())
+        if (DatabaseMigrator.MigrateDatabase(connString, true) == 0)
+            DatabaseMigrator.MigrateDatabase(connString);
 
     // Serilog to ASPNET
     builder.Services.AddSerilog();
 
     // Health Checks
     builder.Services.AddHealthChecks()
-        .AddNpgSql(conString);
+        .AddNpgSql(connString);
 
     // Add services to the container.
     builder.Services.AddControllers();
@@ -40,7 +41,7 @@ try
     builder.Services.AddProblemDetails();
 
     builder.Services.AddApplication();
-    builder.Services.AddInfrastructure();
+    builder.Services.AddInfrastructure(builder.Configuration);
 
     // Options
     builder.Services.AddOptions<PasswordSecurityOptions>()
@@ -55,7 +56,7 @@ try
         app.UseSwaggerUI();
     }
 
-    app.MapHealthChecks("/health");
+    app.MapHealthChecks("/api/health");
 
     app.UseExceptionHandler();
     app.UseHttpsRedirection();
