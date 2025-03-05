@@ -3,5 +3,5 @@
 namespace TeamTactics.Api.Requests.Teams
 {
     public record AssignPlayerRequest(
-        [property: Required] int PlayerId);
+        [Required] int PlayerId);
 }
