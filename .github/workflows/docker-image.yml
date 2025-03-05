@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ScrapperRepo" ]
 
 jobs:
   build:
@@ -23,9 +23,7 @@ jobs:
       run: dotnet restore
 
     - name: Run Migration Verification
-      run: dotnet run --project tools/DbMigrator 
-      env: 
-        Connectionstrings__Postgres: ${{ secrets.DB_CONNECTION }}
+      run: dotnet run --project tools/DbMigrator ${{ secrets.DB_CONNECTION }}
 
     - uses: actions/checkout@v4
     - name: Login to GitHub Container Registry
