@@ -1,0 +1,7 @@
+@startuml Lock team Request
+
+json "LockTeamRequest\nPATCH: /api/teams/{teamId}/lock" as lockTeamRequest {
+    
+}
+
+@enduml

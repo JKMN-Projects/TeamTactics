@@ -53,7 +53,8 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.AddPlayerToTeam(id, request.PlayerId);
+                await _teamManager.AddPlayerToTeamAsync(id, request.PlayerId);
+                return NoContent();
             }
             catch (TeamLockedException ex)
             {
@@ -83,7 +84,43 @@ namespace TeamTactics.Api.Controllers
                     detail: ex.Description,
                     statusCode: StatusCodes.Status400BadRequest);
             }
+        }
 
+        [HttpPut("{teamId:int}/players/{playerId:int}/remove")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> RemovePlayerFromTeam(int teamId, int playerId)
+        {
+            try
+            {
+                await _teamManager.RemovePlayerFromTeamAsync(teamId, playerId);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (PlayerNotOnTeamException ex)
+            {
+                return Problem(
+                    title: "Player is not on the team.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status404NotFound);
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteTeam(int id)
+        {
+            await _teamManager.DeleteTeamAsync(id);
             return NoContent();
         }
 
@@ -122,6 +159,42 @@ namespace TeamTactics.Api.Controllers
                     title: "Player is already the captain.",
                     detail: ex.Description,
                     statusCode: StatusCodes.Status409Conflict);
+            }
+        }
+        [HttpPatch("{id:int}/lock")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> LockTeam(int id)
+        {
+            try
+            {
+                await _teamManager.LockTeamAsync(id);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is already locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (TeamNotFullException ex)
+            {
+                return Problem(
+                    title: "The team is not full.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (NoCaptainException ex)
+            {
+                return Problem(
+                    title: "The team does not have a captain.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
             }
         }
     }

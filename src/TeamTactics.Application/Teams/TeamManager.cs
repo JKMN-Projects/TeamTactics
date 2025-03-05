@@ -61,7 +61,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="PlayerAlreadyInTeamException"></exception>
         /// <exception cref="TeamFullException"></exception>
         /// <exception cref="MaximumPlayersFromSameClubReachedException"></exception>
-        public async Task AddPlayerToTeam(int teamId, int playerId)
+        public async Task AddPlayerToTeamAsync(int teamId, int playerId)
         {
             var player = await _playerRepository.FindById(playerId);
             if (player == null)
@@ -81,6 +81,70 @@ namespace TeamTactics.Application.Teams
 
             await _teamRepository.UpdateAsync(team);
             _logger.LogInformation("Player '{playerId}' added to team '{teamId}'", playerId, teamId);
+        }
+
+        /// <summary>
+        /// Delete a team.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />
+        public async Task DeleteTeamAsync(int teamId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            await _teamRepository.RemoveAsync(teamId);
+            _logger.LogInformation("Team '{teamId}' deleted", teamId);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="TeamNotFullException"></exception>
+        /// <exception cref="NoCaptainException"></exception>
+        public async Task LockTeamAsync(int teamId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            team.Lock();
+
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Team '{teamId}' locked", teamId);
+        }
+
+        /// <summary>
+        /// Remove a player from a team.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="TeamLockedException"></exception>
+        /// <exception cref="PlayerNotOnTeamException"></exception>
+        public async Task RemovePlayerFromTeamAsync(int teamId, int playerId)
+        {
+            var team = await _teamRepository.FindById(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+         
+            team.RemovePlayer(playerId);
+            
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Player '{playerId}' removed from team '{teamId}'", playerId, teamId);
         }
 
         /// <summary>
