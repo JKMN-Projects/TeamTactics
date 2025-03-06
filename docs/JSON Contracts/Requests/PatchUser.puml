@@ -1,0 +1,11 @@
+@startuml Patch team request
+allowmixing
+
+agent "PATCH request \nURI: /api/users/{userId}"
+  json "PatchTeam" as J {
+    "username": "string",
+    "email": "string"
+  }
+
+"PATCH request \nURI: /api/users/{userId}" -> J 
+@enduml

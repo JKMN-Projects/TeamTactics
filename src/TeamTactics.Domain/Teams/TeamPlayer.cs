@@ -14,6 +14,11 @@ namespace TeamTactics.Domain.Teams
             IsCaptain = false;
         }
 
+        public TeamPlayer(int playerId, int clubId, bool isCaptain) : this(playerId, clubId)
+        {
+            IsCaptain = isCaptain;
+        }
+
         internal void SetCaptain()
         {
             IsCaptain = true;

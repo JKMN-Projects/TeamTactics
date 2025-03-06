@@ -21,8 +21,15 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         return competitions;
     }
 
-    public Task<Competition?> FindByIdAsync(int id)
+    public async Task<Competition?> FindByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        string sql = @"SELECT id, name, start_date, end_date FROM team_tactics.competition";
+
+        var competition = await _dbConnection.QuerySingleOrDefaultAsync<Competition?>(sql);
+
+        return competition;
     }
 }

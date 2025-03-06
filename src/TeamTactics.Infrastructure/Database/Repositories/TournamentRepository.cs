@@ -49,12 +49,45 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             return tournament.Id;
         }
 
-        public Task RemoveAsync(int id)
+        /// <summary>
+        /// Should call Team Insert after, to create an empty team to join
+        /// </summary>
+        /// <param name="inviteCode"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckTournamentInviteCodeAsync(string inviteCode)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(inviteCode)) return false;
+
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("InviteCode", inviteCode);
+
+            string sql = @"SELECT id FROM team_tactics.user_tournament WHERE invite_code = @InviteCode";
+
+            var tourneyId = await _dbConnection.QuerySingleOrDefaultAsync<int?>(sql, parameters);
+
+            if (tourneyId == null) return false;
+
+            return true;
         }
 
-        public Task UpdateAsync(Tournament model)
+        public async Task RemoveAsync(int id)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", id);
+
+            //ON DELETE CASCADE deletes all player_user_team associated with the team
+            string sql = @"DELETE FROM team_tactics.user_tournament WHERE id = @Id";
+
+            await _dbConnection.ExecuteAsync(sql, parameters);
+        }
+
+        public Task UpdateAsync(Tournament tournament)
         {
             throw new NotImplementedException();
         }

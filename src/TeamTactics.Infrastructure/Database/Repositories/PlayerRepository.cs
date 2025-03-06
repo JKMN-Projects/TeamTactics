@@ -35,39 +35,36 @@ internal class PlayerRepository(IDbConnection dbConnection) : IPlayerRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"
+        string sql = $@"
     SELECT 
-        p.id AS ""Id"",
-        p.first_name AS ""FirstName"",
-        p.last_name AS ""LastName"",
-        c.id AS ""ClubId"",
-        c.name AS ""ClubName"",
-        pp.id AS ""PositionId"",
-        pp.name AS ""PositionName""
+        p.id AS ""{nameof(PlayerDto.Id)}"",
+        p.first_name AS ""{nameof(PlayerDto.FirstName)}"",
+        p.last_name AS ""{nameof(PlayerDto.LastName)}"",
+        c.id AS ""{nameof(PlayerDto.ClubId)}"",
+        c.name AS ""{nameof(PlayerDto.ClubName)}"",
+        pp.id AS ""{nameof(PlayerDto.PositionId)}"",
+        pp.name AS ""{nameof(PlayerDto.PositionName)}""
     FROM team_tactics.player p
     JOIN team_tactics.player_contract pc 
         ON p.id = pc.player_id AND pc.active = true
     JOIN team_tactics.club c 
         ON c.id = pc.club_id
     JOIN team_tactics.player_position pp 
-        ON pp.id = p.position_id";
+        ON pp.id = p.player_position_id
+    ";
 
         // Add competition filtering if provided
-        if (competitionId.HasValue)
-        {
-            sql += @"
-        JOIN team_tactics.club_competition cc 
-            ON c.id = cc.club_id
-        WHERE cc.competition_id = @CompetitionId";
-        }
-
         var parameters = new DynamicParameters();
         if (competitionId.HasValue)
         {
-            parameters.Add("CompetitionId", competitionId.Value);
+            sql += @"
+            JOIN team_tactics.club_competition cc 
+                ON c.id = cc.club_id
+            WHERE cc.competition_id = @CompetitionId";
+
+            parameters.Add("@CompetitionId", competitionId.Value);
         }
 
-        return await _dbConnection.QueryAsync<PlayerDto>(sql, parameters,
-            commandType: CommandType.Text);
+        return await _dbConnection.QueryAsync<PlayerDto>(sql, parameters);
     }
 }
