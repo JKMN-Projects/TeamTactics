@@ -140,8 +140,7 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT salt FROM team_tactics.user_account
-	WHERE id = @UserId";
+        string sql = @"SELECT salt FROM team_tactics.user_account WHERE id = @UserId";
 
         var parameters = new DynamicParameters();
         parameters.Add("UserId", userId);
@@ -156,7 +155,6 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        // SQL for inserting a single user with password hash
         string sql = @"
     INSERT INTO team_tactics.user_account (username, email, password_hash, salt) 
     VALUES (@Username, @Email, @PasswordHash, @Salt)
@@ -176,13 +174,61 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         return user;
     }
 
-    public Task RemoveAsync(User user)
+    public async Task RemoveAsync(User user)
     {
-        throw new NotImplementedException();
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", user.Id);
+
+        //ON DELETE CASCADE deletes all player_user_team associated with the team
+        string sql = @"DELETE FROM team_tactics.user_account WHERE id = @Id";
+
+        await _dbConnection.ExecuteAsync(sql, parameters);
     }
 
     public Task UpdateAsync(User user)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task UpdateInfoAsync(int userId, string username, string email)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        string sql = @"
+    UPDATE team_tactics.user_account SET
+        username = @Username, 
+        email = @Email
+    WHERE id = @UserId";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Username", username);
+        parameters.Add("Email", email);
+        parameters.Add("UserId", userId);
+
+        await _dbConnection.ExecuteAsync(sql, parameters);
+    }
+
+    public async Task UpdateSecurityAsync(int userId, string passwordHash, string salt)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        string sql = @"
+    UPDATE team_tactics.user_account SET
+        password_hash = @PasswordHash, 
+        salt = @Salt
+    WHERE id = @UserId";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("PasswordHash", passwordHash);
+        parameters.Add("Salt", salt);
+        parameters.Add("UserId", userId);
+
+
+        await _dbConnection.ExecuteAsync(sql, parameters);
     }
 }

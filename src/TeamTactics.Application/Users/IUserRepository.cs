@@ -18,4 +18,6 @@ public interface IUserRepository : IRepository<User, int>
     public Task<User?> FindByEmail(string email);
     public Task<string?> GetUserSaltAsync(int userId);
     public Task<ProfileDto> GetProfileAsync(int id);
+    public Task UpdateSecurityAsync(int userId, string passwordHash, string salt);
+    public Task UpdateInfoAsync(int userId, string username, string email);
 }
