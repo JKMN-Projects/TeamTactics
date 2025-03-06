@@ -8,7 +8,7 @@ package TeamAggregate <<Rectangle>> {
         +string Name
         +TeamStatus Status
         +int UserId
-        +int CompetitionId
+        +int TournamentId
         -List<TeamPlayer> _players
         +IReadOnlyCollection<TeamPlayer> Players
 
@@ -29,13 +29,8 @@ package TeamAggregate <<Rectangle>> {
         +bool IsCaptain   
     }
 
-    class TournamentEnrollments {
-        +int TournamentId
-    }
-
     Team o-- TeamStatus
     Team *-- "0..11" TeamPlayer
-    Team *-- "many" TournamentEnrollments
 }
 
 Team - Player

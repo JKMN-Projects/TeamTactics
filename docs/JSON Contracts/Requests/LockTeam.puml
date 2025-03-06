@@ -1,4 +1,5 @@
 @startuml Lock team request
+allowmixing
 
 json "PATCH request \nURI: /api/teams/{teamId}/lock \nLockTeam" as LockTeam {}
 
