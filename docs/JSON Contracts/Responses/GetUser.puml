@@ -1,0 +1,11 @@
+@startuml Get user response
+allowmixing
+
+agent "GET response \nURI: /api/users/{userId}"
+  json "User" as J {
+    "username": "number",
+    "email": "string"
+  }
+
+"GET response \nURI: /api/users/{userId}" -> J 
+@enduml
