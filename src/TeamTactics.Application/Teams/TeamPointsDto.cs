@@ -2,5 +2,11 @@
 
 public class TeamPointsDto
 {
-    public int TotalPoints { get; set; }
+
+    public decimal TotalPoints { get; set; }
+
+    public TeamPointsDto(decimal totalPoints)
+    {
+        TotalPoints = totalPoints;
+    }
 }

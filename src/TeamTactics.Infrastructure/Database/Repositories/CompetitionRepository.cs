@@ -1,13 +1,6 @@
 ﻿using Dapper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeamTactics.Application.Players;
 using TeamTactics.Domain.Competitions;
-using TeamTactics.Domain.Users;
 
 namespace TeamTactics.Infrastructure.Database.Repositories;
 
@@ -26,5 +19,4 @@ internal class CompetitionRepository(IDbConnection dbConnection)
 
         return competitions;
     }
-
 }
