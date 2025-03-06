@@ -1,6 +1,7 @@
 ﻿
 using Dapper;
 using System.Data;
+using TeamTactics.Domain.Clubs;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Users;
@@ -80,18 +81,87 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             if (dbConnection.State != ConnectionState.Open)
                 dbConnection.Open();
 
+            using var transaction = dbConnection.BeginTransaction();
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("FirstName", player.FirstName);
+                parameters.Add("LastName", player.LastName);
+                parameters.Add("ExternalId", player.ExternalId);
+                parameters.Add("PositionId", player.PositionId);
+                parameters.Add("DateOfBirth", player.BirthDate);
+                string sql = @"
+                    INSERT INTO team_tactics.player (first_name, last_name, player_position_id, birthdate, external_id)
+                    VALUES (@FirstName, @LastName, @PositionId, @DateOfBirth, @ExternalId)
+                    RETURNING id";
+                int id = await dbConnection.QuerySingleAsync<int>(sql, parameters);
+                player.SetId(id);
+
+                List<string> contractValues = [];
+                var contractParameters = new DynamicParameters();
+                for (int i = 0; i < player.PlayerContracts.Count; i++)
+                {
+                    var contract = player.PlayerContracts.ElementAt(i);
+                    contractValues.Add($"(@ClubId{i}, @PlayerId{i}, @Active{i})");
+                    contractParameters.Add($"ClubId{i}", contract.ClubId);
+                    contractParameters.Add($"PlayerId{i}", id);
+                    contractParameters.Add($"Active{i}", contract.Active);
+                }
+                string contractSql = $@"
+                    INSERT INTO team_tactics.player_contract (club_id, player_id, active)
+                    VALUES {string.Join(',', contractValues)}";
+
+                await dbConnection.ExecuteAsync(contractSql, contractParameters);
+                player.SetId(id);
+                transaction.Commit();
+                return id;
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+        #endregion
+
+        #region Seed Clubs
+        public static async Task<int> SeedClub(this IDbConnection dbConnection)
+        {
+            Club club = new ClubFaker()
+                .Generate();
+            return await SeedClub(dbConnection, club);
+        }
+
+        public static async Task<int> SeedClub(this IDbConnection dbConnection, Club club)
+        {
+            if (dbConnection.State != ConnectionState.Open)
+                dbConnection.Open();
+
             var parameters = new DynamicParameters();
-            parameters.Add("FirstName", player.FirstName);
-            parameters.Add("LastName", player.LastName);
-            parameters.Add("ExternalId", player.LastName);
-            parameters.Add("PositionId", player.PositionId);
-            parameters.Add("DateOfBirth", player.BirthDate);
+            parameters.Add("Name", club.Name);
+            parameters.Add("ExternalId", club.ExternalId);
+
             string sql = @"
-                INSERT INTO team_tactics.player (first_name, last_name, player_position_id, birthdate, external_id)
-                VALUES (@FirstName, @LastName, @PositionId, @DateOfBirth, @ExternalId)
+                INSERT INTO team_tactics.club (name, external_id)
+                VALUES (@Name, @ExternalId)
                 RETURNING id";
+
             int id = await dbConnection.QuerySingleAsync<int>(sql, parameters);
+            club.SetId(id);
             return id;
+        }
+
+        public static async Task<IEnumerable<Club>> SeedClubs(this IDbConnection dbConnection, int count)
+        {
+            List<Club> clubIds = new List<Club>();
+            for (int i = 0; i < count; i++)
+            {
+                Club club = new ClubFaker()
+                    .Generate();
+                int id = await SeedClub(dbConnection, club);
+                clubIds.Add(club);
+            }
+            return clubIds;
         }
         #endregion
     }

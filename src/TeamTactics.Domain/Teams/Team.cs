@@ -34,6 +34,22 @@ namespace TeamTactics.Domain.Teams
         }
 
         /// <summary>
+        /// Rename the team
+        /// </summary>
+        /// <param name="name">The new name of the team</param>
+        /// <exception cref="TeamLockedException"></exception>
+        public void Rename(string name)
+        {
+            if (Status == TeamStatus.Locked)
+            {
+                throw new TeamLockedException();
+            }
+
+            ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
+            Name = name;
+        }
+
+        /// <summary>
         /// Add a player to the team
         /// </summary>
         /// <param name="player">The player to be added</param>

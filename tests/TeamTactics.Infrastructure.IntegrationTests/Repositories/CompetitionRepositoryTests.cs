@@ -10,11 +10,9 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
     public abstract class CompetitionRepositoryTests : TestBase
     {
         private readonly CompetitionRepository _sut;
-        private readonly IDbConnection _dbConnection;
 
         protected CompetitionRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
         {
-            _dbConnection = GetService<IDbConnection>();
             _sut = new CompetitionRepository(_dbConnection);
         }
 

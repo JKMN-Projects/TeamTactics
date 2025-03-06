@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
+using TeamTactics.Domain.Clubs;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
@@ -10,12 +11,10 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories;
 
 public abstract class TournamentRepositoryTests : TestBase
 {
-    private readonly IDbConnection _dbConnection;
     private readonly TournamentRepository _sut;
 
     protected TournamentRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
     {
-        _dbConnection = GetService<IDbConnection>();
         _sut = new TournamentRepository(_dbConnection);
     }
 
@@ -110,11 +109,15 @@ public abstract class TournamentRepositoryTests : TestBase
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
             var teamRepository = GetService<ITeamRepository>();
 
-            List<Player> players = new PlayerFaker().Generate(11);
-            foreach (var player in players)
+            Queue<Club> clubs = new Queue<Club>(await _dbConnection.SeedClubs(11));
+
+            List<Player> players = [];
+            for (int i = 0; i < 11; i++)
             {
-                int playerId = await _dbConnection.SeedPlayer(player);
-                player.SetId(playerId);
+                Player insertedPlayer = new PlayerFaker(clubs: [clubs.Dequeue()])
+                    .Generate();
+                int playerId = await _dbConnection.SeedPlayer(insertedPlayer);
+                players.Add(insertedPlayer);
             }
 
             List<Team> teams = new TeamFaker(players: players)
