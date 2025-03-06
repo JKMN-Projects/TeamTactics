@@ -63,13 +63,13 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="MaximumPlayersFromSameClubReachedException"></exception>
         public async Task AddPlayerToTeamAsync(int teamId, int playerId)
         {
-            var player = await _playerRepository.FindById(playerId);
+            var player = await _playerRepository.FindByIdAsync(playerId);
             if (player == null)
             {
                 throw EntityNotFoundException.ForEntity<Player>(playerId, nameof(Player.Id));
             }
 
-            var team = await _teamRepository.FindById(teamId);
+            var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
             {
                 throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
@@ -91,7 +91,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="EntityNotFoundException" />
         public async Task DeleteTeamAsync(int teamId)
         {
-            var team = await _teamRepository.FindById(teamId);
+            var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
             {
                 throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
@@ -112,7 +112,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="NoCaptainException"></exception>
         public async Task LockTeamAsync(int teamId)
         {
-            var team = await _teamRepository.FindById(teamId);
+            var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
             {
                 throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
@@ -135,7 +135,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="PlayerNotOnTeamException"></exception>
         public async Task RemovePlayerFromTeamAsync(int teamId, int playerId)
         {
-            var team = await _teamRepository.FindById(teamId);
+            var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
             {
                 throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
@@ -160,7 +160,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="PlayerAlreadyCaptainException"></exception>
         public async Task SetTeamCaptain(int teamId, int playerId)
         {
-            var team = await _teamRepository.FindById(teamId);
+            var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
             {
                 throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));

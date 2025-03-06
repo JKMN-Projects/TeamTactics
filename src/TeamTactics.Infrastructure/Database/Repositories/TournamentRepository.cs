@@ -14,7 +14,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Tournament?> FindById(int id)
+        public Task<Tournament?> FindByIdAsync(int id)
         {
             throw new NotImplementedException();
         }

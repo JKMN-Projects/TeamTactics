@@ -21,7 +21,7 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         return competitions;
     }
 
-    public async Task<Competition?> FindById(int id)
+    public async Task<Competition?> FindByIdAsync(int id)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
@@ -32,5 +32,4 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
 
         return competition;
     }
-
 }

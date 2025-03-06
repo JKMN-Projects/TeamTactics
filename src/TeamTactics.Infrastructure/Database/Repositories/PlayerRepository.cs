@@ -14,7 +14,7 @@ internal class PlayerRepository(IDbConnection dbConnection) : IPlayerRepository
         throw new NotImplementedException();
     }
 
-    public async Task<Player?> FindById(int id)
+    public async Task<Player?> FindByIdAsync(int id)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();

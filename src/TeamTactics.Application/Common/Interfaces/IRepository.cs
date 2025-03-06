@@ -4,6 +4,6 @@
         where TId : notnull
     {
         public Task<IEnumerable<TModel>> FindAllAsync();
-        public Task<TModel?> FindById(TId id);
+        public Task<TModel?> FindByIdAsync(TId id);
     }
 }
