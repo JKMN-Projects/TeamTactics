@@ -1,0 +1,11 @@
+@startuml Join tournament request
+allowmixing
+
+agent "POST request \nURI: /api/tournaments/join"
+  json "JoinTournament" as J {
+    "inviteCode": "string",
+    "userId": "number"
+  }
+
+"POST request \nURI: /api/tournaments/join" -> J 
+@enduml
