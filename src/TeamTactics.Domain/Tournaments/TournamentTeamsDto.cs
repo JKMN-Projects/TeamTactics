@@ -6,11 +6,5 @@ using System.Threading.Tasks;
 
 namespace TeamTactics.Domain.Tournaments
 {
-    public class TournamentTeamsDto
-    {
-        public int TeamId { get; set; }
-        public string TeamName { get; set; }
-        public int UserId { get; set; }
-        public string Username { get; set; }
-    }
+    public sealed record TournamentTeamsDto(int TeamId, string TeamName, int UserId, string Username);
 }

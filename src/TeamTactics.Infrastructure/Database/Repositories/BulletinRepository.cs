@@ -20,7 +20,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         throw new NotImplementedException();
     }
 
-    public async Task<Bulletin?> FindById(int id)
+    public async Task<Bulletin?> FindByIdAsync(int id)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
