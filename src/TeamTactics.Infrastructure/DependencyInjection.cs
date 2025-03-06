@@ -5,6 +5,8 @@ using System.Data.Common;
 using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Players;
+using TeamTactics.Application.Teams;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Application.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
 using TeamTactics.Infrastructure.Hashing;
@@ -31,6 +33,9 @@ namespace TeamTactics.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<ICompetitionRepository, CompetitionRepository>();
+            services.AddScoped<ITournamentRepository, TournamentRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
+
             return services;
         }
     }
