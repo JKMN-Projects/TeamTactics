@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Players;
+using TeamTactics.Application.Teams;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Application.Users;
 
 namespace TeamTactics.Application;
