@@ -14,7 +14,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<Team?> FindById(int id)
+        public async Task<Team?> FindByIdAsync(int id)
         {
 
             if (_dbConnection.State != ConnectionState.Open)

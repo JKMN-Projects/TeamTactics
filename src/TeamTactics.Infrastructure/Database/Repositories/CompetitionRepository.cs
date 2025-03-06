@@ -21,9 +21,8 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         return competitions;
     }
 
-    public Task<Competition?> FindById(int id)
+    public Task<Competition?> FindByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
-
 }
