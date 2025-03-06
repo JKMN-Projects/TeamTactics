@@ -15,9 +15,6 @@ namespace TeamTactics.Domain.Teams
         private readonly List<TeamPlayer> _players = new List<TeamPlayer>();
         public IReadOnlyCollection<TeamPlayer> Players => _players.AsReadOnly();
 
-        private readonly List<TournamentEnrollments> _enrollments = new List<TournamentEnrollments>();
-        public IReadOnlyCollection<TournamentEnrollments> Enrollments => _enrollments.AsReadOnly();
-
         public Team(string name, int userId, int tournamentId)
         {
             Name = name;
@@ -34,6 +31,22 @@ namespace TeamTactics.Domain.Teams
             UserId = userId;
             TournamentId = tournamentId;
             _players = players;
+        }
+
+        /// <summary>
+        /// Rename the team
+        /// </summary>
+        /// <param name="name">The new name of the team</param>
+        /// <exception cref="TeamLockedException"></exception>
+        public void Rename(string name)
+        {
+            if (Status == TeamStatus.Locked)
+            {
+                throw new TeamLockedException();
+            }
+
+            ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
+            Name = name;
         }
 
         /// <summary>
@@ -148,16 +161,6 @@ namespace TeamTactics.Domain.Teams
             }
 
             Status = TeamStatus.Locked;
-        }
-
-        public void EnrollInTournament(int tournamentId)
-        {
-            if (Status == TeamStatus.Locked)
-            {
-                throw new TeamLockedException();
-            }
-
-            _enrollments.Add(new TournamentEnrollments(tournamentId));
         }
     }
 }

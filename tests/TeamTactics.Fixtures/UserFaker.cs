@@ -12,8 +12,6 @@ namespace TeamTactics.Fixtures
                 f.Internet.Email(),
                 new SecurityInfo(Convert.ToBase64String(f.Random.Bytes(32)))
             ));
-
-            RuleFor(u => u.Id, f => f.Random.Int(min: 1));
         }
     }
 }

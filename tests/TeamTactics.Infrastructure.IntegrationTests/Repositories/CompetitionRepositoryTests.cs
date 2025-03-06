@@ -2,18 +2,17 @@
 using Dapper;
 using System.Data;
 using TeamTactics.Domain.Competitions;
+using TeamTactics.Fixtures;
 using TeamTactics.Infrastructure.Database.Repositories;
 
-namespace TeamTactics.Infrastructure.IntegrationTests
+namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
     public abstract class CompetitionRepositoryTests : TestBase
     {
         private readonly CompetitionRepository _sut;
-        private readonly IDbConnection _dbConnection;
 
         protected CompetitionRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
         {
-            _dbConnection = GetService<IDbConnection>();
             _sut = new CompetitionRepository(_dbConnection);
         }
 
@@ -22,7 +21,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             public FindAllAsync(CustomWebApplicationFactory factory) : base(factory)
             {
             }
-            
+
             private IEnumerable<Competition> SeedCompetitions()
             {
                 List<Competition> seededCompetitions = [
@@ -49,7 +48,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
                 return seededCompetitions;
             }
 
-            
+
             [Fact]
             public async Task Should_ReturnAllCompetitions()
             {
@@ -68,5 +67,43 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             }
         }
 
+        public sealed class FindByIdAsync : CompetitionRepositoryTests
+        {
+            public FindByIdAsync(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
+
+            [Fact]
+            public async Task Should_ReturnCompetition_When_CompetitionExists()
+            {
+                // Arrange
+                var expectedCompetition = new CompetitionFaker("Premier League")
+                    .Generate();
+                int competitionId = await _dbConnection.SeedCompetitonAsync(expectedCompetition);
+
+                // Act
+                var competition = await _sut.FindByIdAsync(competitionId);
+
+                // Assert
+                Assert.NotNull(competition);
+                Assert.NotEqual((int)default, competition.Id);
+                Assert.Equal(expectedCompetition.Name, competition.Name);
+                Assert.Equal(expectedCompetition.StartDate, competition.StartDate);
+                Assert.Equal(expectedCompetition.EndDate, competition.EndDate);
+            }
+
+            [Fact]
+            public async Task Should_ReturnNull_When_CompetitionDoesNotExist()
+            {
+                // Arrange
+                int competitionId = 99;
+
+                // Act
+                var competition = await _sut.FindByIdAsync(competitionId);
+
+                // Assert
+                Assert.Null(competition);
+            }
+        }
     }
 }
