@@ -1,5 +1,4 @@
-﻿
-namespace TeamTactics.Application.Players;
+﻿namespace TeamTactics.Application.Players;
 
 public record PlayerDto(
     int Id,
@@ -8,5 +7,7 @@ public record PlayerDto(
     int ClubId,
     string ClubName,
     int PositionId,
-    string PostionName);
+    string PositionName);
+
+
 
