@@ -11,7 +11,7 @@ public static class DependencyInjection
         // Managers
         services.AddScoped<UserManager>();
         services.AddScoped<PlayerManager>();
-        services.AddScoped<TeamManager>()
+        services.AddScoped<TeamManager>();
         services.AddScoped<CompetitionManager>();
         services.AddScoped<TournamentManager>();
         // Validators
