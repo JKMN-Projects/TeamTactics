@@ -1,7 +1,5 @@
-@startuml Delete team Request
+@startuml Delete team request
 
-json "DeleteTeamRequest\nDELETE: /api/teams/{teamId}" as deleteTeamRequest {
-    
-}
+json "DELETE request \nURI: /api/teams/{teamId} \nDeleteTeam" as DeleteTeam {}
 
 @enduml

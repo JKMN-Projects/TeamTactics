@@ -3,6 +3,6 @@
 namespace TeamTactics.Api.Requests.Teams
 {
     public record CreateTeamRequest(
-        [property:Required] string Name,
-        [property:Required] int competitionId);
+        [Required] string Name,
+        [Required] int competitionId);
 }

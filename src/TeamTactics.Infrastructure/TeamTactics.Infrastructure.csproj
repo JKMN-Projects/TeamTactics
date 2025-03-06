@@ -20,4 +20,8 @@
     <ProjectReference Include="..\TeamTactics.Application\TeamTactics.Application.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="TeamTactics.Infrastructure.IntegrationTests"/>
+	</ItemGroup>
+	
 </Project>

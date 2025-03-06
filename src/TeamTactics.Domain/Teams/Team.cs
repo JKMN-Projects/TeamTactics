@@ -4,15 +4,13 @@ using TeamTactics.Domain.Teams.Exceptions;
 
 namespace TeamTactics.Domain.Teams
 {
-    public class Team
+    public class Team : Entity
     {
         private const int MAX_PLAYERS_PER_CLUB = 2;
-
-        public int Id { get; private set; }
         public string Name { get; private set; }
         public TeamStatus Status { get; private set; }
         public int UserId { get; private set; }
-        public int CompetitionId { get; private set; }
+        public int TournamentId { get; private set; }
 
         private readonly List<TeamPlayer> _players = new List<TeamPlayer>();
         public IReadOnlyCollection<TeamPlayer> Players => _players.AsReadOnly();
@@ -20,11 +18,11 @@ namespace TeamTactics.Domain.Teams
         private readonly List<TournamentEnrollments> _enrollments = new List<TournamentEnrollments>();
         public IReadOnlyCollection<TournamentEnrollments> Enrollments => _enrollments.AsReadOnly();
 
-        public Team(string name, int userId, int competitionId)
+        public Team(string name, int userId, int tournamentId)
         {
             Name = name;
             UserId = userId;
-            CompetitionId = competitionId;
+            TournamentId = tournamentId;
             Status = TeamStatus.Draft;
         }
 

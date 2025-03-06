@@ -1,9 +1,12 @@
-@startuml Authentication Token Response
+@startuml Authentication token response
+allowmixing
 
-json "/api/authentication/login" as authenticationTokenResponse {
+agent "GET response \nURI: /api/authentication/login"
+  json "AuthenticationToken" as J {
     "token": "string",
     "tokenType": "string",
-    "expiresIn": 0
-}
+    "expiresIn": "number"
+  }
 
+"GET response \nURI: /api/authentication/login" -> J 
 @enduml

@@ -1,9 +1,12 @@
-@startuml Register User Request
+@startuml Register request
+allowmixing
 
-json "/api/users/register" as registerUserRequest {
+agent "POST request \nURI: /api/users/register"
+  json "RegisterUser" as J {
   "username": "string",
   "email": "string",
   "password": "string"
-}
+  }
 
+"POST request \nURI: /api/users/register" -> J 
 @enduml

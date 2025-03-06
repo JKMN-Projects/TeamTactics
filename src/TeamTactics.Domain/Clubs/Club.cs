@@ -1,8 +1,7 @@
 ﻿namespace TeamTactics.Domain.Clubs;
 
-public class Club
+public class Club : Entity
 {
-    public int Id { get; set; }
     public string Name { get; set; }
     public string ExternalId { get; set; }
 

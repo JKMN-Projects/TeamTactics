@@ -13,14 +13,14 @@ namespace TeamTactics.Fixtures
 
             CustomInstantiator(f => new Player(f.Person.FirstName, f.Person.LastName, DateOnly.FromDateTime(f.Person.DateOfBirth), externalId, positionId));
 
-            int playerId = faker.UniqueIndex;
+            int playerId = Faker.GlobalUniqueIndex;
             RuleFor(x => x.Id, playerId);
 
             FinishWith((f, p) =>
             {
                 for (int i = 0; i < playerContracts; i++)
                 {
-                    int clubId = faker.Random.Int(1, 100);
+                    int clubId = faker.Random.Int(playerId * 100, playerId * 100 + 99);
                     p.SignContract(clubId);
                 }
             });

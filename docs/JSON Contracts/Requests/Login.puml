@@ -1,8 +1,11 @@
-@startuml Login Request
+@startuml Login request
+allowmixing
 
- json "/api/authentication/login" as loginRequest {
-    "email": "string",
+agent "POST request \nURI: /api/authentication/login"
+  json "Login" as J {
+    "emailOrusername": "string",
     "password": "string"
-}
+  }
 
+"POST request \nURI: /api/authentication/login" -> J 
 @enduml

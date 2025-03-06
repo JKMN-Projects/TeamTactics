@@ -43,7 +43,7 @@ namespace TeamTactics.Infrastructure.Tokens
         private static IEnumerable<Claim> BuildUserClaims(User user)
         {
             yield return new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
-            yield return new Claim(ClaimTypes.Name, user.UserName);
+            yield return new Claim(ClaimTypes.Name, user.Username);
             yield return new Claim(ClaimTypes.Email, user.Email);
         }
     }

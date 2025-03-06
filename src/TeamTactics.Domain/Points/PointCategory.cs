@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace TeamTactics.Domain.Points;
 
-public class PointCategory(int id, string name, double pointAmount, bool active)
+public class PointCategory : Entity
 {
-    public int Id { get; set; } = id;
-    public string Name { get; set; } = name;
-    public double PointAmount { get; set; } = pointAmount;
-    public bool Active { get; set; } = active;
+    public string Name { get; set; }
+    public double PointAmount { get; set; }
+    public bool Active { get; set; }
+
+    public PointCategory(int id, string name, double pointAmount, bool active) : base(id)
+    {
+        Name = name;
+        PointAmount = pointAmount;
+        Active = active;
+    }
 }

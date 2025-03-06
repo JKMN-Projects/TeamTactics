@@ -41,4 +41,8 @@ interface ICompetitionRepository {
 }
 ICRUDRepository <|-- ICompetitionRepository : extends, T=Competition, TId=int
 
+interface ITournamentRepository {
+}
+ICRUDRepository <|-- ITournamentRepository : extends, T=Competition, TId=int
+
 @enduml 
