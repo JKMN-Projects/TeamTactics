@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Fixtures", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Domain.UnitTests", "tests\TeamTactics.Domain.UnitTests\TeamTactics.Domain.UnitTests.csproj", "{D7A1187F-9CE6-4875-B641-BF2D56FC4F3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Webscraper", "TeamTactics.Webscraper\TeamTactics.Webscraper.csproj", "{FAE01BF5-C312-49F4-B50A-E8585AC875C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamTactics.Webscraper", "src\TeamTactics.Webscraper\TeamTactics.Webscraper.csproj", "{FAE01BF5-C312-49F4-B50A-E8585AC875C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
