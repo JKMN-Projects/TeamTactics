@@ -1,0 +1,16 @@
+@startuml Get competition player response
+allowmixing
+
+agent "GET response \nURI: /api/players/competitions/{competitionId}"
+  json "Player" as J {
+    "id": "number",
+    "firstName": "string",
+    "lastName": "string",
+    "clubId": "number",
+    "clubName": "string",
+    "positionId": "number",
+    "positionName": "string"
+  }
+
+"GET response \nURI: /api/players/competitions/{competitionId}" -> J 
+@enduml

@@ -1,8 +1,8 @@
-@startuml Get point team response
+@startuml Get team point response
 allowmixing
 
-agent "GET response \nURI: /api/points/teams/{teamId}"
-  json "PointTeam" as J {
+agent "GET response \nURI: /api/teams/{teamId}/points"
+  json "TeamPoint" as J {
     "playerName": "string",
     "clubName": "string",
     "pointCategoryName": "string",
@@ -10,5 +10,5 @@ agent "GET response \nURI: /api/points/teams/{teamId}"
     "totalPoints": "number"
   }
 
-"GET response \nURI: /api/points/teams/{teamId}" -> J 
+"GET response \nURI: /api/teams/{teamId}/points" -> J 
 @enduml
