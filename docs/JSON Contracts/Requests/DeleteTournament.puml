@@ -1,6 +1,8 @@
 @startuml Delete tournament request
 allowmixing
 
-json "DELETE request \nURI: /api/tournaments/{tournamentId} \nDeleteTournament" as DeleteTournament {}
+json "DELETE request \nURI: /api/tournaments/{tournamentId} \nDeleteTournament" as DeleteTournament {
+    
+}
 
 @enduml

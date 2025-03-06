@@ -1,6 +1,8 @@
 @startuml Delete team request
 allowmixing
 
-json "DELETE request \nURI: /api/teams/{teamId} \nDeleteTeam" as DeleteTeam {}
+json "DELETE request \nURI: /api/teams/{teamId} \nDeleteTeam" as DeleteTeam {
+    
+}
 
 @enduml
