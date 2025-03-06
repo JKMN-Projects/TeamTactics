@@ -49,8 +49,16 @@ namespace TeamTactics.Api.Middleware
                     validationErrors = validationEx.Errors.ToDictionary();
                     break;
                 case UnauthorizedException unauthEx:
-                    statusCode = StatusCodes.Status401Unauthorized;
-                    errorMessage = "Unauthorized.";
+                    if (isUserAuthenticated)
+                    {
+                        statusCode = StatusCodes.Status403Forbidden;
+                        errorMessage = "Forbidden.";
+                    }
+                    else
+                    {
+                        statusCode = StatusCodes.Status401Unauthorized;
+                        errorMessage = "Unauthorized.";
+                    }
                     break;
                 case EntityNotFoundException entityNotFoundEx:
                     statusCode = StatusCodes.Status404NotFound;

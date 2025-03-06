@@ -53,7 +53,7 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         return user;
     }
 
-    public async Task<User?> FindById(int id)
+    public async Task<User?> FindByIdAsync(int id)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
