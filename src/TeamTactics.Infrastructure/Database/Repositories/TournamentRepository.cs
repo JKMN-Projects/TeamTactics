@@ -1,10 +1,8 @@
 ﻿using Dapper;
 using System.Data;
-using System.Data.Common;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Tournaments;
-using TeamTactics.Domain.Users;
 
 namespace TeamTactics.Infrastructure.Database.Repositories
 {

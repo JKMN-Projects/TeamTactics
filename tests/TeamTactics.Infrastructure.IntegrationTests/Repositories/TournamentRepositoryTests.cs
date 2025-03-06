@@ -1,11 +1,9 @@
-﻿
-using Dapper;
-using System.Data;
+﻿using System.Data;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
+using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
-using TeamTactics.Fixtures;
 using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories;
@@ -102,23 +100,50 @@ public abstract class TournamentRepositoryTests : TestBase
             Assert.Equal("Id", ex.KeyName);
         }
 
-        //[Fact]
-        //public async Task Should_DeleteEnrolledTeam_When_TournamentIsDeleted()
-        //{
-        //    // Arrange
-        //    int userId = await _dbConnection.SeedUserAsync();
-        //    int competitionId = await _dbConnection.SeedCompetitonAsync();
-        //    var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
-        //    int tournamentId = await _sut.InsertAsync(tournamentToInsert);
-        //    var teamRepository = GetService<ITeamRepository>();
+        [Fact]
+        public async Task Should_DeleteEnrolledTeam_When_TournamentIsDeleted()
+        {
+            // Arrange
+            int userId = await _dbConnection.SeedUserAsync();
+            int competitionId = await _dbConnection.SeedCompetitonAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            int tournamentId = await _sut.InsertAsync(tournamentToInsert);
+            var teamRepository = GetService<ITeamRepository>();
 
-        //    for (int i = 0; i < 3; i++)
-        //    {
-        //        Team team = new TeamFaker().Generate();
-        //        await teamRepository.InsertAsync(team);
-        //    }
+            List<Player> players = new PlayerFaker().Generate(11);
+            foreach (var player in players)
+            {
+                int playerId = await _dbConnection.SeedPlayer(player);
+                player.SetId(playerId);
+            }
 
-        //    int teamId = await _dbConnection.SeedTeamAsync(tournamentId);
-        //}
+            List<Team> teams = new TeamFaker(players: players)
+                .RuleFor(t => t.UserId, userId)
+                .RuleFor(t => t.TournamentId, tournamentId)
+                .Generate(3);
+
+            foreach (var team in teams)
+            {
+                await teamRepository.InsertAsync(team);
+            }
+
+            // Act
+            await _sut.RemoveAsync(tournamentId);
+
+            // Assert
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            string sql = @"
+    SELECT id
+    FROM team_tactics.user_team
+    WHERE user_tournament_id = @TournamentId";
+            var parameters = new DynamicParameters();
+            parameters.Add("TournamentId", tournamentId);
+
+            var teamIds = await _dbConnection.QueryAsync<int>(sql, parameters);
+
+            Assert.Empty(teamIds);
+        }
     }
 }

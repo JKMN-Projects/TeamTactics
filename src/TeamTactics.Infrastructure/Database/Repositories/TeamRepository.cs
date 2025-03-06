@@ -189,21 +189,45 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
 
-                string teamSql = @"
-            INSERT INTO team_tactics.user_team 
-                (id, name, status, locked_date, user_account_id, user_tournament_id)
-            VALUES 
-                (@Id, @Name, @Status, @LockedDate, @UserId, @TournamentId)
-            ON CONFLICT (id) DO UPDATE SET
-                name = EXCLUDED.name,
-                status = EXCLUDED.status,
-                locked_date = EXCLUDED.locked_date,
-                user_account_id = EXCLUDED.user_account_id,
-                user_tournament_id = EXCLUDED.user_tournament_id
-            RETURNING id";
-
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value); 
+                string teamSql;
+                if (model.Id == 0)
+                {
+                    teamSql = @"
+    INSERT INTO team_tactics.user_team
+        (name, status, locked_date, user_account_id, user_tournament_id)
+    VALUES
+        (@Name, @Status, @LockedDate, @UserId, @TournamentId)
+    RETURNING id";
+                }
+                else
+                {
+                    parameters.Add("Id", model.Id);
+                    teamSql = @"
+    UPDATE team_tactics.user_team SET
+        name = @Name,
+        status = @Status,
+        locked_date = @LockedDate,
+        user_account_id = @UserId,
+        user_tournament_id = @TournamentId
+    WHERE
+        id = @Id";
+                }
+
+            //    string teamSql = @"
+            //INSERT INTO team_tactics.user_team 
+            //    (id, name, status, locked_date, user_account_id, user_tournament_id)
+            //VALUES 
+            //    (COALESCE(@Id, DEFAULT), @Name, @Status, @LockedDate, @UserId, @TournamentId)
+            //ON CONFLICT (id) DO UPDATE SET
+            //    name = EXCLUDED.name,
+            //    status = EXCLUDED.status,
+            //    locked_date = EXCLUDED.locked_date,
+            //    user_account_id = EXCLUDED.user_account_id,
+            //    user_tournament_id = EXCLUDED.user_tournament_id
+            //RETURNING id";
+
+                //parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value);
                 parameters.Add("Name", model.Name);
                 parameters.Add("Status", (int)model.Status);
                 parameters.Add("LockedDate", lockedDate);
