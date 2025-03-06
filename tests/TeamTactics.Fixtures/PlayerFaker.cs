@@ -13,7 +13,7 @@ namespace TeamTactics.Fixtures
 
             CustomInstantiator(f => new Player(f.Person.FirstName, f.Person.LastName, DateOnly.FromDateTime(f.Person.DateOfBirth), externalId, positionId));
 
-            int playerId = faker.UniqueIndex;
+            int playerId = Faker.GlobalUniqueIndex;
             RuleFor(x => x.Id, playerId);
 
             FinishWith((f, p) =>
