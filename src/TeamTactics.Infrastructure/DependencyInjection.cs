@@ -9,6 +9,7 @@ using TeamTactics.Application.Teams;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Application.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
+using TeamTactics.Infrastructure.Database.TypeHandlers;
 using TeamTactics.Infrastructure.Hashing;
 using TeamTactics.Infrastructure.Tokens;
 
@@ -23,6 +24,10 @@ namespace TeamTactics.Infrastructure
             services.AddSingleton<IAuthTokenProvider, JwtTokenProvider>();
 
             var connectString = configuration.GetConnectionString("Postgres");
+
+            // Register Dapper TypeHandlers
+            Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+            Dapper.SqlMapper.AddTypeHandler(new DateOnlyNullableTypeHandler());
 
             services.AddScoped<IDbConnection>(sp => {
                 var connection = new Npgsql.NpgsqlConnection(configuration.GetConnectionString("Postgres"));
