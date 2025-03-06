@@ -11,15 +11,18 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
             .WithDatabase("TeamTactics-IntegrationTests")
             .WithUsername("postgres")
             .WithPassword("postgres")
+            .WithExposedPort(60014)
             .Build();
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             base.ConfigureWebHost(builder);
+            string connString = postgreSqlContainer.GetConnectionString();
             builder.UseSetting(
-                "ConnectionString:Database", // TODO: Verify this is the correct setting.
-                postgreSqlContainer.GetConnectionString());
+                "Connectionstrings:Postgres",
+                connString);
         }
+
 
         public async Task InitializeAsync()
         {

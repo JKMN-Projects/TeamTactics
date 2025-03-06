@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 using System.Data.Common;
 using TeamTactics.Application.Common.Interfaces;
+using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Players;
 using TeamTactics.Application.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
@@ -19,6 +20,8 @@ namespace TeamTactics.Infrastructure
             services.AddSingleton<IHashingService, Rfc2898HashingService>();
             services.AddSingleton<IAuthTokenProvider, JwtTokenProvider>();
 
+            var connectString = configuration.GetConnectionString("Postgres");
+
             services.AddScoped<IDbConnection>(sp => {
                 var connection = new Npgsql.NpgsqlConnection(configuration.GetConnectionString("Postgres"));
                 return connection;
@@ -27,6 +30,7 @@ namespace TeamTactics.Infrastructure
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<ICompetitionRepository, CompetitionRepository>();
             return services;
         }
     }

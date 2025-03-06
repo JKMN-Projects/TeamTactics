@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Xunit.Abstractions;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
 {
