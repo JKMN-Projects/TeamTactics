@@ -13,14 +13,13 @@ public sealed partial class CompetitionManager
 
     public async Task<IEnumerable<CompetitionDto>> GetAllCompetitionsAsync()
     {
-        var competitions = await _competitionRepository.FindAllAsync();
+        var competitions = await _competitionRepository.FindAllAsync(); // TODO: Should properly be a DTO
 
-        return competitions.Select(c => new CompetitionDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-            StartDate = c.StartDate,
-            EndDate = c.EndDate
-        });
+        return competitions.Select(c => new CompetitionDto(
+            Id: c.Id,
+            Name: c.Name,
+            StartDate: c.StartDate,
+            EndDate: c.EndDate
+        ));
     }
 }

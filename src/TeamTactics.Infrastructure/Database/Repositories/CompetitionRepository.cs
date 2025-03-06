@@ -14,7 +14,7 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT id, name, start_date, end_date FROM team_tactics.competitions";
+        string sql = @"SELECT id, name, start_date, end_date FROM team_tactics.competition";
 
         var competitions = await _dbConnection.QueryAsync<Competition>(sql);
 
