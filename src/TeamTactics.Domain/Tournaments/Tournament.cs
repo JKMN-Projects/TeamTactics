@@ -10,12 +10,13 @@ public class Tournament : Entity
 
     public string InviteCode { get; private set; }
 
-    public Tournament(string name, int createdByUserId, int competitionId, string description = "")
+    public Tournament(string name, int createdByUserId, int competitionId, string description = "", string inviteCode = "")
     {
         Name = name;
         Description = description;
         CreatedByUserId = createdByUserId;
         CompetitionId = competitionId;
+        InviteCode = inviteCode;
     }
 
     public void SetInviteCode(string newCode) => this.InviteCode = newCode;
