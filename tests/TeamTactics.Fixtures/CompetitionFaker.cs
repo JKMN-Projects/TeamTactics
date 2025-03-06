@@ -15,12 +15,15 @@ namespace TeamTactics.Fixtures
             "Superliga",
         ];
 
-        public CompetitionFaker()
+        public CompetitionFaker(string? competitionName = null)
         {
             Faker faker = new Faker();
             int year = faker.Date.Past(yearsToGoBack: 10).Year;
             bool isFall = faker.Random.Bool();
-            string competitionName = faker.PickRandom(CompetitionNames);
+            if (competitionName is null)
+            {
+                competitionName = faker.PickRandom(CompetitionNames);
+            }
 
             // Set Start and End Dates for a half season
             DateOnly startDate = new DateOnly(
@@ -37,7 +40,6 @@ namespace TeamTactics.Fixtures
                 startDate,
                 endDate
             ));
-            RuleFor(c => c.Id, f => f.Random.Int(min: 1));
         }
 
 

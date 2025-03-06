@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System.Data;
 using System.Data.Common;
+using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Tournaments;
 using TeamTactics.Domain.Users;
@@ -58,10 +59,13 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             parameters.Add("Id", id);
 
             //ON DELETE CASCADE deletes all player_user_team associated with the team
-            string sql = @"DELETE FROM team_tactics.user_tournament
+            string sql = @"
+    DELETE FROM team_tactics.user_tournament
 	WHERE id = @Id";
 
-            await _dbConnection.ExecuteAsync(sql, parameters);
+            int rowsAffected = await _dbConnection.ExecuteAsync(sql, parameters);
+            if (rowsAffected == 0)
+                throw EntityNotFoundException.ForEntity<Tournament>(id, nameof(Tournament.Id));
         }
 
         public Task UpdateAsync(Tournament tournament)

@@ -9,6 +9,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 {
     public static class SeedTestData
     {
+        #region Seed User
         public static async Task<int> SeedUserAsync(this IDbConnection dbConnection)
         {
             if (dbConnection.State != ConnectionState.Open)
@@ -28,20 +29,26 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             string sql = @"
                 INSERT INTO team_tactics.user_account (email, password_hash, username, salt)
                 VALUES (@Email, @PasswordHash, @Username, @Salt)
-                RETURNING id"; 
+                RETURNING id";
 
             int id = await dbConnection.QuerySingleAsync<int>(sql, parameters);
             return id;
         }
 
+        #endregion
+
+        #region Seed Competition
         public static async Task<int> SeedCompetitonAsync(this IDbConnection dbConnection)
+        {
+            Competition competition = new CompetitionFaker()
+                .Generate();
+            return await SeedCompetitonAsync(dbConnection, competition);
+        }
+
+        public static async Task<int> SeedCompetitonAsync(this IDbConnection dbConnection, Competition competition)
         {
             if (dbConnection.State != ConnectionState.Open)
                 dbConnection.Open();
-
-            Competition competition = new CompetitionFaker()
-                .RuleFor(c => c.Id, (int)default)
-                .Generate();
 
             var parameters = new DynamicParameters();
             parameters.Add("Name", competition.Name);
@@ -57,6 +64,11 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             int id = await dbConnection.QuerySingleAsync<int>(sql, parameters);
             return id;
         }
+        #endregion
 
+        #region Seed Team 
+        public async Task<int> 
+
+        #endregion
     }
 }
