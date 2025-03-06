@@ -26,6 +26,16 @@ namespace TeamTactics.Domain.Teams
             Status = TeamStatus.Draft;
         }
 
+        //database constructor
+        public Team(int id, string name, TeamStatus status, int userId, int tournamentId, List<TeamPlayer> players) : base(id)
+        {
+            Name = name;
+            Status = status;
+            UserId = userId;
+            TournamentId = tournamentId;
+            _players = players;
+        }
+
         /// <summary>
         /// Add a player to the team
         /// </summary>
