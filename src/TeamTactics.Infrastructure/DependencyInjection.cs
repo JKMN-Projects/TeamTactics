@@ -7,9 +7,11 @@ using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Players;
 using TeamTactics.Application.Teams;
 using TeamTactics.Application.Tournaments;
+using TeamTactics.Application.Scraper;
 using TeamTactics.Application.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
 using TeamTactics.Infrastructure.Database.TypeHandlers;
+using TeamTactics.Infrastructure.Database.Scraper;
 using TeamTactics.Infrastructure.Hashing;
 using TeamTactics.Infrastructure.Tokens;
 
@@ -41,6 +43,7 @@ namespace TeamTactics.Infrastructure
             services.AddScoped<ITournamentRepository, TournamentRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
 
+            services.AddScoped<IScraperRepository,ScraperRepository>();
             return services;
         }
     }
