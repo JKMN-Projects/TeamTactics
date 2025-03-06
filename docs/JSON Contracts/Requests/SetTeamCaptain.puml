@@ -1,4 +1,5 @@
 @startuml Set team captain Request
+allowmixing
 
 json "SetTeamCaptain\nPUT: /api/teams/{teamId}/players/{playerId}/set-captain" as setTeamCaptainRequest {
     

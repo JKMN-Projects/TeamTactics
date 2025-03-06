@@ -1,4 +1,5 @@
 @startuml Delete tournament request
+allowmixing
 
 json "DELETE request \nURI: /api/tournaments/{tournamentId} \nDeleteTournament" as DeleteTournament {}
 
