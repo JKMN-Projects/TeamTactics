@@ -4,6 +4,7 @@ allowmixing
 agent "POST request \nURI: /api/tournaments/join"
   json "JoinTournament" as J {
     "inviteCode": "string",
+    "teamName": "string",
     "userId": "number"
   }
 
