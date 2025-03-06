@@ -11,6 +11,10 @@ public interface IUserRepository : IRepository<User, int>
     public Task RemoveAsync(User user);
 
     public Task<bool> CheckPasswordAsync(string emailOrUsername, string passwordHash);
+    public Task<bool> CheckIfEmailExistsAsync(string email);
+    public Task<bool> CheckIfUsernameExistsAsync(string username);
+    
+
     public Task<User?> FindByEmail(string email);
     public Task<string?> GetUserSaltAsync(int userId);
     public Task<ProfileDto> GetProfileAsync(int id);

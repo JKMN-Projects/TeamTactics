@@ -32,6 +32,36 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         return storedHash != null && storedHash == passwordHash;
     }
 
+    public async Task<bool> CheckIfEmailExistsAsync(string email)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        string sql = @"SELECT id FROM team_tactics.user_account WHERE email = @Email";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Email", email);
+
+        int? id = await _dbConnection.QuerySingleOrDefaultAsync<int?>(sql, parameters);
+
+        return id != null;
+    }
+
+    public async Task<bool> CheckIfUsernameExistsAsync(string username)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        string sql = @"SELECT id FROM team_tactics.user_account WHERE username = @Username";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Username", username);
+
+        int? id = await _dbConnection.QuerySingleOrDefaultAsync<int?>(sql, parameters);
+
+        return id != null;
+    }
+
     public Task<IEnumerable<User>> FindAllAsync()
     {
         throw new NotImplementedException();
