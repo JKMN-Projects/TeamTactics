@@ -41,7 +41,7 @@ public sealed class PlayerManager
         int count = 0;
         foreach (var club in clubs)
         {
-            if(count >= 5)
+            if(count >= 7)
             {
                 await Task.Delay(60000);
             }
@@ -66,7 +66,8 @@ public sealed class PlayerManager
                 );
                 players.Add(player);
             }
-            await _scraperRepository.InsertPlayersBulk(players);
+            var insertedPlayers = await _scraperRepository.InsertPlayersBulk(players);
+            await _scraperRepository.InsertPlayerContractsBulk(insertedPlayers.Select(p => new PlayerContractScrape(active: true, club.Id, p.Id)));
         }
     }
 

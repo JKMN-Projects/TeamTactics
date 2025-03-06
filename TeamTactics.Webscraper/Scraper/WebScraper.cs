@@ -22,7 +22,7 @@ internal class WebScraper
     /// <param name="rowXPath"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<List<T>> ScrapeListAsync<T>(string rowXPath = null) where T : new()
+    public async Task<List<T>> ScrapeListAsync<T>() where T : new()
     {
 
         Type modelType = typeof(T);

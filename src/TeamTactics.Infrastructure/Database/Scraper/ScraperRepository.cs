@@ -331,7 +331,7 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
             _dbConnection.Open();
 
         const string sql = @"
-        SELECT name,external_id 
+        SELECT name,external_id, id
         FROM team_tactics.club
         ORDER BY id";
 
