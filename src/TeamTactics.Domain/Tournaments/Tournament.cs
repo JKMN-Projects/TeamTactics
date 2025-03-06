@@ -22,6 +22,7 @@ public class Tournament : Entity
         Description = description;
         CreatedByUserId = createdByUserId;
         CompetitionId = competitionId;
+        InviteCode = inviteCode;
     }
 
     public void SetInviteCode(string newCode) => this.InviteCode = newCode;
