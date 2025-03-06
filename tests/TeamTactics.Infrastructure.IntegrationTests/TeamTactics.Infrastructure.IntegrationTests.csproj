@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeamTactics.Api\TeamTactics.Api.csproj" />
     <ProjectReference Include="..\..\src\TeamTactics.Infrastructure\TeamTactics.Infrastructure.csproj" />
+    <ProjectReference Include="..\TeamTactics.Fixtures\TeamTactics.Fixtures.csproj" />
   </ItemGroup>
 
   <ItemGroup>

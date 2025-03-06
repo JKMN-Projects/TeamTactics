@@ -4,7 +4,7 @@ using System.Data;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Infrastructure.Database.Repositories;
 
-namespace TeamTactics.Infrastructure.IntegrationTests
+namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
     public abstract class CompetitionRepositoryTests : TestBase
     {
@@ -22,7 +22,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             public FindAllAsync(CustomWebApplicationFactory factory) : base(factory)
             {
             }
-            
+
             private IEnumerable<Competition> SeedCompetitions()
             {
                 List<Competition> seededCompetitions = [
@@ -49,7 +49,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
                 return seededCompetitions;
             }
 
-            
+
             [Fact]
             public async Task Should_ReturnAllCompetitions()
             {

@@ -23,7 +23,7 @@ namespace TeamTactics.Application.Tournaments
             ArgumentOutOfRangeException.ThrowIfLessThan(createdByUserId, 1, nameof(createdByUserId));
 
             // Check if competition exists
-            var competition = await _competitionRepository.FindById(competitionId);
+            var competition = await _competitionRepository.FindByIdAsync(competitionId);
             if (competition == null)
             {
                 throw EntityNotFoundException.ForEntity<Competition>(competitionId, nameof(Competition.Id));
