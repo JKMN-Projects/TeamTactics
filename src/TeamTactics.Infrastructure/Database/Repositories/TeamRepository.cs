@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using System.Data;
-using System.Reflection;
-using System.Threading.Tasks;
+using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Teams;
 
@@ -16,7 +15,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<Team?> FindById(int id)
+        public async Task<Team?> FindByIdAsync(int id)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
@@ -24,23 +23,25 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("Id", id);
 
-            string sql = @"
+            string sql = $@"
     SELECT 
         t.id, 
         t.name, 
         t.status, 
         t.user_account_id, 
         t.user_tournament_id,
-        p.player_id,
-        p.captain
+        tp.player_id,
+        tp.captain,
+	    c.id as club_id
     FROM 
         team_tactics.user_team t
     LEFT JOIN 
-        team_tactics.player_user_team p ON t.id = p.user_team_id
+        team_tactics.player_user_team tp ON t.id = tp.user_team_id
+    INNER JOIN team_tactics.player p ON tp.player_id = p.id
+    INNER JOIN team_tactics.player_contract pc ON p.id = pc.player_id and pc.active = true
+    INNER JOIN team_tactics.club c ON pc.club_id = c.id
     WHERE 
         t.id = @Id";
-
-            Team? team = null;
 
             var results = await _dbConnection.QueryAsync<dynamic>(sql, parameters);
 
@@ -53,7 +54,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             foreach (var row in results)
             {
                 if (row.player_id != null)
-                    teamPlayers.Add(new TeamPlayer(row.player_id, id, row.captain));
+                    teamPlayers.Add(new TeamPlayer(row.player_id, row.club_id, row.captain));
 
             }
 
@@ -63,7 +64,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             // Parse team status
             Enum.TryParse(firstRow.status.ToString(), out TeamStatus teamStatus);
 
-            team = new Team(id, firstRow.name, teamStatus, firstRow.user_account_id, firstRow.user_tournament_id, teamPlayers);
+            Team team = new Team(id, firstRow.name, teamStatus, firstRow.user_account_id, firstRow.user_tournament_id, teamPlayers);
 
             return team;
         }
@@ -164,7 +165,11 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             string sql = @"DELETE FROM team_tactics.user_team
 	WHERE id = @Id";
 
-            await _dbConnection.ExecuteAsync(sql, parameters);
+            int rowsAffeted = await _dbConnection.ExecuteAsync(sql, parameters);
+            if (rowsAffeted == 0)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(id, nameof(Team.Id));
+            }
         }
 
         //opdater name og status, når status = locked, opdater locked_date. 
@@ -189,28 +194,61 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
 
-                string teamSql = @"
-            INSERT INTO team_tactics.user_team 
-                (id, name, status, locked_date, user_account_id, user_tournament_id)
-            VALUES 
-                (@Id, @Name, @Status, @LockedDate, @UserId, @TournamentId)
-            ON CONFLICT (id) DO UPDATE SET
-                name = EXCLUDED.name,
-                status = EXCLUDED.status,
-                locked_date = EXCLUDED.locked_date,
-                user_account_id = EXCLUDED.user_account_id,
-                user_tournament_id = EXCLUDED.user_tournament_id
-            RETURNING id";
-
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value); 
+                string teamSql;
+                if (model.Id == 0)
+                {
+                    teamSql = @"
+    INSERT INTO team_tactics.user_team
+        (name, status, locked_date, user_account_id, user_tournament_id)
+    VALUES
+        (@Name, @Status, @LockedDate, @UserId, @TournamentId)
+    RETURNING id";
+                }
+                else
+                {
+                    parameters.Add("Id", model.Id);
+                    teamSql = @"
+    UPDATE team_tactics.user_team SET
+        name = @Name,
+        status = @Status,
+        locked_date = @LockedDate,
+        user_account_id = @UserId,
+        user_tournament_id = @TournamentId
+    WHERE
+        id = @Id
+    RETURNING id";
+                }
+
+            //    string teamSql = @"
+            //INSERT INTO team_tactics.user_team 
+            //    (id, name, status, locked_date, user_account_id, user_tournament_id)
+            //VALUES 
+            //    (COALESCE(@Id, DEFAULT), @Name, @Status, @LockedDate, @UserId, @TournamentId)
+            //ON CONFLICT (id) DO UPDATE SET
+            //    name = EXCLUDED.name,
+            //    status = EXCLUDED.status,
+            //    locked_date = EXCLUDED.locked_date,
+            //    user_account_id = EXCLUDED.user_account_id,
+            //    user_tournament_id = EXCLUDED.user_tournament_id
+            //RETURNING id";
+
+                //parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value);
                 parameters.Add("Name", model.Name);
                 parameters.Add("Status", (int)model.Status);
                 parameters.Add("LockedDate", lockedDate);
                 parameters.Add("UserId", model.UserId);
                 parameters.Add("TournamentId", model.TournamentId);
 
-                int teamId = await _dbConnection.QuerySingleAsync<int>(teamSql, parameters, transaction);
+                int teamId = await _dbConnection.QuerySingleOrDefaultAsync<int>(teamSql, parameters, transaction);
+                if (teamId == 0 && model.Id > 0)
+                {
+                    throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+                }
+                else if (teamId == 0)
+                {
+                    throw new Exception("Failed to get returned team id on insert team.");
+                }
 
                 string deletePlayersSql = @"
             DELETE FROM team_tactics.player_user_team
@@ -243,6 +281,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 }
 
                 transaction.Commit();
+                model.SetId(teamId);
                 return teamId;
             }
             catch

@@ -21,16 +21,25 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         return competitions;
     }
 
-    public async Task<Competition?> FindById(int id)
+    public async Task<Competition?> FindByIdAsync(int id)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT id, name, start_date, end_date FROM team_tactics.competition";
+        DynamicParameters parameters = new();
+        parameters.Add("Id", id);
 
-        var competition = await _dbConnection.QuerySingleOrDefaultAsync<Competition?>(sql);
+        string sql = $@"
+    SELECT 
+        id as {nameof(Competition.Id)}, 
+        name as {nameof(Competition.Name)}, 
+        start_date as {nameof(Competition.StartDate)}, 
+        end_date as {nameof(Competition.EndDate)}
+    FROM team_tactics.competition
+    WHERE id = @Id";
+
+        var competition = await _dbConnection.QuerySingleOrDefaultAsync<Competition?>(sql, parameters);
 
         return competition;
     }
-
 }

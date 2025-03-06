@@ -5,50 +5,38 @@ namespace TeamTactics.Fixtures
 {
     public class TeamFaker : Faker<Team>
     {
-        public TeamFaker(int playerCount = 5, int enrollmentCount = 2)
+        public TeamFaker(int playerCount = 5, IEnumerable<Player>? players = null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(playerCount, 0, nameof(playerCount));
             ArgumentOutOfRangeException.ThrowIfGreaterThan(playerCount, 11, nameof(playerCount));
 
             Faker faker = new Faker();
             int userId = faker.Random.Int(1, 100);
-            int competitionId = faker.Random.Int(1, 100);
+            int tournamentId = faker.Random.Int(1, 100);
 
-            CustomInstantiator(f => new Team(f.Company.CompanyName(), userId, competitionId));
-            RuleFor(x => x.Status, TeamStatus.Draft);
+            CustomInstantiator(f => new Team(f.Company.CompanyName(), userId, tournamentId));
+
+            players ??= GeneratePlayers(playerCount);
+
             FinishWith((f, t) =>
             {
-                AddStartingPlayers(f, t, playerCount);
-                AddEnrollments(f, t, enrollmentCount);
-            });
+                if (playerCount == 0) return;
 
+                foreach (var player in players)
+                {
+                    t.AddPlayer(player);
+                }
+                t.SetCaptain(players.ElementAt(0).Id);
+            });
         }
 
-        private static void AddStartingPlayers(Faker f, Team t, int playerCount)
+        private static IEnumerable<Player> GeneratePlayers(int count)
         {
-            if (playerCount == 0) return;
-
-            int captainIndex = 0; // f.Random.Int(0, playerCount - 1);
-            for (int i = 0; i < playerCount; i++)
+            for (int i = 0; i < count; i++)
             {
-                Player player = new PlayerFaker()
+                yield return new PlayerFaker()
                     .RuleFor(p => p.Id, i)
                     .Generate();
-                t.AddPlayer(player);
-                if (i == captainIndex)
-                {
-                    t.SetCaptain(player.Id);
-                }
-            }
-        }
-
-        private static void AddEnrollments(Faker f, Team t, int enrollmentCount)
-        {
-            if (enrollmentCount == 0) return;
-
-            for (int i = 0; i < enrollmentCount; i++)
-            {
-                t.EnrollInTournament(i);
             }
         }
     }

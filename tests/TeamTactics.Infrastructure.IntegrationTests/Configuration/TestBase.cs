@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
 {
@@ -7,6 +6,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
     {
         private readonly CustomWebApplicationFactory _factory;
         private IServiceScope? _scope;
+        protected IDbConnection _dbConnection { get; private set; } = default!;
 
         protected TestBase(CustomWebApplicationFactory factory)
         {
@@ -18,6 +18,18 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
         {
             _scope?.Dispose();
             _scope = _factory.Services.CreateScope();
+            _dbConnection = GetService<IDbConnection>();
+        }
+
+        protected async Task RefreshScopeAsync()
+        {
+            CreateNewScope();
+            await OnRefreshScopeAsync();
+        }
+
+        protected virtual Task OnRefreshScopeAsync() 
+        {
+            return Task.CompletedTask;
         }
 
         protected T GetService<T>()

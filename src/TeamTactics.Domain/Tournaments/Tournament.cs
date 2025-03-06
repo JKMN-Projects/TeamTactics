@@ -10,12 +10,19 @@ public class Tournament : Entity
 
     public string InviteCode { get; private set; }
 
-    public Tournament(string name, int createdByUserId, int competitionId, string description = "")
+    #region Default Constructor
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private Tournament() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    #endregion
+
+    public Tournament(string name, int createdByUserId, int competitionId, string description = "", string inviteCode = "")
     {
         Name = name;
         Description = description;
         CreatedByUserId = createdByUserId;
         CompetitionId = competitionId;
+        InviteCode = inviteCode;
     }
 
     public void SetInviteCode(string newCode) => this.InviteCode = newCode;

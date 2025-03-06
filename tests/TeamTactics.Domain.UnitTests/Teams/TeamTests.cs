@@ -273,5 +273,37 @@ namespace TeamTactics.Domain.UnitTests.Teams
                 Assert.Throws<NoCaptainException>(act);
             }
         }
+
+        public sealed class Rename : TeamTests
+        {
+            [Fact]
+            public void Should_RenameTeam()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 11).Generate();
+                string newName = "New Name";
+
+                // Act
+                team.Rename(newName);
+
+                // Assert
+                Assert.Equal(newName, team.Name);
+            }
+
+            [Fact]
+            public void ShouldThrow_TeamLockedException_When_TeamIsLocked()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 11).Generate();
+                team.Lock();
+                string newName = "New Name";
+
+                // Act
+                Action act = () => team.Rename(newName);
+
+                // Assert
+                Assert.Throws<TeamLockedException>(act);
+            }
+        }
     }
 }

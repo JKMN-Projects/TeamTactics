@@ -1,9 +1,8 @@
 ﻿using Dapper;
 using System.Data;
-using System.Data.Common;
+using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Tournaments;
-using TeamTactics.Domain.Users;
 
 namespace TeamTactics.Infrastructure.Database.Repositories
 {
@@ -16,7 +15,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Tournament?> FindById(int id)
+        public Task<Tournament?> FindByIdAsync(int id)
         {
             throw new NotImplementedException();
         }
@@ -73,6 +72,83 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             return true;
         }
 
+        public async Task<IEnumerable<Tournament>> GetOwnedTournamentsAsync(int ownerId)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            string sql = @"SELECT id, name, description, user_account_id, competition_id, invite_code FROM team_tactics.user_tournament WHERE user_account_id = @OwnerId";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("OwnerId", ownerId);
+
+            var result = await _dbConnection.QueryAsync<(int Id, string Name, string Description, int UserId, int CompId, string InviteCode)>(sql, parameters);
+
+            return result.Any()
+                ? result.Select(r => {
+                    var t = new Tournament(r.Name, r.UserId, r.CompId, r.Description, r.InviteCode);
+                    t.SetId(r.Id);
+                    t.SetInviteCode(r.InviteCode);
+                    return t;
+                })
+                : new List<Tournament>();
+        }
+
+        public async Task<IEnumerable<Tournament>> GetJoinedTournamentsAsync(string userId)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            string sql = @"
+                  SELECT ut.id, ut.name, ut.description, ut.user_account_id, ut.competition_id, ut.invite_code 
+                    FROM team_tactics.user_tournament AS ut
+                  JOIN team_tactics.user_team AS team
+                    ON ut.id = team.user_tournament_id
+                  WHERE team.user_account_id = @UserId";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("UserId", userId);
+
+            var result = await _dbConnection.QueryAsync<(int Id, string Name, string Description, int UserId, int CompId, string InviteCode)>(sql, parameters);
+
+            return result.Any()
+                ? result.Select(r => {
+                    var t = new Tournament(r.Name, r.UserId, r.CompId, r.Description, r.InviteCode);
+                    t.SetId(r.Id);
+                    t.SetInviteCode(r.InviteCode);
+                    return t;
+                })
+                : new List<Tournament>();
+        }
+
+        
+
+
+        public async Task<IEnumerable<TournamentTeamsDto>> GetOtherTeamsInTournamentAsync(int tournamentId, int currentUserId)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            string sql = @$"
+        SELECT 
+            team.id as {nameof(TournamentTeamsDto.TeamId)}, 
+            team.name as {nameof(TournamentTeamsDto.TeamName)}, 
+            ua.id as {nameof(TournamentTeamsDto.UserId)}, 
+            ua.name as {nameof(TournamentTeamsDto.Username)}
+        FROM team_tactics.user_team team
+        JOIN team_tactics.user_account ua 
+            ON team.user_account_id = ua.id
+        WHERE team.user_tournament_id = @TournamentId
+            AND team.user_account_id != @CurrentUserId
+        ORDER BY team.name";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("TournamentId", tournamentId);
+            parameters.Add("CurrentUserId", currentUserId);
+
+            return await _dbConnection.QueryAsync<TournamentTeamsDto>(sql, parameters);
+        }
+        
         public async Task RemoveAsync(int id)
         {
             if (_dbConnection.State != ConnectionState.Open)
@@ -82,9 +158,13 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             parameters.Add("Id", id);
 
             //ON DELETE CASCADE deletes all player_user_team associated with the team
-            string sql = @"DELETE FROM team_tactics.user_tournament WHERE id = @Id";
+            string sql = @"
+    DELETE FROM team_tactics.user_tournament
+	WHERE id = @Id";
 
-            await _dbConnection.ExecuteAsync(sql, parameters);
+            int rowsAffected = await _dbConnection.ExecuteAsync(sql, parameters);
+            if (rowsAffected == 0)
+                throw EntityNotFoundException.ForEntity<Tournament>(id, nameof(Tournament.Id));
         }
 
         public Task UpdateAsync(Tournament tournament)

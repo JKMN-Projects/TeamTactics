@@ -34,5 +34,19 @@ namespace TeamTactics.Api.Controllers
             return Created();
             //return CreatedAtAction(nameof(GetTournamentAsync), new { id = tournamentId });
         }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteTournament(int id)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new UnauthorizedException("User not logged in."));
+            await _tournamentManager.DeleteTournamentAsync(id, userId);
+            return NoContent();
+        }
     }
 }
