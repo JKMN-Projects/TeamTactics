@@ -49,12 +49,22 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             return tournament.Id;
         }
 
-        public Task RemoveAsync(int id)
+        public async Task RemoveAsync(int id)
         {
-            throw new NotImplementedException();
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", id);
+
+            //ON DELETE CASCADE deletes all player_user_team associated with the team
+            string sql = @"DELETE FROM team_tactics.user_tournament
+	WHERE id = @Id";
+
+            await _dbConnection.ExecuteAsync(sql, parameters);
         }
 
-        public Task UpdateAsync(Tournament model)
+        public Task UpdateAsync(Tournament tournament)
         {
             throw new NotImplementedException();
         }
