@@ -11,7 +11,7 @@ internal class WebScraper
     public WebScraper(HttpClient httpClient, ScraperParameters parameters = null)
     {
         _httpClient = httpClient;
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "*");
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36");
         _parameters = parameters ?? new ScraperParameters();
     }
 
@@ -35,9 +35,17 @@ internal class WebScraper
         string rowsXPath = _parameters.ApplyToTemplate(sourceAttr.RowsXPathTemplate);
 
 
-        string html = await _httpClient.GetStringAsync(url);
         var htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(html);
+        try
+        {
+            string html = await _httpClient.GetStringAsync(url);
+            htmlDoc.LoadHtml(html);
+
+        }
+        catch (Exception e)
+        {
+            var test = e.Message;
+        }
 
         var items = new List<T>();
 

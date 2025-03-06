@@ -4,8 +4,10 @@ using System.Data;
 using System.Data.Common;
 using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Players;
+using TeamTactics.Application.Scraper;
 using TeamTactics.Application.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
+using TeamTactics.Infrastructure.Database.Scraper;
 using TeamTactics.Infrastructure.Hashing;
 using TeamTactics.Infrastructure.Tokens;
 
@@ -27,6 +29,7 @@ namespace TeamTactics.Infrastructure
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<IScraperRepository,ScraperRepository>();
             return services;
         }
     }

@@ -22,8 +22,17 @@ public class PlayersController : ControllerBase
         return Ok(players);
     }
 
+    [HttpPost("StartClubPopulation")]
+    public async Task<IActionResult> StartClubPopulation()
+    {
+        await _playerManager.StartClubPopulation();
+        return Ok();
+    }
+
+    [HttpPost("StartPlayerPopulation")]
     public async Task<IActionResult> StartPlayerPopulation()
     {
-
+        await _playerManager.StartPlayerPopulation();
+        return Ok();
     }
 }

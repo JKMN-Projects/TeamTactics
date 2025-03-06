@@ -7,6 +7,21 @@ namespace TeamTactics.Webscraper.ScraperModels;
     "//table[@id='stats_standard_9']/tbody/tr[not(contains(@class, 'spacer') or contains(@class, 'thead'))]")]
 public class ClubPlayer
 {
+
+    private string id;
+
+    [Selector(xpath: ".//th[@data-stat='player']/a", attribute: "href")]
+    public string Id
+    {
+        get { return id; }
+        set 
+        {
+
+            id = value.Split("/")[3];
+        }
+    }
+
+
     [Selector(xpath: ".//th[@data-stat='player']/a")]
     public string Player { get; set; }
 

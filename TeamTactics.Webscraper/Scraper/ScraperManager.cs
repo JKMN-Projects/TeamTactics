@@ -17,9 +17,10 @@ public class ScraperManager
     }
     public async Task<List<ClubPlayer>> GetSquadPlayers(string clubId, string clubName)
     {
+
         var parameters = new ScraperParameters()
             .WithParameter("clubId", clubId)
-            .WithParameter("teamId", clubName);
+            .WithParameter("clubName", clubName);
         var scraper = new WebScraper(_httpClient, parameters);
         var squadPlayers = await scraper.ScrapeListAsync<ClubPlayer>();
         return squadPlayers;
