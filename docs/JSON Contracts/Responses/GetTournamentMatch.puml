@@ -1,13 +1,15 @@
 @startuml Get tournament match response
 allowmixing
 
-agent "GET response \nURI: /api/tournaments/{tournamentId}/match"
+agent "GET response \nURI: /api/tournaments/{tournamentId}/matches"
   json "TournamentMatch" as J {
     "homeClubName": "string",
     "awayClubName": "string",
+    "homeClubScore": "number",
+    "awayClubScore": "number",
     "competitionName": "string",
     "utcTimestamp": "number"
   }
 
-"GET response \nURI: /api/tournaments/{tournamentId}/match" -> J 
+"GET response \nURI: /api/tournaments/{tournamentId}/matches" -> J 
 @enduml
