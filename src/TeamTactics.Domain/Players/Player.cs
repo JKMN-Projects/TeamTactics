@@ -22,6 +22,15 @@ public class Player : Entity
         PositionId = positionId;
     }
 
+    public Player(int id, string firstName, string lastName, DateOnly birthdate, string externalId, int positionId) : base(id)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        BirthDate = birthdate;
+        ExternalId = externalId;
+        PositionId = positionId;
+    }
+
     public void SignContract(int clubId)
     {
         _playerContracts.ForEach(pc => pc.DeactivateContract());
