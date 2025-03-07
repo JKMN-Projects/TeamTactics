@@ -1,40 +1,39 @@
 ﻿using Dapper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Points;
 using TeamTactics.Domain.Points;
 
-namespace TeamTactics.Infrastructure.Database.Repositories
+namespace TeamTactics.Infrastructure.Database.Repositories;
+
+class PointRepository(IDbConnection dbConnection) : IPointsRepository
 {
-    class PointRepository(IDbConnection dbConnection) : IPointsRepository
+    private IDbConnection _dbConnection = dbConnection;
+
+    public async Task<IEnumerable<PointCategoryDto>> FindAllActiveAsync()
     {
-        private IDbConnection _dbConnection = dbConnection;
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
 
-        public async Task<IEnumerable<PointCategoryDto>> FindAllActiveAsync()
-        {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
+        string sql = $@"
+    SELECT 
+        name AS {nameof(PointCategoryDto.Name)}, 
+        description AS {nameof(PointCategoryDto.Description)}, 
+        point_amount AS {nameof(PointCategoryDto.PointAmount)}
+    FROM team_tactics.point_category 
+    WHERE active = true";
 
-            string sql = @"SELECT name, description, point_amount FROM team_tactics.point_category WHERE active = true";
+        var pointCategories = await _dbConnection.QueryAsync<PointCategoryDto>(sql);
 
-            var pointCategories = await _dbConnection.QueryAsync<PointCategoryDto>(sql);
+        return pointCategories;
+    }
 
-            return pointCategories;
-        }
+    public Task<IEnumerable<PointCategory>> FindAllAsync()
+    {
+        throw new NotImplementedException();
+    }
 
-        public Task<IEnumerable<PointCategory>> FindAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<PointCategory?> FindByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+    public Task<PointCategory?> FindByIdAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -3,4 +3,4 @@
 public record PointCategoryDto(
     string Name,
     string Description,
-    double PointAmount);
+    decimal PointAmount);
