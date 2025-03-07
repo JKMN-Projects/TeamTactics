@@ -158,7 +158,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="TeamLockedException"></exception>
         /// <exception cref="PlayerNotOnTeamException"></exception>
         /// <exception cref="PlayerAlreadyCaptainException"></exception>
-        public async Task SetTeamCaptain(int teamId, int playerId)
+        public async Task SetTeamCaptainAsync(int teamId, int playerId)
         {
             var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
@@ -169,6 +169,33 @@ namespace TeamTactics.Application.Teams
             team.SetCaptain(playerId);
             await _teamRepository.UpdateAsync(team);
             _logger.LogInformation("Player '{playerId}' set as captain of team '{teamId}'", playerId, teamId);
+        }
+
+        /// <summary>
+        /// Rename a team.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />
+        /// <exception cref="TeamLockedException"></exception>
+        public async Task RenameTeamAsync(int userId, int teamId, string name)
+        {
+            var team = await _teamRepository.FindByIdAsync(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            if (team.UserId != userId)
+            {
+                throw new UnauthorizedException("User does not own the team.");
+            }
+
+            team.Rename(name);
+
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Team '{teamId}' renamed to '{name}'", teamId, name);
         }
     }
 }
