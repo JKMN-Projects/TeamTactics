@@ -144,7 +144,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         }
 
         /// <summary>
-        /// Get Totalpoints with TeamId from Team Repo
+        /// Get Totalpoints with TeamId from Point Repo
         /// </summary>
         /// <param name="tournamentId"></param>
         /// <returns></returns>
