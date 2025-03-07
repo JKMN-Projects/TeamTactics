@@ -69,30 +69,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             return team;
         }
 
-        public async Task<TeamPointsDto> FindTeamPointsAsync(int teamId)
-        {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
-            string sql = @"
-    SELECT SUM(pc.point_amount * mpp.occurrences)
-    FROM team_tactics.player_user_team put
-    JOIN team_tactics.match_player_point mpp 
-    	ON put.player_id = mpp.player_id
-    JOIN team_tactics.point_category pc 
-    	ON mpp.point_category_id = pc.id
-    WHERE put.user_team_id = @TeamId
-        AND pc.active = true";
-
-            var parameters = new DynamicParameters();
-            parameters.Add("TeamId", teamId);
-
-            var categoryTotals = await _dbConnection.QueryAsync<decimal>(sql, parameters);
-            decimal totalPoints = categoryTotals.Sum();
-
-            return new TeamPointsDto(totalPoints);
-        }
-
         //returner alle teams som brugeren ejer
         public async Task<IEnumerable<Team>> FindUserTeamsAsync(int userId)
         {
@@ -162,8 +138,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             parameters.Add("Id", id);
 
             //ON DELETE CASCADE deletes all player_user_team associated with the team
-            string sql = @"DELETE FROM team_tactics.user_team
-	WHERE id = @Id";
+            string sql = @"DELETE FROM team_tactics.user_team WHERE id = @Id";
 
             int rowsAffeted = await _dbConnection.ExecuteAsync(sql, parameters);
             if (rowsAffeted == 0)
@@ -219,19 +194,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         id = @Id
     RETURNING id";
                 }
-
-            //    string teamSql = @"
-            //INSERT INTO team_tactics.user_team 
-            //    (id, name, status, locked_date, user_account_id, user_tournament_id)
-            //VALUES 
-            //    (COALESCE(@Id, DEFAULT), @Name, @Status, @LockedDate, @UserId, @TournamentId)
-            //ON CONFLICT (id) DO UPDATE SET
-            //    name = EXCLUDED.name,
-            //    status = EXCLUDED.status,
-            //    locked_date = EXCLUDED.locked_date,
-            //    user_account_id = EXCLUDED.user_account_id,
-            //    user_tournament_id = EXCLUDED.user_tournament_id
-            //RETURNING id";
 
                 //parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value);
                 parameters.Add("Name", team.Name);

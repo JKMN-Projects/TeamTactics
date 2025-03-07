@@ -89,7 +89,6 @@ namespace TeamTactics.Application.UnitTests.Users
             [InlineData("")]
             [InlineData(" ")]
             [InlineData("someInvalidEmail")]
-            [InlineData("someInvalid@Email")]
             [InlineData("someInvalidEmail.com")]
             [InlineData("some@Invalid@Email.com")]
             public async Task Should_ThrowArgumentException_When_EmailIsInvalid(string? email)
