@@ -46,8 +46,10 @@ namespace TeamTactics.Application.Teams
         }
         public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
         {
-            var team = await _teamRepository.FindTeamPointsAsync(teamId);
-            return team;
+            return new TeamPointsDto(0);
+
+            //var team = await _teamRepository.FindTeamPointsAsync(teamId);
+            //return team;
         }
 
         /// <summary>
