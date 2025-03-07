@@ -60,10 +60,10 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
         string sql = @$"
     SELECT 
 	p.first_name || ' ' || p.last_name,
-	c.name AS ""{nameof(PointResultDto.clubName)}"",
-	pc2.""name"" AS ""{nameof(PointResultDto.pointCategoryName)}"",
-	mpp.occurrences AS ""{nameof(PointResultDto.occurrences)}"",
-	(pc2.point_amount * mpp.occurrences) AS ""{nameof(PointResultDto.totalPoints)}""
+	c.name,
+	pc2.""name"",
+	mpp.occurrences,
+	(pc2.point_amount * mpp.occurrences) as ""totalPoints""
 	FROM team_tactics.match_result as mr 
 	JOIN team_tactics.match_player_point as mpp 
 		ON mpp.match_result_id = mr.id
@@ -94,11 +94,11 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
 
         string sql = @$"
     SELECT 
-	p.first_name || ' ' || p.last_name AS ""{nameof(PointResultDto.playerName)}"",
-	c.name AS ""{nameof(PointResultDto.clubName)}"",
-	pc2.""name"" AS ""{nameof(PointResultDto.pointCategoryName)}"",
-	mpp.occurrences AS ""{nameof(PointResultDto.occurrences)}"",
-	(pc2.point_amount * mpp.occurrences) AS ""{nameof(PointResultDto.totalPoints)}""
+	p.first_name || ' ' || p.last_name AS ""playerName"",
+	c.name,
+	pc2.""name"",
+	mpp.occurrences,
+	(pc2.point_amount * mpp.occurrences) AS ""totalPoints""
 	FROM team_tactics.user_team as uteam
 	JOIN team_tactics.user_tournament as utourn 
 		ON utourn.id = uteam.user_tournament_id
@@ -125,11 +125,11 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
         //Temp change to base off competiton startDate
         sql = @$"
     SELECT 
-	p.first_name || ' ' || p.last_name AS ""{nameof(PointResultDto.playerName)}"",
-	c.name AS ""{nameof(PointResultDto.clubName)}"",
-	pc2.""name"" AS ""{nameof(PointResultDto.pointCategoryName)}"",
-	mpp.occurrences AS ""{nameof(PointResultDto.occurrences)}"",
-	(pc2.point_amount * mpp.occurrences) AS ""{nameof(PointResultDto.totalPoints)}""
+	p.first_name || ' ' || p.last_name AS ""playerName"",
+	c.name,
+	pc2.""name"",
+	mpp.occurrences,
+	(pc2.point_amount * mpp.occurrences) AS ""totalPoints""
 	FROM team_tactics.user_team as uteam
 	JOIN team_tactics.user_tournament as utourn 
 		ON utourn.id = uteam.user_tournament_id
@@ -157,9 +157,9 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
         var parameters = new DynamicParameters();
         parameters.Add("TeamId", teamId);
 
-        var pointResults = await _dbConnection.QueryAsync<PointResultDto>(sql, parameters);
+        var results = await _dbConnection.QueryAsync<(string playerName, string clubName, string pointCategoryName, int occurrences, decimal totalPoints)>(sql, parameters);
 
-        return pointResults;
+        return results.Any() ? results.Select(r => new PointResultDto(r.playerName, r.clubName, r.pointCategoryName, r.occurrences, r.totalPoints)) : new List<PointResultDto>();
     }
 
     public Task<IEnumerable<PointCategory>> FindAllAsync()
