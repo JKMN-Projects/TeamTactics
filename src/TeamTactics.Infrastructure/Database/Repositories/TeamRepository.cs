@@ -80,15 +80,15 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             parameters.Add("UserId", userId);
 
             string sql = $@"
-    SELECT uteam.id, uteam.name, utourn.name 
+    SELECT uteam.id, uteam.name, utourn.id, utourn.name
 	FROM team_tactics.user_team as uteam 
 	JOIN team_tactics.user_tournament as utourn
 		ON utourn.id = uteam.user_tournament_id
 	WHERE uteam.user_account_id = @UserId";
 
-            var tourneyTeamsResults = await _dbConnection.QueryAsync<(int teamId, string teamName, string tourneyName)>(sql);
+            var tourneyTeamsResults = await _dbConnection.QueryAsync<(int teamId, string teamName, int tourneyId, string tourneyName)>(sql);
 
-            return tourneyTeamsResults.Any() ? tourneyTeamsResults.Select(tt => new TeamTournamentsDto(tt.teamId, tt.teamName, tt.tourneyName)) : new List<TeamTournamentsDto>();
+            return tourneyTeamsResults.Any() ? tourneyTeamsResults.Select(tt => new TeamTournamentsDto(tt.teamId, tt.teamName, tt.tourneyId, tt.tourneyName)) : new List<TeamTournamentsDto>();
         }
 
         public async Task<int> InsertAsync(Team team)

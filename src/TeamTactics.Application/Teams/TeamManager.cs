@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using TeamTactics.Application.Players;
 using TeamTactics.Application.Points;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Teams.Exceptions;
@@ -55,7 +56,7 @@ namespace TeamTactics.Application.Teams
                 throw EntityNotFoundException.ForEntity<Tournament>(inviteCode, nameof(Tournament.InviteCode));
             }
 
-            IEnumerable<Team> teams = await _teamRepository.FindUserTeamsAsync(userId);
+            IEnumerable<TeamTournamentsDto> teams = await _teamRepository.GetAllTeamsByUserId(userId);
             if (teams.Any(t => t.TournamentId == tournamentId.Value))
             {
                 throw new AlreadyJoinedTournamentException(userId, tournamentId.Value);
