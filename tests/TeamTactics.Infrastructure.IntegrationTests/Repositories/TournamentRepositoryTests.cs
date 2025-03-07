@@ -149,4 +149,40 @@ public abstract class TournamentRepositoryTests : TestBase
             Assert.Empty(teamIds);
         }
     }
+
+    public sealed class FindIdByInviteCodeAsync : TournamentRepositoryTests
+    {
+        public FindIdByInviteCodeAsync(CustomWebApplicationFactory factory) : base(factory)
+        {
+        }
+
+        [Fact]
+        public async Task Should_ReturnTournamentId_When_InviteCodeExists()
+        {
+            // Arrange
+            int userId = await _dbConnection.SeedUserAsync();
+            int competitionId = await _dbConnection.SeedCompetitonAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            int tournamentId = await _sut.InsertAsync(tournamentToInsert);
+
+            // Act
+            int? foundTournamentId = await _sut.FindIdByInviteCodeAsync(tournamentToInsert.InviteCode);
+
+            // Assert
+            Assert.Equal(tournamentId, foundTournamentId);
+        }
+
+        [Fact]
+        public async Task Should_ReturnNull_When_InviteCodeDoesNotExist()
+        {
+            // Arrange
+            string inviteCode = "non-existent-code";
+
+            // Act
+            int? foundTournamentId = await _sut.FindIdByInviteCodeAsync(inviteCode);
+
+            // Assert
+            Assert.Null(foundTournamentId);
+        }
+    }
 }

@@ -4,7 +4,7 @@ allowmixing
 agent "POST request \nURI: /api/teams"
   json "CreateTeam" as J {
     "name": "string",
-    "competitionId": "number"
+    "inviteCode": "string"
   }
 
 "POST request \nURI: /api/teams" -> J 

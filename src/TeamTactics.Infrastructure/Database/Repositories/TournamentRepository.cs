@@ -77,7 +77,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         /// </summary>
         /// <param name="inviteCode"></param>
         /// <returns></returns>
-        public async Task<int?> FindByInviteCodeAsync(string inviteCode)
+        public async Task<int?> FindIdByInviteCodeAsync(string inviteCode)
         {
             if (string.IsNullOrWhiteSpace(inviteCode)) return null;
 
