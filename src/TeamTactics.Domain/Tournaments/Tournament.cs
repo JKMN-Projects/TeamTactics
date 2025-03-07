@@ -26,4 +26,13 @@ public class Tournament : Entity
     }
 
     public void SetInviteCode(string newCode) => this.InviteCode = newCode;
+
+    public void Update(string name, string description)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(description, nameof(description));
+
+        Name = name;
+        Description = description;
+    }
 }
