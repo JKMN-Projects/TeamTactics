@@ -162,8 +162,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             parameters.Add("Id", id);
 
             //ON DELETE CASCADE deletes all player_user_team associated with the team
-            string sql = @"DELETE FROM team_tactics.user_team
-	WHERE id = @Id";
+            string sql = @"DELETE FROM team_tactics.user_team WHERE id = @Id";
 
             int rowsAffeted = await _dbConnection.ExecuteAsync(sql, parameters);
             if (rowsAffeted == 0)
@@ -219,19 +218,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         id = @Id
     RETURNING id";
                 }
-
-            //    string teamSql = @"
-            //INSERT INTO team_tactics.user_team 
-            //    (id, name, status, locked_date, user_account_id, user_tournament_id)
-            //VALUES 
-            //    (COALESCE(@Id, DEFAULT), @Name, @Status, @LockedDate, @UserId, @TournamentId)
-            //ON CONFLICT (id) DO UPDATE SET
-            //    name = EXCLUDED.name,
-            //    status = EXCLUDED.status,
-            //    locked_date = EXCLUDED.locked_date,
-            //    user_account_id = EXCLUDED.user_account_id,
-            //    user_tournament_id = EXCLUDED.user_tournament_id
-            //RETURNING id";
 
                 //parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value);
                 parameters.Add("Name", model.Name);

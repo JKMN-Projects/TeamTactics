@@ -5,7 +5,7 @@ namespace TeamTactics.Application.Tournaments
 {
     public interface ITournamentRepository : ICrudRepository<Tournament, int>
     {
-        public Task<bool> CheckTournamentInviteCodeAsync(string inviteCode);
+        public Task<int?> FindByInviteCodeAsync(string inviteCode);
         Task<IEnumerable<Tournament>> GetJoinedTournamentsAsync(string userId);
         Task<IEnumerable<TournamentTeamsDto>> GetOtherTeamsInTournamentAsync(int tournamentId, int currentUserId);
         Task<IEnumerable<Tournament>> GetOwnedTournamentsAsync(int ownerId);
