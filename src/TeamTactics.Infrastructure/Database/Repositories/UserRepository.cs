@@ -4,6 +4,7 @@ using TeamTactics.Application.Users;
 using TeamTactics.Domain.Users;
 using Dapper;
 using System.Data;
+using TeamTactics.Application.Common.Exceptions;
 
 namespace TeamTactics.Infrastructure.Database.Repositories;
 
@@ -197,7 +198,11 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         //ON DELETE CASCADE deletes all player_user_team associated with the team
         string sql = @"DELETE FROM team_tactics.user_account WHERE id = @Id";
 
-        await _dbConnection.ExecuteAsync(sql, parameters);
+        int rowsAffected = await _dbConnection.ExecuteAsync(sql, parameters);
+        if (rowsAffected == 0) 
+        {
+            throw EntityNotFoundException.ForEntity<User>(user.Id, nameof(User.Id));
+        }
     }
 
     public Task UpdateAsync(User user)

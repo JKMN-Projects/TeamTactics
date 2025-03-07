@@ -71,5 +71,83 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 await Assert.ThrowsAsync<EntityNotFoundException>(act);
             }
         }
+
+        public sealed class CheckPasswordAsync : UserRepositoryTests
+        {
+            public CheckPasswordAsync(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
+
+            [Fact]
+            public async Task Should_ReturnTrue_WhenPasswordIsCorrect()
+            {
+                // Arrange
+                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
+                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+                
+                // Act
+                bool result = await _sut.CheckPasswordAsync(addedUser.Email, "passwordHash");
+
+                // Assert
+                Assert.True(result);
+            }
+
+            [Fact]
+
+            public async Task Should_ReturnFalse_WhenPasswordIsIncorrect()
+            {
+                // Arrange
+                var user = new User("username2", "email2@jknm.com", new SecurityInfo("salt"));
+                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+
+                // Act
+                bool result = await _sut.CheckPasswordAsync(addedUser.Email, "anotherPasswordHash");
+
+                // Assert
+                Assert.False(result);
+            }
+        }
+
+        public sealed class CheckIfEmailExistsAsync : UserRepositoryTests
+        {
+            public CheckIfEmailExistsAsync(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
+
+            [Fact]
+            public async Task Should_ReturnTrue_WhenEmailExists()
+            {
+                // Arrange
+                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
+                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+
+                // Act
+                bool result = await _sut.CheckIfEmailExistsAsync(addedUser.Email);
+
+                // Assert
+                Assert.True(result);
+            }
+        }
+
+        public sealed class CheckIfUsernameExistsAsync : UserRepositoryTests
+        {
+            public CheckIfUsernameExistsAsync(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
+
+            [Fact]
+            public async Task Should_ReturnTrue_WheUsernameExists()
+            {
+                // Arrange
+                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
+                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+
+                // Act
+                bool result = await _sut.CheckIfUsernameExistsAsync(addedUser.Username);
+
+                // Assert
+                Assert.True(result);
+            }
+        }
     }
 }
