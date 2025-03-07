@@ -53,9 +53,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         /// </summary>
         /// <param name="inviteCode"></param>
         /// <returns></returns>
-        public async Task<bool> CheckTournamentInviteCodeAsync(string inviteCode)
+        public async Task<int?> FindByInviteCodeAsync(string inviteCode)
         {
-            if (string.IsNullOrWhiteSpace(inviteCode)) return false;
+            if (string.IsNullOrWhiteSpace(inviteCode)) return null;
 
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
@@ -67,9 +67,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
 
             var tourneyId = await _dbConnection.QuerySingleOrDefaultAsync<int?>(sql, parameters);
 
-            if (tourneyId == null) return false;
-
-            return true;
+            return tourneyId;
         }
 
         public async Task<IEnumerable<Tournament>> GetOwnedTournamentsAsync(int ownerId)
