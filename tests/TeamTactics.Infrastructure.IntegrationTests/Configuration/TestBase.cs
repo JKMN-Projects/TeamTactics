@@ -21,25 +21,17 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
             _dbConnection = GetService<IDbConnection>();
         }
 
-        protected async Task RefreshScopeAsync()
+        protected void RefreshScope()
         {
             CreateNewScope();
-            await OnRefreshScopeAsync();
+            OnRefreshScope();
         }
-
-        protected virtual Task OnRefreshScopeAsync() 
-        {
-            return Task.CompletedTask;
-        }
+        
+        protected virtual void OnRefreshScope() {}
 
         protected T GetService<T>()
-            where T : class
-        {
-            if (_scope == null)
-            {
-                throw new InvalidOperationException("Service provider is not initialized.");
-            }
-            return _scope.ServiceProvider.GetRequiredService<T>();
-        }
+            where T : class => _scope == null
+                ? throw new InvalidOperationException("Service provider is not initialized.")
+                : _scope.ServiceProvider.GetRequiredService<T>();
     }
 }

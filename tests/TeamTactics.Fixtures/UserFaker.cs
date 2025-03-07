@@ -9,9 +9,8 @@ namespace TeamTactics.Fixtures
         {
             CustomInstantiator(f => new User(
                 f.Internet.UserName(),
-                f.Internet.Email(),
-                new SecurityInfo(Convert.ToBase64String(f.Random.Bytes(32)))
-            ));
+                f.Internet.Email())
+            );
         }
     }
 }
