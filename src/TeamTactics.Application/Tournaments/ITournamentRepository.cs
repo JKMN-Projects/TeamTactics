@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using TeamTactics.Application.Common.Interfaces;
+﻿using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Domain.Tournaments;
 
 namespace TeamTactics.Application.Tournaments

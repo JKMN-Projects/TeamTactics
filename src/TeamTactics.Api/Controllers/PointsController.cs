@@ -14,7 +14,7 @@ public sealed class PointsController : ControllerBase
         _pointsManager = pointsManager;
     }
 
-    [HttpGet()]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetActive()
     {
