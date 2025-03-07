@@ -32,7 +32,7 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         string sql = $@"SELECT id, name, start_date, end_date FROM team_tactics.competition 
                         WHERE id = @Id";
 
-        var competitionsResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, DateOnly startDate, DateOnly endDate)?>(sql);
+        var competitionsResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, DateOnly startDate, DateOnly endDate)?>(sql, parameters);
 
         return competitionsResult.HasValue ? new Competition(competitionsResult.Value.id, competitionsResult.Value.name, competitionsResult.Value.startDate, competitionsResult.Value.endDate) : null;
     }
