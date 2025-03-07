@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using TeamTactics.Application.Players;
-using TeamTactics.Application.Tournaments;
+using TeamTactics.Application.Points;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Teams.Exceptions;
@@ -13,17 +13,20 @@ namespace TeamTactics.Application.Teams
     public sealed class TeamManager
     {
         private readonly ITeamRepository _teamRepository;
+        private readonly IPointsRepository _pointRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly ITournamentRepository _tournamentRepository;
         private readonly ILogger<TeamManager> _logger;
 
         public TeamManager(
             ITeamRepository teamRepository,
+            IPointsRepository pointRepository,
             IPlayerRepository playerRepository,
             ITournamentRepository tournamentRepository,
             ILogger<TeamManager> logger)
         {
             _teamRepository = teamRepository;
+            _pointRepository = pointRepository;
             _playerRepository = playerRepository;
             _tournamentRepository = tournamentRepository;
             _logger = logger;
@@ -60,12 +63,6 @@ namespace TeamTactics.Application.Teams
 
             Team team = new Team(name, userId, tournamentId.Value);
             return await _teamRepository.InsertAsync(team);
-        }
-
-        public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
-        {
-            var team = await _teamRepository.FindTeamPointsAsync(teamId);
-            return team;
         }
 
         /// <summary>
@@ -117,6 +114,12 @@ namespace TeamTactics.Application.Teams
 
             await _teamRepository.RemoveAsync(teamId);
             _logger.LogInformation("Team '{teamId}' deleted", teamId);
+        }
+
+        public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
+        {
+            var teamPoints = await _pointRepository.FindTeamPointsAsync(teamId);
+            return teamPoints;
         }
 
         /// <summary>
@@ -176,7 +179,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="TeamLockedException"></exception>
         /// <exception cref="PlayerNotOnTeamException"></exception>
         /// <exception cref="PlayerAlreadyCaptainException"></exception>
-        public async Task SetTeamCaptain(int teamId, int playerId)
+        public async Task SetTeamCaptainAsync(int teamId, int playerId)
         {
             var team = await _teamRepository.FindByIdAsync(teamId);
             if (team == null)
@@ -187,6 +190,33 @@ namespace TeamTactics.Application.Teams
             team.SetCaptain(playerId);
             await _teamRepository.UpdateAsync(team);
             _logger.LogInformation("Player '{playerId}' set as captain of team '{teamId}'", playerId, teamId);
+        }
+
+        /// <summary>
+        /// Rename a team.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />
+        /// <exception cref="TeamLockedException"></exception>
+        public async Task RenameTeamAsync(int userId, int teamId, string name)
+        {
+            var team = await _teamRepository.FindByIdAsync(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            if (team.UserId != userId)
+            {
+                throw new UnauthorizedException("User does not own the team.");
+            }
+
+            team.Rename(name);
+
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Team '{teamId}' renamed to '{name}'", teamId, name);
         }
     }
 }

@@ -69,30 +69,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             return team;
         }
 
-        public async Task<TeamPointsDto> FindTeamPointsAsync(int teamId)
-        {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
-            string sql = @"
-    SELECT SUM(pc.point_amount * mpp.occurrences)
-    FROM team_tactics.player_user_team put
-    JOIN team_tactics.match_player_point mpp 
-    	ON put.player_id = mpp.player_id
-    JOIN team_tactics.point_category pc 
-    	ON mpp.point_category_id = pc.id
-    WHERE put.user_team_id = @TeamId
-        AND pc.active = true";
-
-            var parameters = new DynamicParameters();
-            parameters.Add("TeamId", teamId);
-
-            var categoryTotals = await _dbConnection.QueryAsync<decimal>(sql, parameters);
-            decimal totalPoints = categoryTotals.Sum();
-
-            return new TeamPointsDto(totalPoints);
-        }
-
         //returner alle teams som brugeren ejer
         public async Task<IEnumerable<Team>> FindUserTeamsAsync(int userId)
         {

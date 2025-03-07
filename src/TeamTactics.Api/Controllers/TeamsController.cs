@@ -151,7 +151,7 @@ namespace TeamTactics.Api.Controllers
         {
             try
             {
-                await _teamManager.SetTeamCaptain(id, playerId);
+                await _teamManager.SetTeamCaptainAsync(id, playerId);
                 return NoContent();
             }
             catch (TeamLockedException ex)
@@ -209,6 +209,31 @@ namespace TeamTactics.Api.Controllers
             {
                 return Problem(
                     title: "The team does not have a captain.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+        }
+
+        [HttpPatch("{id:int}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RenameTeam(int id, RenameTeamRequest request)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new UnauthorizedException("User not logged in."));
+            try
+            {
+                await _teamManager.RenameTeamAsync(userId, id, request.Name);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
                     detail: ex.Description,
                     statusCode: StatusCodes.Status400BadRequest);
             }

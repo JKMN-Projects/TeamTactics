@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Common;
 using TeamTactics.Application.Scraper;
+using TeamTactics.Domain.Competitions;
 
 namespace TeamTactics.Infrastructure.Database.Scraper;
 
@@ -28,7 +29,7 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
             _dbConnection.Open();
 
         const string sql = @"
-        SELECT id, name, point_amount, active 
+        SELECT id, name, point_amount, active, external_id 
         FROM team_tactics.point_category
         WHERE active = true
         ORDER BY id";
@@ -218,7 +219,25 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
             }
         }
     }
+    public async Task<MatchResultScrape?> GetLatestMatch(int competitionId)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
 
+        const string sql = @"
+        SELECT  id, home_club_score, away_club_score, home_club_id, away_club_id, ""timestamp"", competition_id
+        FROM team_tactics.match_result
+        WHERE competition_id = @Id
+        ORDER BY ""timestamp"" DESC
+        LIMIT 1";
+
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", competitionId);
+
+        return await _dbConnection.QueryFirstOrDefaultAsync<MatchResultScrape>(sql,parameters);
+
+    }
     public async Task<IEnumerable<MatchResultScrape>> InsertMatchResultsBulk(IEnumerable<MatchResultScrape> matchResults)
     {
         if (_dbConnection.State != ConnectionState.Open)
@@ -254,8 +273,8 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
                     home_club_id, away_club_id, 
                     timestamp, competition_id,
                     url_name, external_id)
-                VALUES {string.Join(", ", valuesClauses)}
-                RETURNING id";
+                    VALUES {string.Join(", ", valuesClauses)}
+                    RETURNING id";
 
                 var ids = (await _dbConnection.QueryAsync<int>(sql, parameters, transaction)).ToList();
 
@@ -267,8 +286,9 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
                 transaction.Commit();
                 return matchResultsList;
             }
-            catch
+            catch(Exception e)
             {
+                
                 transaction.Rollback();
                 throw;
             }
@@ -325,16 +345,97 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
         }
     }
 
-    public async Task<IEnumerable<ClubScrape>> GetClubs()
+    public async Task<IEnumerable<ClubScrape>> GetClubs(int competitionId)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
         const string sql = @"
-        SELECT name,external_id, id
-        FROM team_tactics.club
-        ORDER BY id";
+        SELECT c.name, c.external_id, c.id
+        FROM team_tactics.club c
+        JOIN team_tactics.club_competition cc ON c.id = cc.club_id
+        WHERE cc.competition_id = @CompetitionId
+        ORDER BY c.id";
 
-        return await _dbConnection.QueryAsync<ClubScrape>(sql);
+
+        var parameters = new DynamicParameters();
+        parameters.Add("CompetitionId", competitionId);
+        return await _dbConnection.QueryAsync<ClubScrape>(sql,parameters);
+    }
+
+    public async Task<IEnumerable<MatchResultScrape>> GetFixturesWithNoStats()
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+        const string sql = @"
+        SELECT 
+            mr.id AS Id ,
+            mr.home_club_score AS HomeClubScore,
+            mr.away_club_score AS AwayClubScore,
+            mr.home_club_id AS HomeClubId,
+            mr.away_club_id AS AwayClubId, 
+            mr.""timestamp"" AS Timestamp,
+            mr.competition_id AS CompetitionId,
+            mr.url_name AS UrlName,
+            mr.external_id AS ExternalId
+        FROM team_tactics.match_result mr
+        LEFT JOIN team_tactics.match_player_point mpp ON mr.id = mpp.match_result_id
+        WHERE mpp.match_result_id IS NULL;";
+
+
+
+        return await _dbConnection.QueryAsync<MatchResultScrape>(sql);
+
+    }
+    public async Task<ClubScrape?> GetClubById(int clubId)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+
+        const string sql = @"
+        SELECT c.name, c.external_id, c.id
+        FROM team_tactics.club c
+        WHERE c.id = @ClubId
+        LIMIT 1";
+
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ClubId", clubId);
+        return await _dbConnection.QueryFirstOrDefaultAsync<ClubScrape>(sql, parameters);
+
+
+    }
+
+    public async Task<PlayerScrape?> GetPlayerIdByExternalIdAndClubId(string externalPlayerId, int clubId)
+    {
+        if (_dbConnection.State != ConnectionState.Open)
+            _dbConnection.Open();
+
+
+        const string sql = @"SELECT 
+            p.id, 
+            p.first_name AS firstName, 
+            p.last_name AS lastName, 
+            p.external_id AS externalId, 
+            p.player_position_id AS positionId, 
+            p.birthdate
+        FROM 
+            team_tactics.player p
+        INNER JOIN 
+            team_tactics.player_contract pc ON p.id = pc.player_id
+        WHERE 
+            pc.club_id = @ClubId 
+            AND p.external_id = @ExternalPlayerId
+            AND pc.active = true
+        LIMIT 1
+        ";
+
+
+        var parameters = new DynamicParameters();
+        parameters.Add("ExternalPlayerId", externalPlayerId);
+        parameters.Add("ClubId", clubId);
+        return await _dbConnection.QueryFirstOrDefaultAsync<PlayerScrape>(sql, parameters);
     }
 }

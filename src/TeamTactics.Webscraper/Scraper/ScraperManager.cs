@@ -8,13 +8,34 @@ public class ScraperManager
     public ScraperManager()
     {
         _httpClient = new HttpClient();
+        var apiKey = Environment.GetEnvironmentVariable("ApiKey"); //TODO: Load with option patteren
+        _httpClient.BaseAddress = new Uri($"https://api.scraperapi.com/?api_key={apiKey}&url=");
     }
+    /// <summary>
+    /// Method used to get all clubs
+    /// Hardcoded to premierleague right now
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="HttpProtocolException"></exception>
+    /// <exception cref="TaskCanceledException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     public async Task<List<Club>> GetClubs()
     {
         var scraper = new WebScraper(_httpClient);
         var clubs = await scraper.ScrapeListAsync<Club>();
         return clubs;
     }
+    /// <summary>
+    /// Method used to get squad players on a club
+    /// </summary>
+    /// <param name="clubId"></param>
+    /// <param name="clubName"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="HttpProtocolException"></exception>
+    /// <exception cref="TaskCanceledException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     public async Task<List<ClubPlayer>> GetSquadPlayers(string clubId, string clubName)
     {
 
@@ -25,12 +46,32 @@ public class ScraperManager
         var squadPlayers = await scraper.ScrapeListAsync<ClubPlayer>();
         return squadPlayers;
     }
-    public async Task<List<PremierLeagueFixture>> GetFixtures()
+    /// <summary>
+    /// Method used to scrape all fixtures
+    /// Hardcoded right now to premierleague
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="HttpProtocolException"></exception>
+    /// <exception cref="TaskCanceledException"></exception>
+    /// <exception cref="UriFormatException"></exception>
+    public async Task<List<Fixture>> GetFixtures()
     {
         var scraper = new WebScraper(_httpClient);
-        var fixtures = await scraper.ScrapeListAsync<PremierLeagueFixture>();
+        var fixtures = await scraper.ScrapeListAsync<Fixture>();
         return fixtures;
     }
+    /// <summary>
+    /// Method to get playerstats on a match for a team
+    /// </summary>
+    /// <param name="matchId"></param>
+    /// <param name="matchName"></param>
+    /// <param name="teamId"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="HttpProtocolException"></exception>
+    /// <exception cref="TaskCanceledException"></exception>
+    /// <exception cref="UriFormatException"></exception> 
     public async Task<List<PlayerStats>> GetPlayerStats(string matchId, string matchName, string teamId)
     {
         var parameters = new ScraperParameters()

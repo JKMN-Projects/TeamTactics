@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Players;
+using TeamTactics.Application.Points;
 using TeamTactics.Application.Teams;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Application.Users;
@@ -17,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<TeamManager>();
         services.AddScoped<CompetitionManager>();
         services.AddScoped<TournamentManager>();
+        services.AddScoped<PointsManager>();
         // Validators
         services.AddSingleton<PasswordValidator>();
 

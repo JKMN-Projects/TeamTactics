@@ -10,7 +10,7 @@ public class Club
     [Selector(xpath: ".//td[@data-stat='team']/a")]
     public string Name { get; set; }
 
-    [Selector(xpath: ".//td[@data-stat='team']/a", attribute: "href", transform: "https://fbref.com{0}")]
+    [Selector(xpath: ".//td[@data-stat='team']/a", attribute: "href")]
     public string Link { get; set; }
 
     public List<ClubPlayer> SquadPlayers { get; private set; }

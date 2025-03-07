@@ -1,11 +1,11 @@
 ﻿namespace TeamTactics.Application.Scraper;
 
-public class PlayerScrape(string firstName, string lastName, DateOnly birthdate, string externalId, int positionId)
+public class PlayerScrape
 {
     public int Id { get; set; }
-    public string FirstName { get; private set; } = firstName;
-    public string LastName { get; private set; } = lastName;
-    public DateOnly BirthDate { get; private set; } = birthdate;
-    public string ExternalId { get; private set; } = externalId;
-    public int PositionId { get; private set; } = positionId;
+    public string FirstName { get;  set; }
+    public string LastName { get;  set; }
+    public DateOnly BirthDate { get;  set; }
+    public string ExternalId { get;  set; }
+    public int PositionId { get;  set; }
 }
