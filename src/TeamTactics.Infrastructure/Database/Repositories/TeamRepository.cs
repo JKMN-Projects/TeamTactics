@@ -188,6 +188,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             try
             {
                 DateOnly? lockedDate = null;
+
+                // TODO: This sets the locked whenever the team is updated, should only be set when the status is changed to locked.
+                // This should be handled in the domian lock method.
                 if (model.Status == TeamStatus.Locked)
                 {
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
