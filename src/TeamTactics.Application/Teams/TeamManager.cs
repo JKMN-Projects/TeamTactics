@@ -43,7 +43,7 @@ namespace TeamTactics.Application.Teams
         public async Task<int> CreateTeamAsync(string name, int userId, string inviteCode)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-            ArgumentOutOfRangeException.ThrowIfLessThan(userId, 1, nameof(userId));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(userId, nameof(userId));
             ArgumentException.ThrowIfNullOrWhiteSpace(inviteCode, nameof(inviteCode));
 
             int? tournamentId = await _tournamentRepository.FindIdByInviteCodeAsync(inviteCode);
