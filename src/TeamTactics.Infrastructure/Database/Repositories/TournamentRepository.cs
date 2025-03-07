@@ -22,7 +22,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<TournamentDto?> GetTournamentByIdAsync(int tournamentId)
+        public async Task<TournamentDto?> GetTournamentDtoByIdAsync(int tournamentId)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
