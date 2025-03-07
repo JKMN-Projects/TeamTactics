@@ -1,0 +1,75 @@
+﻿using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Domain.Users;
+using TeamTactics.Infrastructure.Database.Repositories;
+
+namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
+{
+    public abstract class UserRepositoryTests : TestBase
+    {
+        private readonly UserRepository _sut;
+
+        protected UserRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
+        {
+            _sut = new UserRepository(_dbConnection);
+        }
+
+        public sealed class InsertAsync : UserRepositoryTests
+        {
+            public InsertAsync(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
+
+            [Fact]
+            public async Task Should_InsertUser()
+            {
+                // Arrange
+                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
+
+                // Act
+                User result = await _sut.InsertAsync(user, "passwordHash");
+                
+                // Assert
+                var addedUser = await _sut.FindByIdAsync(result.Id);
+                Assert.NotNull(addedUser);
+                Assert.Equal(user.Username, addedUser.Username);
+                Assert.Equal(user.Email, addedUser.Email);
+                Assert.Equal(user.SecurityInfo.Salt, addedUser.SecurityInfo.Salt);
+            }
+        }
+
+        public sealed class RemoveAsync : UserRepositoryTests
+        {
+            public RemoveAsync(CustomWebApplicationFactory factory) : base(factory)
+            {
+            }
+
+            [Fact]
+            public async Task Should_RemoveUser()
+            {
+                // Arrange
+                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
+                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+
+                // Act  
+                await _sut.RemoveAsync(addedUser);
+
+                // Assert
+                var removedUser = await _sut.FindByIdAsync(addedUser.Id);
+                Assert.Null(removedUser);
+            }
+
+            [Fact]
+            public async Task Should_ThrowEntityNotFoundException_WhenUserDoesNotExist()
+            {
+                // Arrange
+                var user = new User("username", "email@jknm.com", new("salt"));
+
+                // Act
+                var act = async () => await _sut.RemoveAsync(user);
+
+                // Assert
+                await Assert.ThrowsAsync<EntityNotFoundException>(act);
+            }
+        }
+    }
+}

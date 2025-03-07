@@ -72,7 +72,13 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT * FROM team_tactics.user_account
+        string sql = $@"
+    SELECT 
+        id AS {nameof(User.Id)},
+        username AS {nameof(User.Username)},
+        email AS {nameof(User.Email)},
+        salt AS salt
+    FROM team_tactics.user_account
 	WHERE email = @Email";
 
         var parameters = new DynamicParameters();
@@ -88,8 +94,14 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT * FROM team_tactics.user_account
-	WHERE id = @ID";
+        string sql = $@"
+        SELECT 
+            id AS {nameof(User.Id)},
+            username AS {nameof(User.Username)},
+            email AS {nameof(User.Email)},
+            salt AS salt
+        FROM team_tactics.user_account
+	    WHERE id = @ID";
 
         var parameters = new DynamicParameters();
         parameters.Add("ID", id);

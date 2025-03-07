@@ -91,7 +91,7 @@ namespace TeamTactics.Application.Users
 
             var passwordHash = _hashingService.Hash(
                 Encoding.UTF8.GetBytes(password),
-                Encoding.UTF8.GetBytes(user.SecurityInfo.Salt));
+                Convert.FromBase64String(user.SecurityInfo.Salt));
 
             if (!await _userRepository.CheckPasswordAsync(email, Convert.ToBase64String(passwordHash)))
             {
