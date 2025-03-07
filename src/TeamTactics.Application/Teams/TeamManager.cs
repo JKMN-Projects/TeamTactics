@@ -1,9 +1,12 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using TeamTactics.Application.Players;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Teams.Exceptions;
+using TeamTactics.Domain.Tournaments;
+using TeamTactics.Domain.Tournaments.Exceptions;
 
 namespace TeamTactics.Application.Teams
 {
@@ -11,39 +14,54 @@ namespace TeamTactics.Application.Teams
     {
         private readonly ITeamRepository _teamRepository;
         private readonly IPlayerRepository _playerRepository;
+        private readonly ITournamentRepository _tournamentRepository;
         private readonly ILogger<TeamManager> _logger;
 
         public TeamManager(
             ITeamRepository teamRepository,
             IPlayerRepository playerRepository,
+            ITournamentRepository tournamentRepository,
             ILogger<TeamManager> logger)
         {
             _teamRepository = teamRepository;
             _playerRepository = playerRepository;
+            _tournamentRepository = tournamentRepository;
             _logger = logger;
         }
 
         /// <summary>
-        /// Create a new team with the given name, user and competition.
+        /// Checks if the tournament invite code is correct and inserts a new team into the database.
         /// </summary>
         /// <param name="name">The name of the team. Must be unique in the tournament.</param>
         /// <param name="userId">The user id of the user creating the team.</param>
-        /// <param name="competitionId">The id of the competition the team is based on.</param>
+        /// <param name="inviteCode">The invite code for the tournament the team should join.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
-        public async Task<int> CreateTeamAsync(string name, int userId, int competitionId)
+        /// <exception cref="EntityNotFoundException" />
+        public async Task<int> CreateTeamAsync(string name, int userId, string inviteCode)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
             ArgumentOutOfRangeException.ThrowIfLessThan(userId, 1, nameof(userId));
-            ArgumentOutOfRangeException.ThrowIfLessThan(competitionId, 1, nameof(competitionId));
+            ArgumentException.ThrowIfNullOrWhiteSpace(inviteCode, nameof(inviteCode));
 
-            // TODO: Check if competition exists, might be checked on foreign key constraint
+            int? tournamentId = await _tournamentRepository.FindIdByInviteCodeAsync(inviteCode);
+            if (!tournamentId.HasValue)
+            {
+                throw EntityNotFoundException.ForEntity<Tournament>(inviteCode, nameof(Tournament.InviteCode));
+            }
 
-            var team = new Team(name, userId, competitionId);
+            IEnumerable<Team> teams = await _teamRepository.FindUserTeamsAsync(userId);
+            if (teams.Any(t => t.TournamentId == tournamentId.Value))
+            {
+                throw new AlreadyJoinedTournamentException(userId, tournamentId.Value);
+            }
+
+            Team team = new Team(name, userId, tournamentId.Value);
             return await _teamRepository.InsertAsync(team);
         }
+
         public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
         {
             var team = await _teamRepository.FindTeamPointsAsync(teamId);

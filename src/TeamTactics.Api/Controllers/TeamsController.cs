@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TeamTactics.Api.Requests.Teams;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Teams.Exceptions;
+using TeamTactics.Domain.Tournaments.Exceptions;
 
 namespace TeamTactics.Api.Controllers
 {
@@ -22,13 +22,28 @@ namespace TeamTactics.Api.Controllers
 
         [HttpPost]
         [Authorize]
+        [ProducesResponseType<int>(StatusCodes.Status201Created)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateTeam([FromBody] CreateTeamRequest request)
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? throw new UnauthorizedException("User not logged in."));
-            int teamId = await _teamManager.CreateTeamAsync(request.Name, userId, request.competitionId);
-            return Created(); // TODO: Return CreatedAtAction
-            //return CreatedAtAction(nameof(GetTeamAsync), new { id = teamId });
+            try
+            {
+                int teamId = await _teamManager.CreateTeamAsync(request.Name, userId, request.InviteCode);
+                return Created("", teamId);
+            }
+            catch (AlreadyJoinedTournamentException ex)
+            {
+                return Problem(
+                    title: "User already joined the tournament.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status409Conflict);
+            }
         }
 
         [HttpGet("{teamId}/Points")]

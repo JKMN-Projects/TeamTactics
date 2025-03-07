@@ -4,5 +4,5 @@ namespace TeamTactics.Api.Requests.Teams
 {
     public record CreateTeamRequest(
         [Required] string Name,
-        [Required] int competitionId);
+        [Required] string InviteCode);
 }
