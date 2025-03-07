@@ -89,7 +89,6 @@ namespace TeamTactics.Application.UnitTests.Users
             [InlineData("")]
             [InlineData(" ")]
             [InlineData("someInvalidEmail")]
-            [InlineData("someInvalid@Email")]
             [InlineData("someInvalidEmail.com")]
             [InlineData("some@Invalid@Email.com")]
             public async Task Should_ThrowArgumentException_When_EmailIsInvalid(string? email)
@@ -153,7 +152,7 @@ namespace TeamTactics.Application.UnitTests.Users
                 // Arrange
                 var userFaker = new UserFaker();
                 User user = userFaker.Generate();
-                _userRepositoryMock.FindByEmail(user.Email)
+                _userRepositoryMock.FindByEmailOrUsername(user.Email)
                     .Returns(user);
                 _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>(), Arg.Any<string>())
                     .Returns(true);
@@ -174,7 +173,7 @@ namespace TeamTactics.Application.UnitTests.Users
             {
                 // Arrange
                 string email = new Faker().Internet.Email();
-                _userRepositoryMock.FindByEmail(email)
+                _userRepositoryMock.FindByEmailOrUsername(email)
                     .Returns((User?)null);
                 // Act
                 async Task Act() => await _sut.GetAuthenticationTokenAsync(email, _faker.Internet.Password());
@@ -190,7 +189,7 @@ namespace TeamTactics.Application.UnitTests.Users
                 // Arrange
                 var userFaker = new UserFaker();
                 User user = userFaker.Generate();
-                _userRepositoryMock.FindByEmail(user.Email)
+                _userRepositoryMock.FindByEmailOrUsername(user.Email)
                     .Returns(user);
                 _userRepositoryMock.CheckPasswordAsync(Arg.Any<string>(), Arg.Any<string>())
                     .Returns(false);

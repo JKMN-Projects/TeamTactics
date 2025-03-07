@@ -68,26 +68,20 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         throw new NotImplementedException();
     }
 
-    public async Task<User?> FindByEmail(string email)
+    public async Task<User?> FindByEmailOrUsername(string emailOrUsername)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = $@"
-    SELECT 
-        id AS {nameof(User.Id)},
-        username AS {nameof(User.Username)},
-        email AS {nameof(User.Email)},
-        salt AS salt
-    FROM team_tactics.user_account
-	WHERE email = @Email";
+        string sql = @"SELECT id, username, email FROM team_tactics.user_account
+	                    WHERE email = @EmailOrUsername OR username = @EmailOrUsername";
 
         var parameters = new DynamicParameters();
-        parameters.Add("Email", email);
+        parameters.Add("EmailOrUsername", emailOrUsername);
 
-        User? user = await _dbConnection.QuerySingleOrDefaultAsync<User?>(sql, parameters);
+        var userResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string username, string email)?>(sql, parameters);
 
-        return user;
+        return userResult.HasValue ? new User(userResult.Value.id, userResult.Value.username, userResult.Value.email) : null;
     }
 
     public async Task<User?> FindByIdAsync(int id)
@@ -95,25 +89,21 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = $@"
-        SELECT 
-            id AS {nameof(User.Id)},
-            username AS {nameof(User.Username)},
-            email AS {nameof(User.Email)},
-            salt AS salt
-        FROM team_tactics.user_account
-	    WHERE id = @ID";
+        string sql = @"SELECT id, username, email FROM team_tactics.user_account WHERE id = @ID";
 
         var parameters = new DynamicParameters();
         parameters.Add("ID", id);
 
-        User? user = await _dbConnection.QuerySingleOrDefaultAsync<User?>(sql, parameters);
+        var userResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string username, string email)?>(sql, parameters);
 
-        return user;
+        return userResult.HasValue ? new User(userResult.Value.id, userResult.Value.username, userResult.Value.email) : null;
     }
 
     public async Task<ProfileDto> GetProfileAsync(int id)
     {
+        //Get associated tournaments from TournamentRepo
+        throw new NotImplementedException();
+
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
@@ -138,15 +128,13 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
     JOIN team_tactics.tournament t ON ut.competition_id = t.id
     WHERE ut.user_account_id = @UserId";
 
-        var tournaments = await _dbConnection.QueryAsync<ProfileDto.Tournament>(tournamentSql, userParams);
+        var tournamentsResult = await _dbConnection.QueryAsync<(int tourneyId, string tourneyName)>(tournamentSql, userParams);
 
         // Create and return the DTO
-        return new ProfileDto(
-            Username: userInfo.Username,
-            Email: userInfo.Email,
-            Competitions: tournaments.ToList()
-        );
+        return new ProfileDto(userInfo.Username, userInfo.Email, tournamentsResult.Select(t => new ProfileDto.Tournament(t.tourneyId, t.tourneyName)).ToList());
     }
+
+
 
     public async Task<string?> GetUserSaltAsync(int userId)
     {

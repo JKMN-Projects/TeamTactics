@@ -1,9 +1,19 @@
 ﻿namespace TeamTactics.Application.Scraper;
 
-public class PointCategoryScrape(int id, string name, double pointAmount, bool active)
+public class PointCategoryScrape
 {
-    public int Id { get; set; } = id;
-    public string Name { get; set; } = name;
-    public double PointAmount { get; set; } = pointAmount;
-    public bool Active { get; set; } = active;
+    public PointCategoryScrape(int id, string name, decimal point_amount, bool active, string external_Id)
+    {
+        Id = id;
+        Name = name;
+        PointAmount = point_amount;
+        Active = active;
+        ExternalId = external_Id;
+
+    }
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public decimal PointAmount { get; private set; }
+    public bool Active { get; private set; }
+    public string ExternalId { get; private set; }
 }

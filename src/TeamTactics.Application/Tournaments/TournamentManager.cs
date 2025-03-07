@@ -50,5 +50,34 @@ namespace TeamTactics.Application.Tournaments
 
             await _tournamentRepository.RemoveAsync(tournamentId);
         }
+
+        /// <summary>
+        /// Update the name and description of a tournament.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="tournamentId"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="UnauthorizedException"></exception>
+        public async Task UpdateTournamentAsync(int userId, int tournamentId, string name, string description)
+        {
+            Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
+            if (tournament == null)
+            {
+                throw EntityNotFoundException.ForEntity<Tournament>(tournamentId, nameof(Tournament.Id));
+            }
+
+            if (tournament.CreatedByUserId != userId)
+            {
+                throw new UnauthorizedException("User is not authorized to update this tournament.");
+            }
+
+            tournament.Update(name, description);
+            await _tournamentRepository.UpdateAsync(tournament);
+        }
     }
 }

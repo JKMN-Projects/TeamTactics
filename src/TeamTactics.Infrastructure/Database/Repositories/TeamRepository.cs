@@ -1,8 +1,10 @@
 ﻿using Dapper;
 using System.Data;
 using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Application.Points;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Teams;
+using TeamTactics.Domain.Tournaments;
 
 namespace TeamTactics.Infrastructure.Database.Repositories
 {
@@ -43,7 +45,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     WHERE 
         t.id = @Id";
 
-            var results = await _dbConnection.QueryAsync<dynamic>(sql, parameters);
+            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
 
             if (!results.Any())
                 return null;
@@ -53,8 +55,8 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             // Add players (if any)
             foreach (var row in results)
             {
-                if (row.player_id != null)
-                    teamPlayers.Add(new TeamPlayer(row.player_id, row.club_id, row.captain));
+                if (row.teamPlayerId.HasValue && row.clubId.HasValue && row.teamPlayerIsCaptain.HasValue)
+                    teamPlayers.Add(new TeamPlayer(row.teamPlayerId.Value, row.clubId.Value, row.teamPlayerIsCaptain.Value));
 
             }
 
@@ -62,39 +64,14 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var firstRow = results.First();
 
             // Parse team status
-            Enum.TryParse(firstRow.status.ToString(), out TeamStatus teamStatus);
+            Enum.TryParse(firstRow.teamStatus.ToString(), out TeamStatus teamStatus);
 
-            Team team = new Team(id, firstRow.name, teamStatus, firstRow.user_account_id, firstRow.user_tournament_id, teamPlayers);
+            Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
 
             return team;
         }
 
-        public async Task<TeamPointsDto> FindTeamPointsAsync(int teamId)
-        {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
-            string sql = @"
-    SELECT SUM(pc.point_amount * mpp.occurrences)
-    FROM team_tactics.player_user_team put
-    JOIN team_tactics.match_player_point mpp 
-    	ON put.player_id = mpp.player_id
-    JOIN team_tactics.point_category pc 
-    	ON mpp.point_category_id = pc.id
-    WHERE put.user_team_id = @TeamId
-        AND pc.active = true";
-
-            var parameters = new DynamicParameters();
-            parameters.Add("TeamId", teamId);
-
-            var categoryTotals = await _dbConnection.QueryAsync<decimal>(sql, parameters);
-            decimal totalPoints = categoryTotals.Sum();
-
-            return new TeamPointsDto(totalPoints);
-        }
-
-        //returner alle teams som brugeren ejer
-        public async Task<IEnumerable<Team>> FindUserTeamsAsync(int userId)
+        public async Task<IEnumerable<TeamTournamentsDto>> GetAllTeamsByUserId(int userId)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
@@ -102,50 +79,16 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("UserId", userId);
 
-            string sql = @"
-    SELECT 
-        t.id, 
-        t.name, 
-        t.status, 
-        t.user_account_id, 
-        t.user_tournament_id,
-        p.player_id,
-        p.captain
-    FROM 
-        team_tactics.user_team t
-    LEFT JOIN 
-        team_tactics.player_user_team p ON t.id = p.user_team_id
-    WHERE 
-        t.user_account_id = @UserId
-    ORDER BY 
-        t.id";
+            string sql = $@"
+    SELECT uteam.id, uteam.name, utourn.name 
+	FROM team_tactics.user_team as uteam 
+	JOIN team_tactics.user_tournament as utourn
+		ON utourn.id = uteam.user_tournament_id
+	WHERE uteam.user_account_id = @UserId";
 
-            var results = await _dbConnection.QueryAsync<dynamic>(sql, parameters);
+            var tourneyTeamsResults = await _dbConnection.QueryAsync<(int teamId, string teamName, string tourneyName)>(sql);
 
-            // Group results by team ID
-            var teamGroups = results.GroupBy(r => (int)r.id);
-            var teams = new List<Team>();
-
-            foreach (var group in teamGroups)
-            {
-                var teamId = group.Key;
-                var firstRow = group.First();
-
-                Enum.TryParse(firstRow.status.ToString(), out TeamStatus teamStatus);
-
-                var players = new List<TeamPlayer>();
-                foreach (var row in group)
-                {
-                    if (row.player_id != null)
-                    {
-                        players.Add(new TeamPlayer(row.player_id, teamId, row.captain));
-                    }
-                }
-
-                teams.Add(new Team(teamId, firstRow.name, teamStatus, firstRow.user_account_id, firstRow.user_tournament_id, players));
-            }
-
-            return teams;
+            return tourneyTeamsResults.Any() ? tourneyTeamsResults.Select(tt => new TeamTournamentsDto(tt.teamId, tt.teamName, tt.tourneyName)) : new List<TeamTournamentsDto>();
         }
 
         public async Task<int> InsertAsync(Team team)
@@ -162,8 +105,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             parameters.Add("Id", id);
 
             //ON DELETE CASCADE deletes all player_user_team associated with the team
-            string sql = @"DELETE FROM team_tactics.user_team
-	WHERE id = @Id";
+            string sql = @"DELETE FROM team_tactics.user_team WHERE id = @Id";
 
             int rowsAffeted = await _dbConnection.ExecuteAsync(sql, parameters);
             if (rowsAffeted == 0)
@@ -179,7 +121,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             await UpsertAsync(team);
         }
 
-        private async Task<int> UpsertAsync(Team model)
+        private async Task<int> UpsertAsync(Team team)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
@@ -189,14 +131,14 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             try
             {
                 DateOnly? lockedDate = null;
-                if (model.Status == TeamStatus.Locked)
+                if (team.Status == TeamStatus.Locked)
                 {
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
 
                 var parameters = new DynamicParameters();
                 string teamSql;
-                if (model.Id == 0)
+                if (team.Id == 0)
                 {
                     teamSql = @"
     INSERT INTO team_tactics.user_team
@@ -207,7 +149,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 }
                 else
                 {
-                    parameters.Add("Id", model.Id);
+                    parameters.Add("Id", team.Id);
                     teamSql = @"
     UPDATE team_tactics.user_team SET
         name = @Name,
@@ -220,28 +162,15 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     RETURNING id";
                 }
 
-            //    string teamSql = @"
-            //INSERT INTO team_tactics.user_team 
-            //    (id, name, status, locked_date, user_account_id, user_tournament_id)
-            //VALUES 
-            //    (COALESCE(@Id, DEFAULT), @Name, @Status, @LockedDate, @UserId, @TournamentId)
-            //ON CONFLICT (id) DO UPDATE SET
-            //    name = EXCLUDED.name,
-            //    status = EXCLUDED.status,
-            //    locked_date = EXCLUDED.locked_date,
-            //    user_account_id = EXCLUDED.user_account_id,
-            //    user_tournament_id = EXCLUDED.user_tournament_id
-            //RETURNING id";
-
                 //parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value);
-                parameters.Add("Name", model.Name);
-                parameters.Add("Status", (int)model.Status);
+                parameters.Add("Name", team.Name);
+                parameters.Add("Status", (int)team.Status);
                 parameters.Add("LockedDate", lockedDate);
-                parameters.Add("UserId", model.UserId);
-                parameters.Add("TournamentId", model.TournamentId);
+                parameters.Add("UserId", team.UserId);
+                parameters.Add("TournamentId", team.TournamentId);
 
                 int teamId = await _dbConnection.QuerySingleOrDefaultAsync<int>(teamSql, parameters, transaction);
-                if (teamId == 0 && model.Id > 0)
+                if (teamId == 0 && team.Id > 0)
                 {
                     throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
                 }
@@ -256,13 +185,13 @@ namespace TeamTactics.Infrastructure.Database.Repositories
 
                 await _dbConnection.ExecuteAsync(deletePlayersSql, new { TeamId = teamId }, transaction);
 
-                if (model.Players.Any())
+                if (team.Players.Any())
                 {
                     var playerValues = new List<string>();
                     var playerParameters = new DynamicParameters();
 
                     int i = 0;
-                    foreach (var player in model.Players)
+                    foreach (var player in team.Players)
                     {
                         playerValues.Add($"(@PlayerId{i}, @TeamId, @Captain{i})");
 
@@ -281,7 +210,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 }
 
                 transaction.Commit();
-                model.SetId(teamId);
+                team.SetId(teamId);
                 return teamId;
             }
             catch
