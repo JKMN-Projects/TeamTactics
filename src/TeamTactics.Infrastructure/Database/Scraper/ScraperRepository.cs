@@ -29,7 +29,7 @@ public class ScraperRepository(IDbConnection dbConnection) : IScraperRepository
             _dbConnection.Open();
 
         const string sql = @"
-        SELECT id, name, point_amount, active 
+        SELECT id, name, point_amount, active, external_id 
         FROM team_tactics.point_category
         WHERE active = true
         ORDER BY id";

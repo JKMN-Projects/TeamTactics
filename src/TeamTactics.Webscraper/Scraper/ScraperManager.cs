@@ -8,6 +8,8 @@ public class ScraperManager
     public ScraperManager()
     {
         _httpClient = new HttpClient();
+        var apiKey = Environment.GetEnvironmentVariable("ApiKey"); //TODO: Load with option patteren
+        _httpClient.BaseAddress = new Uri($"https://api.scraperapi.com/?api_key={apiKey}&url=");
     }
     /// <summary>
     /// Method used to get all clubs

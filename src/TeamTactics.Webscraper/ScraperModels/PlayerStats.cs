@@ -27,16 +27,20 @@ public class PlayerStats
     public int Minutes { get; set; }
 
     [Selector(xpath: ".//td[@data-stat='goals']")]
-    public int Goal { get; set; }
+    public int Goals { get; set; }
 
     [Selector(xpath: ".//td[@data-stat='assists']")]
-    public int Assist { get; set; }
+    public int Assists { get; set; }
 
     [Selector(xpath: ".//td[@data-stat='shots']")]
-    public int Shot { get; set; }
+    public int Shots { get; set; }
 
     [Selector(xpath: ".//td[@data-stat='blocks']")]
-    public int Block { get; set; }
+    public int Blocks { get; set; }
+    [Selector(xpath: ".//td[@data-stat='pens_made']")]
+    public int Pens_Made { get; set; }
+    [Selector(xpath: ".//td[@data-stat='pens_att']")]
+    public int Pens_Att { get; set; }
 
 }
 

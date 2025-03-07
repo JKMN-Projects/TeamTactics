@@ -37,6 +37,11 @@ internal class WebScraper
         string url = _parameters.ApplyToTemplate(sourceAttr.UrlTemplate);
         string rowsXPath = _parameters.ApplyToTemplate(sourceAttr.RowsXPathTemplate);
 
+        if(_httpClient.BaseAddress != null)
+        {
+            url = url.Replace(":", "%3A").Replace("/", "%2F");
+            url = _httpClient.BaseAddress + url;
+        }
 
         var htmlDoc = new HtmlDocument();
         try
@@ -92,6 +97,7 @@ internal class WebScraper
 
         return items;
     }
+
 
 
     /// <summary>

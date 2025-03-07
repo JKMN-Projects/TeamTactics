@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using TeamTactics.Application.Scraper;
 using TeamTactics.Application.Users;
 using TeamTactics.Domain.Players;
@@ -115,9 +116,14 @@ public sealed class PlayerManager
             var properties = playerStat.GetType().GetProperties();
             foreach (var pointCategory in pointCategories)
             {
-                var property = playerStat.GetType().GetProperty(pointCategory.Name);
+                var property = properties.FirstOrDefault(p =>
+                    string.Equals(p.Name, pointCategory.ExternalId, StringComparison.OrdinalIgnoreCase));
                 if (property != null)
                 {
+                    if((int)property.GetValue(playerStat) == 0)
+                    {
+                        continue;
+                    }
                     playerPointScrapes.Add(new MatchPlayerPointScrape()
                     {
                         MatchId = matchId,
