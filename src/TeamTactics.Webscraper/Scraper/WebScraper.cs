@@ -22,6 +22,9 @@ internal class WebScraper
     /// <param name="rowXPath"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="HttpProtocolException"></exception>
+    /// <exception cref="TaskCanceledException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     public async Task<List<T>> ScrapeListAsync<T>() where T : new()
     {
 
@@ -34,6 +37,11 @@ internal class WebScraper
         string url = _parameters.ApplyToTemplate(sourceAttr.UrlTemplate);
         string rowsXPath = _parameters.ApplyToTemplate(sourceAttr.RowsXPathTemplate);
 
+        if(_httpClient.BaseAddress != null)
+        {
+            url = url.Replace(":", "%3A").Replace("/", "%2F");
+            url = _httpClient.BaseAddress + url;
+        }
 
         var htmlDoc = new HtmlDocument();
         try
@@ -44,7 +52,7 @@ internal class WebScraper
         }
         catch (Exception e)
         {
-            var test = e.Message;
+            throw;
         }
 
         var items = new List<T>();
@@ -89,6 +97,7 @@ internal class WebScraper
 
         return items;
     }
+
 
 
     /// <summary>
