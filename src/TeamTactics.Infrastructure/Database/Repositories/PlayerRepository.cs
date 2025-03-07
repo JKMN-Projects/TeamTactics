@@ -19,15 +19,14 @@ internal class PlayerRepository(IDbConnection dbConnection) : IPlayerRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT * FROM team_tactics.player
-	WHERE id = @Id";
+        string sql = @"SELECT * FROM team_tactics.player WHERE id = @Id";
 
         var parameters = new DynamicParameters();
         parameters.Add("Id", id);
 
-        Player? player = await _dbConnection.QuerySingleOrDefaultAsync<Player?>(sql, parameters);
+        var playerResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string firstName, string lastName, string externalId, int posId, DateOnly birthdate)?>(sql, parameters);
 
-        return player;
+        return playerResult.HasValue ? new Player(playerResult.Value.id, playerResult.Value.firstName, playerResult.Value.lastName, playerResult.Value.birthdate, playerResult.Value.externalId, playerResult.Value.posId) : null;
     }
 
     public async Task<IEnumerable<PlayerDto>> GetPlayersAsync(int? competitionId = null)
@@ -65,6 +64,8 @@ internal class PlayerRepository(IDbConnection dbConnection) : IPlayerRepository
             parameters.Add("@CompetitionId", competitionId.Value);
         }
 
-        return await _dbConnection.QueryAsync<PlayerDto>(sql, parameters);
+        var playerResult = await _dbConnection.QueryAsync<(int id, string firstName, string lastName, int clubId, string clubName, int posId, string posName)>(sql, parameters);
+
+        return playerResult.Any() ? playerResult.Select(p => new PlayerDto(p.id, p.firstName, p.lastName, p.clubId, p.clubName, p.posId, p.posName)) : new List<PlayerDto>();
     }
 }

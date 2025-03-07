@@ -18,6 +18,13 @@ namespace TeamTactics.Domain.Users
             Email = email;
             SecurityInfo = securityInfo;
         }
+
+        public User(int id, string username, string email) : base(id)
+        {
+            Username = username;
+            Email = email;
+            SecurityInfo = new SecurityInfo(string.Empty);
+        }
     }
 
     public sealed record SecurityInfo(string Salt);

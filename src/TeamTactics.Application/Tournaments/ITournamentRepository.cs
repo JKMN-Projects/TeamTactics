@@ -7,7 +7,9 @@ namespace TeamTactics.Application.Tournaments
     {
         public Task<int?> FindByInviteCodeAsync(string inviteCode);
         Task<IEnumerable<Tournament>> GetJoinedTournamentsAsync(string userId);
-        Task<IEnumerable<TournamentTeamsDto>> GetOtherTeamsInTournamentAsync(int tournamentId, int currentUserId);
+        Task<IEnumerable<TournamentTeamsDto>> GetTeamsInTournamentAsync(int tournamentId);
         Task<IEnumerable<Tournament>> GetOwnedTournamentsAsync(int ownerId);
+        Task UpdateOwnerAsync(int tournamentId, int previousOwnerId, int newOwnerId);
+        Task<TournamentDto?> GetTournamentDtoByIdAsync(int tournamentId);
     }
 }

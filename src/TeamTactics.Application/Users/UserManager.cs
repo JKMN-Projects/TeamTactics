@@ -48,7 +48,7 @@ namespace TeamTactics.Application.Users
             var validationResult = _passwordValidator.Validate(password);
             validationResult.ThrowIfInvalid();
             
-            var existingUser = await _userRepository.FindByEmail(email);
+            var existingUser = await _userRepository.FindByEmailOrUsername(email);
             if (existingUser is not null)
             {
                 throw new ArgumentException("User already exists", nameof(email));
@@ -71,29 +71,29 @@ namespace TeamTactics.Application.Users
         /// <summary>
         /// Gets an authentication token for the user with the given email and password.
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="emailOrUsername"></param>
         /// <param name="password"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="UnauthorizedException"></exception>
         /// <exception cref="EntityNotFoundException"></exception>
-        public async Task<AuthenticationToken> GetAuthenticationTokenAsync(string email, string password)
+        public async Task<AuthenticationToken> GetAuthenticationTokenAsync(string emailOrUsername, string password)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(email);
+            ArgumentException.ThrowIfNullOrWhiteSpace(emailOrUsername);
             ArgumentException.ThrowIfNullOrWhiteSpace(password);
 
-            var user = await _userRepository.FindByEmail(email);
+            var user = await _userRepository.FindByEmailOrUsername(emailOrUsername);
             if (user is null)
             {
-                throw EntityNotFoundException.ForEntity<User>(email, nameof(User.Email));
+                throw EntityNotFoundException.ForEntity<User>(emailOrUsername, nameof(User.Email));
             }
 
             var passwordHash = _hashingService.Hash(
                 Encoding.UTF8.GetBytes(password),
                 Encoding.UTF8.GetBytes(user.SecurityInfo.Salt));
 
-            if (!await _userRepository.CheckPasswordAsync(email, Convert.ToBase64String(passwordHash)))
+            if (!await _userRepository.CheckPasswordAsync(emailOrUsername, Convert.ToBase64String(passwordHash)))
             {
                 _logger.LogInformation("User with Id '{userId}' failed to login", user.Id);
                 throw new UnauthorizedException("Invalid password");

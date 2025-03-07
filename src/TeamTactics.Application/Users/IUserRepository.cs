@@ -15,7 +15,7 @@ public interface IUserRepository : IRepository<User, int>
     public Task<bool> CheckIfUsernameExistsAsync(string username);
     
 
-    public Task<User?> FindByEmail(string email);
+    public Task<User?> FindByEmailOrUsername(string email);
     public Task<string?> GetUserSaltAsync(int userId);
     public Task<ProfileDto> GetProfileAsync(int id);
     public Task UpdateSecurityAsync(int userId, string passwordHash, string salt);
