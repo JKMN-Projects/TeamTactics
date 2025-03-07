@@ -25,16 +25,14 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT id, text, created_time, user_tournament_id, user_account_id 
-                  FROM bulletin 
-                  WHERE id = @Id";
+        string sql = @"SELECT id, text, created_time, last_edited_time, user_tournament_id, user_account_id FROM bulletin WHERE id = @Id";
 
         var parameters = new DynamicParameters();
         parameters.Add("Id", id);
 
-        var bulletin = await _dbConnection.QuerySingleOrDefaultAsync<Bulletin?>(sql, parameters);
-        
-        return bulletin;
+        var bulletinsResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string text, DateTime createdTime, DateTime lastEditedTime, int tourneyId, int userId)?>(sql, parameters);
+
+        return bulletinsResult.HasValue ? new Bulletin(bulletinsResult.Value.id, bulletinsResult.Value.text, bulletinsResult.Value.createdTime, bulletinsResult.Value.lastEditedTime, bulletinsResult.Value.tourneyId, bulletinsResult.Value.userId) : null;
     }
 
     public async Task<IEnumerable<Bulletin>> FindInTournamentAsync(int tournamentId)
@@ -42,17 +40,16 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT id, text, created_time, user_tournament_id, user_account_id 
-                  FROM bulletin 
-                  WHERE user_tournament_id = @TournamentId
+        string sql = @"SELECT id, text, created_time, last_edited_time, user_tournament_id, user_account_id 
+                  FROM bulletin WHERE user_tournament_id = @TournamentId
                   ORDER BY created_time DESC";
 
         var parameters = new DynamicParameters();
         parameters.Add("TournamentId", tournamentId);
 
-        var bulletins = await _dbConnection.QueryAsync<Bulletin>(sql, parameters);
+        var bulletinsResult = await _dbConnection.QueryAsync<(int id, string text, DateTime createdTime, DateTime lastEditedTime, int tourneyId, int userId)>(sql, parameters);
 
-        return bulletins;
+        return bulletinsResult.Any() ? bulletinsResult.Select(b => new Bulletin(b.id, b.text, b.createdTime, b.lastEditedTime, b.tourneyId, b.userId)) : new List<Bulletin>();
     }
 
     public async Task<bool> GetIfBulletinOwner(int userId, int bulletinId)
@@ -60,9 +57,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT * 
-                  FROM bulletin 
-                  WHERE id = @BulletinId AND user_account_id = @UserId";
+        string sql = @"SELECT * FROM bulletin WHERE id = @BulletinId AND user_account_id = @UserId";
 
         var parameters = new DynamicParameters();
         parameters.Add("BulletinId", bulletinId);
@@ -109,9 +104,10 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"UPDATE bulletin 
-                  SET text = @Text, 
-                      last_edited_time = @LastEditTime
+        string sql = @"
+                  UPDATE bulletin SET 
+                    text = @Text, 
+                    last_edited_time = @LastEditTime
                   WHERE id = @Id";
 
         var parameters = new DynamicParameters();

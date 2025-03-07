@@ -1,8 +1,10 @@
 ﻿using Dapper;
 using System.Data;
 using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Application.Points;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Teams;
+using TeamTactics.Domain.Tournaments;
 
 namespace TeamTactics.Infrastructure.Database.Repositories
 {
@@ -43,7 +45,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     WHERE 
         t.id = @Id";
 
-            var results = await _dbConnection.QueryAsync<dynamic>(sql, parameters);
+            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
 
             if (!results.Any())
                 return null;
@@ -53,8 +55,8 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             // Add players (if any)
             foreach (var row in results)
             {
-                if (row.player_id != null)
-                    teamPlayers.Add(new TeamPlayer(row.player_id, row.club_id, row.captain));
+                if (row.teamPlayerId.HasValue && row.clubId.HasValue && row.teamPlayerIsCaptain.HasValue)
+                    teamPlayers.Add(new TeamPlayer(row.teamPlayerId.Value, row.clubId.Value, row.teamPlayerIsCaptain.Value));
 
             }
 
@@ -62,15 +64,14 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var firstRow = results.First();
 
             // Parse team status
-            Enum.TryParse(firstRow.status.ToString(), out TeamStatus teamStatus);
+            Enum.TryParse(firstRow.teamStatus.ToString(), out TeamStatus teamStatus);
 
-            Team team = new Team(id, firstRow.name, teamStatus, firstRow.user_account_id, firstRow.user_tournament_id, teamPlayers);
+            Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
 
             return team;
         }
 
-        //returner alle teams som brugeren ejer
-        public async Task<IEnumerable<Team>> FindUserTeamsAsync(int userId)
+        public async Task<IEnumerable<TeamTournamentsDto>> GetAllTeamsByUserId(int userId)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
@@ -78,50 +79,16 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("UserId", userId);
 
-            string sql = @"
-    SELECT 
-        t.id, 
-        t.name, 
-        t.status, 
-        t.user_account_id, 
-        t.user_tournament_id,
-        p.player_id,
-        p.captain
-    FROM 
-        team_tactics.user_team t
-    LEFT JOIN 
-        team_tactics.player_user_team p ON t.id = p.user_team_id
-    WHERE 
-        t.user_account_id = @UserId
-    ORDER BY 
-        t.id";
+            string sql = $@"
+    SELECT uteam.id, uteam.name, utourn.name 
+	FROM team_tactics.user_team as uteam 
+	JOIN team_tactics.user_tournament as utourn
+		ON utourn.id = uteam.user_tournament_id
+	WHERE uteam.user_account_id = @UserId";
 
-            var results = await _dbConnection.QueryAsync<dynamic>(sql, parameters);
+            var tourneyTeamsResults = await _dbConnection.QueryAsync<(int teamId, string teamName, string tourneyName)>(sql);
 
-            // Group results by team ID
-            var teamGroups = results.GroupBy(r => (int)r.id);
-            var teams = new List<Team>();
-
-            foreach (var group in teamGroups)
-            {
-                var teamId = group.Key;
-                var firstRow = group.First();
-
-                Enum.TryParse(firstRow.status.ToString(), out TeamStatus teamStatus);
-
-                var players = new List<TeamPlayer>();
-                foreach (var row in group)
-                {
-                    if (row.player_id != null)
-                    {
-                        players.Add(new TeamPlayer(row.player_id, teamId, row.captain));
-                    }
-                }
-
-                teams.Add(new Team(teamId, firstRow.name, teamStatus, firstRow.user_account_id, firstRow.user_tournament_id, players));
-            }
-
-            return teams;
+            return tourneyTeamsResults.Any() ? tourneyTeamsResults.Select(tt => new TeamTournamentsDto(tt.teamId, tt.teamName, tt.tourneyName)) : new List<TeamTournamentsDto>();
         }
 
         public async Task<int> InsertAsync(Team team)

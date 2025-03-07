@@ -46,8 +46,8 @@ class MatchRepository(IDbConnection dbConnection) : IMatchRepository
         var parameters = new DynamicParameters();
         parameters.Add("TournamentId", tournamentId);
 
-        var result = await _dbConnection.QuerySingleOrDefaultAsync<(string HClubName, string AClubName, int HClubScore, int AClubScore, string competitionName, DateTime utcTimestamp)>(sql, parameters);
+        var result = await _dbConnection.QuerySingleOrDefaultAsync<(string HClubName, string AClubName, int HClubScore, int AClubScore, string competitionName, DateTime utcTimestamp)?>(sql, parameters);
 
-        return new Match(result.HClubName, result.AClubName, result.HClubScore, result.AClubScore, result.competitionName, result.utcTimestamp);
+        return result.HasValue ? new Match(result.Value.HClubName, result.Value.AClubName, result.Value.HClubScore, result.Value.AClubScore, result.Value.competitionName, result.Value.utcTimestamp) : null;
     }
 }

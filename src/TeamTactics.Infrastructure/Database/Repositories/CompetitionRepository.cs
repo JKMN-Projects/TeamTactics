@@ -16,9 +16,9 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
 
         string sql = @"SELECT id, name, start_date, end_date FROM team_tactics.competition";
 
-        var competitions = await _dbConnection.QueryAsync<Competition>(sql);
+        var competitionsResult = await _dbConnection.QueryAsync<(int id, string name, DateOnly startDate, DateOnly endDate)>(sql);
 
-        return competitions;
+        return competitionsResult.Any() ? competitionsResult.Select(c => new Competition(c.id, c.name, c.startDate, c.endDate)) : new List<Competition>();
     }
 
     public async Task<Competition?> FindByIdAsync(int id)
@@ -29,17 +29,11 @@ internal class CompetitionRepository(IDbConnection dbConnection) : ICompetitionR
         DynamicParameters parameters = new();
         parameters.Add("Id", id);
 
-        string sql = $@"
-    SELECT 
-        id as {nameof(Competition.Id)}, 
-        name as {nameof(Competition.Name)}, 
-        start_date as {nameof(Competition.StartDate)}, 
-        end_date as {nameof(Competition.EndDate)}
-    FROM team_tactics.competition
-    WHERE id = @Id";
+        string sql = $@"SELECT id, name, start_date, end_date FROM team_tactics.competition 
+                        WHERE id = @Id";
 
-        var competition = await _dbConnection.QuerySingleOrDefaultAsync<Competition?>(sql, parameters);
+        var competitionsResult = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, DateOnly startDate, DateOnly endDate)?>(sql);
 
-        return competition;
+        return competitionsResult.HasValue ? new Competition(competitionsResult.Value.id, competitionsResult.Value.name, competitionsResult.Value.startDate, competitionsResult.Value.endDate) : null;
     }
 }
