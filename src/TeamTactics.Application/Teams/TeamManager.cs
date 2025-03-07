@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using TeamTactics.Application.Players;
+using TeamTactics.Application.Points;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Teams.Exceptions;
@@ -10,15 +11,18 @@ namespace TeamTactics.Application.Teams
     public sealed class TeamManager
     {
         private readonly ITeamRepository _teamRepository;
+        private readonly IPointsRepository _pointRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly ILogger<TeamManager> _logger;
 
         public TeamManager(
             ITeamRepository teamRepository,
+            IPointsRepository pointRepository,
             IPlayerRepository playerRepository,
             ILogger<TeamManager> logger)
         {
             _teamRepository = teamRepository;
+            _pointRepository = pointRepository;
             _playerRepository = playerRepository;
             _logger = logger;
         }
@@ -44,13 +48,7 @@ namespace TeamTactics.Application.Teams
             var team = new Team(name, userId, competitionId);
             return await _teamRepository.InsertAsync(team);
         }
-        public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
-        {
-            return new TeamPointsDto(0);
-
-            //var team = await _teamRepository.FindTeamPointsAsync(teamId);
-            //return team;
-        }
+        
 
         /// <summary>
         /// Add player to team if both player and team exists. Throws <see cref="EntityNotFoundException"/> if either player or team does not exist."/>
@@ -101,6 +99,12 @@ namespace TeamTactics.Application.Teams
 
             await _teamRepository.RemoveAsync(teamId);
             _logger.LogInformation("Team '{teamId}' deleted", teamId);
+        }
+
+        public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
+        {
+            var teamPoints = await _pointRepository.FindTeamPointsAsync(teamId);
+            return teamPoints;
         }
 
         /// <summary>
