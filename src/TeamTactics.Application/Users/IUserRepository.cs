@@ -6,7 +6,7 @@ namespace TeamTactics.Application.Users;
 
 public interface IUserRepository : IRepository<User, int>
 {
-    public Task<User> InsertAsync(User user, string passwordHash);
+    public Task<User> InsertAsync(User user, string passwordHash, string salt);
     public Task UpdateAsync(User user);
     public Task RemoveAsync(User user);
 

@@ -23,17 +23,16 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_InsertUser()
             {
                 // Arrange
-                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
+                var user = new User("username", "email@jknm.com");
 
                 // Act
-                User result = await _sut.InsertAsync(user, "passwordHash");
+                User result = await _sut.InsertAsync(user, "passwordHash", "salt");
                 
                 // Assert
                 var addedUser = await _sut.FindByIdAsync(result.Id);
                 Assert.NotNull(addedUser);
                 Assert.Equal(user.Username, addedUser.Username);
                 Assert.Equal(user.Email, addedUser.Email);
-                Assert.Equal(user.SecurityInfo.Salt, addedUser.SecurityInfo.Salt);
             }
         }
 
@@ -47,8 +46,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_RemoveUser()
             {
                 // Arrange
-                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
-                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+                var user = new User("username", "email@jknm.com");
+                User addedUser = await _sut.InsertAsync(user, "passwordHash", "salt");
 
                 // Act  
                 await _sut.RemoveAsync(addedUser);
@@ -62,7 +61,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_ThrowEntityNotFoundException_WhenUserDoesNotExist()
             {
                 // Arrange
-                var user = new User("username", "email@jknm.com", new("salt"));
+                var user = new User("username", "email@jknm.com");
 
                 // Act
                 var act = async () => await _sut.RemoveAsync(user);
@@ -82,8 +81,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_ReturnTrue_WhenPasswordIsCorrect()
             {
                 // Arrange
-                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
-                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+                var user = new User("username", "email@jknm.com");
+                User addedUser = await _sut.InsertAsync(user, "passwordHash", "salt");
                 
                 // Act
                 bool result = await _sut.CheckPasswordAsync(addedUser.Email, "passwordHash");
@@ -97,8 +96,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_ReturnFalse_WhenPasswordIsIncorrect()
             {
                 // Arrange
-                var user = new User("username2", "email2@jknm.com", new SecurityInfo("salt"));
-                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+                var user = new User("username2", "email2@jknm.com");
+                User addedUser = await _sut.InsertAsync(user, "passwordHash", "salt");
 
                 // Act
                 bool result = await _sut.CheckPasswordAsync(addedUser.Email, "anotherPasswordHash");
@@ -118,8 +117,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_ReturnTrue_WhenEmailExists()
             {
                 // Arrange
-                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
-                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+                var user = new User("username", "email@jknm.com");
+                User addedUser = await _sut.InsertAsync(user, "passwordHash", "salt");
 
                 // Act
                 bool result = await _sut.CheckIfEmailExistsAsync(addedUser.Email);
@@ -139,8 +138,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_ReturnTrue_WheUsernameExists()
             {
                 // Arrange
-                var user = new User("username", "email@jknm.com", new SecurityInfo("salt"));
-                User addedUser = await _sut.InsertAsync(user, "passwordHash");
+                var user = new User("username", "email@jknm.com");
+                User addedUser = await _sut.InsertAsync(user, "passwordHash", "salt");
 
                 // Act
                 bool result = await _sut.CheckIfUsernameExistsAsync(addedUser.Username);

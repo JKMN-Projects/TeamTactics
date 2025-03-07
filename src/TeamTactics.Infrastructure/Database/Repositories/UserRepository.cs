@@ -151,7 +151,7 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         return userSalt;
     }
 
-    public async Task<User> InsertAsync(User user, string passwordHash)
+    public async Task<User> InsertAsync(User user, string passwordHash, string salt)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
@@ -165,7 +165,7 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
         parameters.Add("Username", user.Username);
         parameters.Add("Email", user.Email);
         parameters.Add("PasswordHash", passwordHash);
-        parameters.Add("Salt", user.SecurityInfo.Salt);
+        parameters.Add("Salt", salt);
 
         // Execute query and get the generated ID
         int userId = await _dbConnection.QuerySingleAsync<int>(sql, parameters);

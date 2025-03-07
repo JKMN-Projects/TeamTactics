@@ -5,9 +5,8 @@ namespace TeamTactics.Domain.Users
     {
         public string Username { get; private set; }
         public string Email { get; private set; }
-        public SecurityInfo SecurityInfo { get; private set; }
 
-        public User(string username, string email, SecurityInfo securityInfo)
+        public User(string username, string email)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(username);
             ArgumentException.ThrowIfNullOrWhiteSpace(email);
@@ -16,16 +15,12 @@ namespace TeamTactics.Domain.Users
 
             Username = username;
             Email = email;
-            SecurityInfo = securityInfo;
         }
 
         public User(int id, string username, string email) : base(id)
         {
             Username = username;
             Email = email;
-            SecurityInfo = new SecurityInfo(string.Empty);
         }
     }
-
-    public sealed record SecurityInfo(string Salt);
 }

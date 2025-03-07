@@ -55,15 +55,15 @@ namespace TeamTactics.Application.UnitTests.Users
                 _hashingServiceMock.GenerateSalt().Returns(faker.Random.Bytes(32));
                 _hashingServiceMock.Hash(Arg.Any<byte[]>(), Arg.Any<byte[]>()).Returns(faker.Random.Bytes(32));
 
-                var expectedUser = new User(username, email, new SecurityInfo(""));
-                _userRepositoryMock.InsertAsync(Arg.Any<User>(), Arg.Any<string>()).Returns(expectedUser);
+                var expectedUser = new User(username, email);
+                _userRepositoryMock.InsertAsync(Arg.Any<User>(), Arg.Any<string>(), Arg.Any<string>()).Returns(expectedUser);
 
                 // Act
                 await _sut.CreateUserAsync(username, email, password);
 
                 // Assert
                 await _userRepositoryMock.Received(1)
-                    .InsertAsync(Arg.Any<User>(), Arg.Is<string>(x => x != password));
+                    .InsertAsync(Arg.Any<User>(), Arg.Is<string>(x => x != password), Arg.Any<string>());
             }
 
             [Theory]
@@ -175,12 +175,15 @@ namespace TeamTactics.Application.UnitTests.Users
                 string email = new Faker().Internet.Email();
                 _userRepositoryMock.FindByEmailOrUsername(email)
                     .Returns((User?)null);
+
                 // Act
                 async Task Act() => await _sut.GetAuthenticationTokenAsync(email, _faker.Internet.Password());
+
                 // Assert
                 var ex = await Assert.ThrowsAnyAsync<EntityNotFoundException>(Act);
                 Assert.Equal(email, ex.Key);
-                Assert.Equal(nameof(User.Email), ex.KeyName);
+                Assert.Contains(nameof(User.Email), ex.KeyName);
+                Assert.Contains(nameof(User.Username), ex.KeyName);
             }
 
             [Fact]

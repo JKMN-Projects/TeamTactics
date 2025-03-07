@@ -47,24 +47,25 @@ namespace TeamTactics.Application.Users
             ArgumentException.ThrowIfNullOrWhiteSpace(password);
             var validationResult = _passwordValidator.Validate(password);
             validationResult.ThrowIfInvalid();
-            
-            var existingUser = await _userRepository.FindByEmailOrUsername(email);
-            if (existingUser is not null)
-            {
-                throw new ArgumentException("User already exists", nameof(email));
-            }
+
+            bool emailTaken = await _userRepository.CheckIfEmailExistsAsync(email);
+            bool usernameTaken = await _userRepository.CheckIfUsernameExistsAsync(username);
+            if (emailTaken)
+                throw new ArgumentException("Email already exists", nameof(email));
+            if (usernameTaken)
+                throw new ArgumentException("Username already taken", nameof(username));
 
             // Hash password
             var salt = _hashingService.GenerateSalt();
+            string saltString = Convert.ToBase64String(salt);
             var passwordHash = _hashingService.Hash(Encoding.UTF8.GetBytes(password), salt);
             string passwordHashString = Convert.ToBase64String(passwordHash);
 
             User user = new User(
                 username,
-                email,
-                new SecurityInfo(Convert.ToBase64String(salt)));
+                email);
             
-            User newUser = await _userRepository.InsertAsync(user, passwordHashString);
+            User newUser = await _userRepository.InsertAsync(user, passwordHashString, saltString);
             _logger.LogInformation("User '{username}' created with id {userId}", newUser.Username, newUser.Id);
         }
 
@@ -86,12 +87,18 @@ namespace TeamTactics.Application.Users
             var user = await _userRepository.FindByEmailOrUsername(emailOrUsername);
             if (user is null)
             {
-                throw EntityNotFoundException.ForEntity<User>(emailOrUsername, nameof(User.Email));
+                throw EntityNotFoundException.ForEntity<User>(emailOrUsername, "UsernameAndEmail");
+            }
+
+            string? saltString = await _userRepository.GetUserSaltAsync(user.Id);
+            if (saltString is null)
+            {
+                throw new InvalidOperationException("Unable to get user salt.");
             }
 
             var passwordHash = _hashingService.Hash(
                 Encoding.UTF8.GetBytes(password),
-                Convert.FromBase64String(user.SecurityInfo.Salt));
+                Convert.FromBase64String(saltString));
 
             if (!await _userRepository.CheckPasswordAsync(emailOrUsername, Convert.ToBase64String(passwordHash)))
             {

@@ -1,11 +1,7 @@
-﻿
-using Dapper;
-using System.Data;
-using TeamTactics.Domain.Clubs;
+﻿using TeamTactics.Domain.Clubs;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Users;
-using TeamTactics.Fixtures;
 
 namespace TeamTactics.Infrastructure.IntegrationTests
 {
@@ -25,7 +21,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
             var parameters = new DynamicParameters();
             parameters.Add("Email", user.Email);
             parameters.Add("Username", user.Username);
-            parameters.Add("Salt", user.SecurityInfo.Salt);
+            parameters.Add("Salt", "Salt");
             parameters.Add("PasswordHash", Convert.ToBase64String(faker.Random.Bytes(32)));
 
             string sql = @"
