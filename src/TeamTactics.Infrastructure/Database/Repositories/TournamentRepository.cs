@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data;
+using System.Data.Common;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Tournaments;
@@ -18,6 +19,28 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         public Task<Tournament?> FindByIdAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<TournamentDto?> GetTournamentByIdAsync(int tournamentId)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            string sql = @$"
+        SELECT ut.id, ut.name, ut.description, ut.invite_code, c.name, ua.username, ua.id
+	FROM team_tactics.user_tournament as ut 
+	JOIN team_tactics.competition as c 
+		ON c.id  = ut.competition_id
+	JOIN team_tactics.user_account as ua 
+		ON ua.id = ut.user_account_id
+	WHERE ut.id = @TournamentId";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("TournamentId", tournamentId);
+
+            var result = await _dbConnection.QuerySingleOrDefaultAsync<(int Id, string Name, string Description, string inviteCode, string competitionName, string ownerUsername, int ownerUserId)>(sql, parameters);
+
+            return new TournamentDto(result.Id, result.Name, result.Description, result.inviteCode, result.competitionName, result.ownerUsername, result.ownerUserId);
         }
 
         public async Task<int> InsertAsync(Tournament tournament)
@@ -102,9 +125,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             string sql = @"
                   SELECT ut.id, ut.name, ut.description, ut.user_account_id, ut.competition_id, ut.invite_code 
                     FROM team_tactics.user_tournament AS ut
-                  JOIN team_tactics.user_team AS team
-                    ON ut.id = team.user_tournament_id
-                  WHERE team.user_account_id = @UserId";
+                    JOIN team_tactics.user_team AS team
+                        ON ut.id = team.user_tournament_id
+                    WHERE team.user_account_id = @UserId";
 
             var parameters = new DynamicParameters();
             parameters.Add("UserId", userId);
@@ -120,9 +143,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 })
                 : new List<Tournament>();
         }
-
-        
-
 
         public async Task<IEnumerable<TournamentTeamsDto>> GetOtherTeamsInTournamentAsync(int tournamentId, int currentUserId)
         {
