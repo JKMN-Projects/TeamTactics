@@ -22,6 +22,9 @@ internal class WebScraper
     /// <param name="rowXPath"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="HttpProtocolException"></exception>
+    /// <exception cref="TaskCanceledException"></exception>
+    /// <exception cref="UriFormatException"></exception>
     public async Task<List<T>> ScrapeListAsync<T>() where T : new()
     {
 
@@ -44,7 +47,7 @@ internal class WebScraper
         }
         catch (Exception e)
         {
-            var test = e.Message;
+            throw;
         }
 
         var items = new List<T>();

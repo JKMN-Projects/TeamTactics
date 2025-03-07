@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TeamTactics.Application.Players;
+using TeamTactics.Domain.Competitions;
 
 namespace TeamTactics.Api.Controllers;
 
@@ -22,17 +23,29 @@ public class PlayersController : ControllerBase
         return Ok(players);
     }
 
-    [HttpPost("StartClubPopulation")]
-    public async Task<IActionResult> StartClubPopulation()
+    [HttpPost("StartClubPopulation/{externalCompetitionId}")]
+    public async Task<IActionResult> StartClubPopulation(string externalCompetitionId)
     {
-        await _playerManager.StartClubPopulation();
+        await _playerManager.StartClubPopulation(externalCompetitionId);
         return Ok();
     }
 
-    [HttpPost("StartPlayerPopulation")]
-    public async Task<IActionResult> StartPlayerPopulation()
+    [HttpPost("StartPlayerPopulation/{competitionId}")]
+    public async Task<IActionResult> StartPlayerPopulation(int competitionId)
     {
-        await _playerManager.StartPlayerPopulation();
+        await _playerManager.StartPlayerPopulation(competitionId);
+        return Ok();
+    }
+    [HttpPost("LoadFixture/{competitionId}/{toDate}")]
+    public async Task<IActionResult> StartPlayerPopulation(int competitionId, DateTime toDate)
+    {
+        await _playerManager.LoadFixtures(competitionId, toDate);
+        return Ok();
+    }
+    [HttpPost("LoadPlayerStats/{competitionId}")]
+    public async Task<IActionResult> LoadPlayerStats(int competitionId)
+    {
+        await _playerManager.LoadPlayerStatsForFixtures();
         return Ok();
     }
 }

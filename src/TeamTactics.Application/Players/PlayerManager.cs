@@ -1,7 +1,9 @@
-﻿using TeamTactics.Application.Scraper;
+﻿using System.Linq;
+using TeamTactics.Application.Scraper;
 using TeamTactics.Application.Users;
 using TeamTactics.Domain.Players;
 using TeamTactics.Webscraper.Scraper;
+using TeamTactics.Webscraper.ScraperModels;
 
 namespace TeamTactics.Application.Players;
 
@@ -26,17 +28,112 @@ public sealed class PlayerManager
     //Commands
     //Commands use domain models
 
-    public async Task StartClubPopulation()
+    public async Task StartClubPopulation(string externalCompetitionId)
     {
         var scraperManager = new ScraperManager();
         IEnumerable<Webscraper.ScraperModels.Club> clubs = await scraperManager.GetClubs();
         var clubScrapes = clubs.Select(c => new ClubScrape(c.Name, (c.Link = c.Link.Replace("https://fbref.com/en/squads/", "").Replace("-stats", "").Split("/")[0])));
-        await _scraperRepository.InsertClubsAndClubCompetitionsBulk(clubScrapes, "9");
+        await _scraperRepository.InsertClubsAndClubCompetitionsBulk(clubScrapes, externalCompetitionId);
     }
-    public async Task StartPlayerPopulation()
+    public async Task LoadFixtures(int competitionId, DateTime loadToDate)
+    {
+
+        var clubs = await _scraperRepository.GetClubs(competitionId);
+
+        var pointCategories = await _scraperRepository.GetPointCategories();
+
+
+        var latestMatch = await _scraperRepository.GetLatestMatch(competitionId);
+
+
+        var scraperManager = new ScraperManager();
+        var fixtures = await scraperManager.GetFixtures();
+        if (latestMatch == null)
+        {
+            fixtures = fixtures.Where(f => DateTime.Parse(f.Date) > DateTime.MinValue && DateTime.Parse(f.Date) <= loadToDate).ToList();
+        }
+        else
+        {
+            fixtures = fixtures.Where(f => DateTime.Parse(f.Date) > latestMatch.Timestamp && DateTime.Parse(f.Date) <= loadToDate).ToList();
+        }
+        IEnumerable<MatchResultScrape> matchResults = fixtures.Select(f => new MatchResultScrape()
+        {
+            HomeClubId = clubs.Where(c => c.ExternalId == f.HomeTeamId).Select(c => c.Id).FirstOrDefault(),
+            HomeClubScore = f.HomeScore, 
+            AwayClubScore = f.AwayScore,
+            AwayClubId = clubs.Where(c => c.ExternalId == f.AwayTeamId).Select(c => c.Id).FirstOrDefault(),
+            ExternalId = f.Id,
+            CompetitionId = competitionId,
+            Timestamp = DateTime.Parse(f.Date),
+            UrlName = f.MatchReportUrl,
+        });
+        if(fixtures.Count() > 0)
+        {
+            var insertedMatches = await _scraperRepository.InsertMatchResultsBulk(matchResults);
+        }
+
+    }
+    public async Task LoadPlayerStatsForFixtures()
+    {
+        var fixtures = await _scraperRepository.GetFixturesWithNoStats();
+        var pointCategories = await _scraperRepository.GetPointCategories();
+        
+        var scraperManager = new ScraperManager();
+        int count = 0;
+        foreach (var fixture in fixtures)
+        {
+            if (count >= 4)
+            {
+                await Task.Delay(60000);
+                count = 0;
+            }
+            var homeClub = await _scraperRepository.GetClubById(fixture.HomeClubId);
+            var homePlayerStats = await scraperManager.GetPlayerStats(fixture.ExternalId, fixture.UrlName, homeClub.ExternalId);
+            var awayClub = await _scraperRepository.GetClubById(fixture.AwayClubId);
+            var awayPlayerStats = await scraperManager.GetPlayerStats(fixture.ExternalId, fixture.UrlName, awayClub.ExternalId);
+
+            IEnumerable<MatchPlayerPointScrape> playerPointScrapes = new List<MatchPlayerPointScrape>();
+            playerPointScrapes = playerPointScrapes.Concat(await GetMatchPlayerPointScrapes(homePlayerStats, pointCategories, fixture.Id, homeClub.Id));
+            playerPointScrapes = playerPointScrapes.Concat(await GetMatchPlayerPointScrapes(awayPlayerStats, pointCategories, fixture.Id, awayClub.Id));
+            if (playerPointScrapes.Count() > 0)
+            {
+                await _scraperRepository.InsertMatchPlayerPointsBulk(playerPointScrapes);
+            }
+        }
+
+    }
+    private async Task<List<MatchPlayerPointScrape>> GetMatchPlayerPointScrapes(List<PlayerStats> playerStats, IEnumerable<PointCategoryScrape> pointCategories, int matchId, int clubId)
+    {
+        var playerPointScrapes = new List<MatchPlayerPointScrape>();
+        foreach (var playerStat in playerStats)
+        {
+            var player = await _scraperRepository.GetPlayerIdByExternalIdAndClubId(playerStat.Id, clubId);
+            if(player == null)
+            {
+                continue;
+            }
+            var properties = playerStat.GetType().GetProperties();
+            foreach (var pointCategory in pointCategories)
+            {
+                var property = playerStat.GetType().GetProperty(pointCategory.Name);
+                if (property != null)
+                {
+                    playerPointScrapes.Add(new MatchPlayerPointScrape()
+                    {
+                        MatchId = matchId,
+                        PlayerId = player.Id,
+                        PointCategoryId = pointCategory.Id,
+                        Occurrences = (int)property.GetValue(playerStat)
+                    });
+                }
+            }
+        }
+        return playerPointScrapes;
+    }
+    public async Task StartPlayerPopulation(int competition)
     {
         var scraperManager = new ScraperManager();
-        var clubs = await _scraperRepository.GetClubs();
+        var clubs = await _scraperRepository.GetClubs(competition);
         var positions = await _scraperRepository.GetPlayerPositions();
         int count = 0;
         foreach (var club in clubs)
@@ -44,6 +141,7 @@ public sealed class PlayerManager
             if(count >= 7)
             {
                 await Task.Delay(60000);
+                count = 0;
             }
             var players = new List<PlayerScrape>();
             var clubPlayers = await scraperManager.GetSquadPlayers(club.ExternalId, club.Name);
@@ -56,14 +154,14 @@ public sealed class PlayerManager
                 }
                 var names = clubPlayer.Player.Split(' ').ToList();
                 var convertedPos = _positions[clubPlayer.Postition.Split(",")[0]];
-                var player = new PlayerScrape(
-                    firstName: names.First(),
-                    lastName: String.Join(" ", names.Skip(1)),
-                    birthdate: DateOnly.Parse(clubPlayer.Birthdate),
-                    externalId: clubPlayer.Id,
-                    positionId: positions.Where(c => c.Name == convertedPos).Select(c => c.Id).First()
-                    
-                );
+                var player = new PlayerScrape()
+                {
+                    FirstName = names.First(),
+                    LastName = String.Join(" ", names.Skip(1)),
+                    ExternalId = clubPlayer.Id,
+                    BirthDate = DateOnly.Parse(clubPlayer.Birthdate),
+                    PositionId = positions.Where(c => c.Name == convertedPos).Select(c => c.Id).First()
+                };
                 players.Add(player);
             }
             var insertedPlayers = await _scraperRepository.InsertPlayersBulk(players);
