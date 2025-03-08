@@ -3,27 +3,28 @@ using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
-    public abstract class CompetitionRepositoryTests : TestBase, IAsyncLifetime
+    public abstract class CompetitionRepositoryTests : RepositoryTestBase
     {
         private readonly CompetitionRepository _sut;
         private readonly DataSeeder _dataSeeder;
 
-        protected CompetitionRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
+        protected CompetitionRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
         {
             _sut = new CompetitionRepository(_dbConnection);
             _dataSeeder = new DataSeeder(_dbConnection);
         }
 
-        public async Task DisposeAsync()
+        public override async Task DisposeAsync()
         {
+            await base.DisposeAsync();
             await ResetDatabaseAsync();
         }
 
-        public Task InitializeAsync() => Task.CompletedTask;
+        public override Task InitializeAsync() => base.InitializeAsync();
 
         public sealed class FindAllAsync : CompetitionRepositoryTests
         {
-            public FindAllAsync(CustomWebApplicationFactory factory) : base(factory)
+            public FindAllAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -55,7 +56,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class FindByIdAsync : CompetitionRepositoryTests
         {
-            public FindByIdAsync(CustomWebApplicationFactory factory) : base(factory)
+            public FindByIdAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 

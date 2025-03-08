@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using DbMigrator;
+using TeamTactics.Infrastructure.Database.TypeHandlers;
 using Testcontainers.PostgreSql;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
 {
-    public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
+    public class PostgresDatabaseFixture : IAsyncLifetime
     {
         private readonly PostgreSqlContainer postgreSqlContainer = new PostgreSqlBuilder()
             .WithImage("postgres:latest")
@@ -12,25 +12,23 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
             .WithUsername("postgres")
             .WithPassword("postgres")
             .Build();
-        
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            base.ConfigureWebHost(builder);
-            string connString = postgreSqlContainer.GetConnectionString();
-            builder.UseSetting(
-                "Connectionstrings:Postgres",
-                connString + ";Include Error Detail=true");
-        }
 
+        public string ConnectionString => postgreSqlContainer.GetConnectionString();
 
         public async Task InitializeAsync()
         {
             await postgreSqlContainer.StartAsync();
+
+            Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+            Dapper.SqlMapper.AddTypeHandler(new DateOnlyNullableTypeHandler());
+
+            DatabaseMigrator.MigrateDatabase(ConnectionString);
         }
 
         async Task IAsyncLifetime.DisposeAsync()
         {
             await postgreSqlContainer.StopAsync();
+            await postgreSqlContainer.DisposeAsync();
         }
     }
 }

@@ -9,23 +9,24 @@ using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
-    public abstract class TeamRepositoryTests : TestBase, IAsyncLifetime
+    public abstract class TeamRepositoryTests : RepositoryTestBase, IAsyncLifetime
     {
         private readonly TeamRepository _sut;
         private readonly DataSeeder _dataSeeder;
 
-        protected TeamRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
+        protected TeamRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
         {
             _sut = new TeamRepository(_dbConnection);
             _dataSeeder = new DataSeeder(_dbConnection);
         }
 
-        public async Task DisposeAsync()
+        public override async Task DisposeAsync()
         {
+            await base.DisposeAsync();
             await ResetDatabaseAsync();
         }
 
-        public Task InitializeAsync() => Task.CompletedTask;
+        public override Task InitializeAsync() => base.InitializeAsync();
 
         private async Task<Team> SeedTeamAsync()
         {
@@ -33,7 +34,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
 
             var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
-            var tournamentRepository = GetService<ITournamentRepository>();
+            var tournamentRepository = new TournamentRepository(_dbConnection);
             int tournamentId = await tournamentRepository.InsertAsync(tournamentToInsert);
 
             Faker faker = new Faker();
@@ -51,7 +52,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class FindByIdAsync : TeamRepositoryTests
         {
-            public FindByIdAsync(CustomWebApplicationFactory factory) : base(factory)
+            public FindByIdAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -97,7 +98,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class InsertAsync : TeamRepositoryTests
         {
-            public InsertAsync(CustomWebApplicationFactory factory) : base(factory)
+            public InsertAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -132,7 +133,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class UpdateAsync : TeamRepositoryTests
         {
-            public UpdateAsync(CustomWebApplicationFactory factory) : base(factory)
+            public UpdateAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -187,7 +188,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class RemoveAsync : TeamRepositoryTests
         {
-            public RemoveAsync(CustomWebApplicationFactory factory) : base(factory)
+            public RemoveAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 

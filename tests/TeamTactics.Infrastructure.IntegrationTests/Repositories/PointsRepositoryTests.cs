@@ -3,25 +3,26 @@ using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories;
 
-public abstract class PointsRepositoryTests : TestBase, IAsyncLifetime
+public abstract class PointsRepositoryTests : RepositoryTestBase, IAsyncLifetime
 {
     private readonly PointRepository _pointsRepository;
 
-    protected PointsRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
+    protected PointsRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
     {
         _pointsRepository = new PointRepository(_dbConnection);
     }
 
-    public async Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
+        await base.DisposeAsync();
         await ResetDatabaseAsync();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public override Task InitializeAsync() => base.InitializeAsync();
 
     public sealed class FindAllActiveAsync : PointsRepositoryTests
     {
-        public FindAllActiveAsync(CustomWebApplicationFactory factory) : base(factory)
+        public FindAllActiveAsync(PostgresDatabaseFixture factory) : base(factory)
         {
         }
 

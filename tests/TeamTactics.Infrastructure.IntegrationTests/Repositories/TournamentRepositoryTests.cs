@@ -11,27 +11,28 @@ using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories;
 
-public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
+public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLifetime
 {
     private readonly TournamentRepository _sut;
     private readonly DataSeeder _dataSeeder;
 
-    protected TournamentRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
+    protected TournamentRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
     {
         _sut = new TournamentRepository(_dbConnection);
         _dataSeeder = new DataSeeder(_dbConnection);
     }
 
-    public async Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
+        await base.DisposeAsync();
         await ResetDatabaseAsync();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public override Task InitializeAsync() => base.InitializeAsync();
 
     public sealed class InsertAsync : TournamentRepositoryTests
     {
-        public InsertAsync(CustomWebApplicationFactory factory) : base(factory)
+        public InsertAsync(PostgresDatabaseFixture factory) : base(factory)
         {
         }
 
@@ -48,13 +49,11 @@ public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
 
             // Assert
             //var tournament = await _sut.FindByIdAsync(tournamentId);
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
             var tournament = await _dbConnection.QuerySingleOrDefaultAsync<Tournament>($@"
     SELECT id, name, description, user_account_id as CreatedByUserId, competition_id as CompetitionId
     FROM team_tactics.user_tournament
     WHERE id = @Id", 
-    new { Id = tournamentId });
+                new { Id = tournamentId });
 
             Assert.NotNull(tournament);
             Assert.Equal(tournamentToInsert.Name, tournament.Name);
@@ -66,7 +65,7 @@ public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
 
     public sealed class RemoveAsync : TournamentRepositoryTests
     {
-        public RemoveAsync(CustomWebApplicationFactory factory) : base(factory)
+        public RemoveAsync(PostgresDatabaseFixture factory) : base(factory)
         {
         }
 
@@ -118,7 +117,7 @@ public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
             var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
             var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
-            var teamRepository = GetService<ITeamRepository>();
+            var teamRepository = new TeamRepository(_dbConnection);
 
             Faker faker = new Faker();
             for (int i = 0; i < 3; i++)
@@ -137,9 +136,6 @@ public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
             await _sut.RemoveAsync(tournamentId);
 
             // Assert
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
             string verifyTeamDeletionSql = @"
     SELECT id
     FROM team_tactics.user_team
@@ -155,7 +151,7 @@ public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
 
     public sealed class FindIdByInviteCodeAsync : TournamentRepositoryTests
     {
-        public FindIdByInviteCodeAsync(CustomWebApplicationFactory factory) : base(factory)
+        public FindIdByInviteCodeAsync(PostgresDatabaseFixture factory) : base(factory)
         {
         }
 

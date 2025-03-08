@@ -25,9 +25,6 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 
         public async Task<int> SeedUserAsync(User user)
         {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
             var faker = new Faker();
             var parameters = new DynamicParameters();
             parameters.Add("Email", user.Email);
@@ -55,10 +52,6 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 
         public async Task<int> SeedCompetitionAsync(Competition competition)
         {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
-
             var parameters = new DynamicParameters();
             parameters.Add("Name", competition.Name);
             parameters.Add("StartDate", competition.StartDate);
@@ -88,9 +81,6 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 
         public async Task<int> SeedClubAsync(Club club)
         {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
             var parameters = new DynamicParameters();
             parameters.Add("Name", club.Name);
             parameters.Add("ExternalId", club.ExternalId);
@@ -106,6 +96,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 
         public async Task<IEnumerable<Club>> SeedRandomClubsAsync(int count)
         {
+            using var transaction = _dbConnection.BeginTransaction();
             List<Club> clubs = new List<Club>();
             for (int i = 0; i < count; i++)
             {
@@ -129,10 +120,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 
         public async Task<int> SeedPlayerAsync(Player player)
         {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-
             using var transaction = _dbConnection.BeginTransaction();
+
             try
             {
                 var parameters = new DynamicParameters();

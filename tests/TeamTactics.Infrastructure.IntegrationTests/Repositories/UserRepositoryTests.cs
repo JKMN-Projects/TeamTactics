@@ -4,25 +4,26 @@ using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
-    public abstract class UserRepositoryTests : TestBase, IAsyncLifetime
+    public abstract class UserRepositoryTests : RepositoryTestBase, IAsyncLifetime
     {
         private readonly UserRepository _sut;
 
-        protected UserRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
+        protected UserRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
         {
             _sut = new UserRepository(_dbConnection);
         }
 
-        public async Task DisposeAsync()
+        public override async Task DisposeAsync()
         {
+            await base.DisposeAsync();
             await ResetDatabaseAsync();
         }
 
-        public Task InitializeAsync() => Task.CompletedTask;
+        public override Task InitializeAsync() => base.InitializeAsync();
 
         public sealed class InsertAsync : UserRepositoryTests
         {
-            public InsertAsync(CustomWebApplicationFactory factory) : base(factory)
+            public InsertAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -45,7 +46,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class RemoveAsync : UserRepositoryTests
         {
-            public RemoveAsync(CustomWebApplicationFactory factory) : base(factory)
+            public RemoveAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -80,7 +81,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class CheckPasswordAsync : UserRepositoryTests
         {
-            public CheckPasswordAsync(CustomWebApplicationFactory factory) : base(factory)
+            public CheckPasswordAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -116,7 +117,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class CheckIfEmailExistsAsync : UserRepositoryTests
         {
-            public CheckIfEmailExistsAsync(CustomWebApplicationFactory factory) : base(factory)
+            public CheckIfEmailExistsAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
@@ -137,7 +138,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public sealed class CheckIfUsernameExistsAsync : UserRepositoryTests
         {
-            public CheckIfUsernameExistsAsync(CustomWebApplicationFactory factory) : base(factory)
+            public CheckIfUsernameExistsAsync(PostgresDatabaseFixture factory) : base(factory)
             {
             }
 
