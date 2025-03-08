@@ -26,7 +26,8 @@ namespace TeamTactics.Fixtures
                 {
                     t.AddPlayer(player);
                 }
-                t.SetCaptain(players.ElementAt(0).Id);
+                var captain = faker.PickRandom(players);
+                t.SetCaptain(captain.Id);
             });
         }
 

@@ -2,21 +2,32 @@
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Clubs;
+using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
+using TeamTactics.Domain.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories;
 
-public abstract class TournamentRepositoryTests : TestBase
+public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
 {
     private readonly TournamentRepository _sut;
+    private readonly DataSeeder _dataSeeder;
 
     protected TournamentRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
     {
         _sut = new TournamentRepository(_dbConnection);
+        _dataSeeder = new DataSeeder(_dbConnection);
     }
+
+    public async Task DisposeAsync()
+    {
+        await ResetDatabaseAsync();
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
 
     public sealed class InsertAsync : TournamentRepositoryTests
     {
@@ -28,9 +39,9 @@ public abstract class TournamentRepositoryTests : TestBase
         public async Task Should_AddTournamentToDb_When_TournamentIsInserted()
         {
             // Arrange
-            int userId = await _dbConnection.SeedUserAsync();
-            int competitionId = await _dbConnection.SeedCompetitonAsync();
-            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            Competition competition = await _dataSeeder.SeedRandomCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, competition.Id, description: "A Tournament description");
 
             // Act
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
@@ -63,9 +74,9 @@ public abstract class TournamentRepositoryTests : TestBase
         public async Task Should_DeleteTournamentFromDb_When_TournamentExists()
         {
             // Arrange
-            int userId = await _dbConnection.SeedUserAsync();
-            int competitionId = await _dbConnection.SeedCompetitonAsync();
-            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            Competition competition = await _dataSeeder.SeedRandomCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, competition.Id, description: "A Tournament description");
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
 
             // Act
@@ -103,30 +114,22 @@ public abstract class TournamentRepositoryTests : TestBase
         public async Task Should_DeleteEnrolledTeam_When_TournamentIsDeleted()
         {
             // Arrange
-            int userId = await _dbConnection.SeedUserAsync();
-            int competitionId = await _dbConnection.SeedCompetitonAsync();
-            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
             var teamRepository = GetService<ITeamRepository>();
 
-            Queue<Club> clubs = new Queue<Club>(await _dbConnection.SeedClubs(11));
-
-            List<Player> players = [];
-            for (int i = 0; i < 11; i++)
+            Faker faker = new Faker();
+            for (int i = 0; i < 3; i++)
             {
-                Player insertedPlayer = new PlayerFaker(clubs: [clubs.Dequeue()])
+                var availablePlayers = seedResult.Clubs.SelectMany(c => c.Players.OrderBy(_ => Guid.NewGuid()).Take(2)).ToList();
+                var teamPlayers = faker.PickRandom(availablePlayers, 11).ToList();
+                Team team = new TeamFaker(players: teamPlayers)
+                    .RuleFor(t => t.UserId, user.Id)
+                    .RuleFor(t => t.TournamentId, tournamentId)
                     .Generate();
-                int playerId = await _dbConnection.SeedPlayer(insertedPlayer);
-                players.Add(insertedPlayer);
-            }
 
-            List<Team> teams = new TeamFaker(players: players)
-                .RuleFor(t => t.UserId, userId)
-                .RuleFor(t => t.TournamentId, tournamentId)
-                .Generate(3);
-
-            foreach (var team in teams)
-            {
                 await teamRepository.InsertAsync(team);
             }
 
@@ -137,14 +140,14 @@ public abstract class TournamentRepositoryTests : TestBase
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
 
-            string sql = @"
+            string verifyTeamDeletionSql = @"
     SELECT id
     FROM team_tactics.user_team
     WHERE user_tournament_id = @TournamentId";
             var parameters = new DynamicParameters();
             parameters.Add("TournamentId", tournamentId);
 
-            var teamIds = await _dbConnection.QueryAsync<int>(sql, parameters);
+            var teamIds = await _dbConnection.QueryAsync<int>(verifyTeamDeletionSql, parameters);
 
             Assert.Empty(teamIds);
         }
@@ -160,9 +163,9 @@ public abstract class TournamentRepositoryTests : TestBase
         public async Task Should_ReturnTournamentId_When_InviteCodeExists()
         {
             // Arrange
-            int userId = await _dbConnection.SeedUserAsync();
-            int competitionId = await _dbConnection.SeedCompetitonAsync();
-            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            Competition competition = await _dataSeeder.SeedRandomCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, competition.Id, description: "A Tournament description");
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
 
             // Act

@@ -1,20 +1,25 @@
-﻿
-using Dapper;
-using System.Data;
-using TeamTactics.Domain.Competitions;
-using TeamTactics.Fixtures;
+﻿using TeamTactics.Domain.Competitions;
 using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
-    public abstract class CompetitionRepositoryTests : TestBase
+    public abstract class CompetitionRepositoryTests : TestBase, IAsyncLifetime
     {
         private readonly CompetitionRepository _sut;
+        private readonly DataSeeder _dataSeeder;
 
         protected CompetitionRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
         {
             _sut = new CompetitionRepository(_dbConnection);
+            _dataSeeder = new DataSeeder(_dbConnection);
         }
+
+        public async Task DisposeAsync()
+        {
+            await ResetDatabaseAsync();
+        }
+
+        public Task InitializeAsync() => Task.CompletedTask;
 
         public sealed class FindAllAsync : CompetitionRepositoryTests
         {
@@ -22,45 +27,26 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             {
             }
 
-            private IEnumerable<Competition> SeedCompetitions()
+            [Fact]
+            public async Task Should_ReturnAllCompetitions()
             {
+                // Arrange
                 List<Competition> seededCompetitions = [
                     new Competition("Premier League", new DateOnly(2021, 8, 1), new DateOnly(2022, 5, 1)),
                     new Competition("La Liga", new DateOnly(2021, 8, 1), new DateOnly(2022, 5, 1)),
                     new Competition("Serie A", new DateOnly(2021, 8, 1), new DateOnly(2022, 5, 1))
                 ];
-
-                List<string> valueClauses = new List<string>();
-                var parameters = new DynamicParameters();
-                for (int i = 0; i < seededCompetitions.Count; i++)
+                foreach (var competition in seededCompetitions)
                 {
-                    valueClauses.Add($"(@ExternalId{i}, @Name{i}, @StartDate{i}, @EndDate{i})");
-                    parameters.Add($"ExternalId{i}", Guid.NewGuid().ToString().Substring(0, 10));
-                    parameters.Add($"Name{i}", seededCompetitions[i].Name);
-                    parameters.Add($"StartDate{i}", seededCompetitions[i].StartDate.ToDateTime(TimeOnly.MinValue));
-                    parameters.Add($"EndDate{i}", seededCompetitions[i].EndDate.ToDateTime(TimeOnly.MinValue));
+                    await _dataSeeder.SeedCompetitionAsync(competition);
                 }
-                string sql = $@"
-                    INSERT INTO team_tactics.competition (external_id, name, start_date, end_date) 
-                        VALUES {string.Join(", ", valueClauses)}";
-
-                _dbConnection.Query(sql, parameters);
-                return seededCompetitions;
-            }
-
-
-            [Fact]
-            public async Task Should_ReturnAllCompetitions()
-            {
-                // Arrange
-                var expectedCompetitions = SeedCompetitions();
 
                 // Act
                 var competitions = await _sut.FindAllAsync();
 
                 // Assert
                 var competitionNames = competitions.Select(c => c.Name);
-                foreach (var expectedCompetition in expectedCompetitions)
+                foreach (var expectedCompetition in seededCompetitions)
                 {
                     Assert.Contains(expectedCompetition.Name, competitionNames);
                 }
@@ -79,7 +65,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 // Arrange
                 var expectedCompetition = new CompetitionFaker("Premier League")
                     .Generate();
-                int competitionId = await _dbConnection.SeedCompetitonAsync(expectedCompetition);
+                int competitionId = await _dataSeeder.SeedCompetitionAsync(expectedCompetition);
 
                 // Act
                 var competition = await _sut.FindByIdAsync(competitionId);

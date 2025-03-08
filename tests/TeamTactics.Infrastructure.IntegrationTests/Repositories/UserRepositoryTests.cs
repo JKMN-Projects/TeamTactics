@@ -4,7 +4,7 @@ using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
-    public abstract class UserRepositoryTests : TestBase
+    public abstract class UserRepositoryTests : TestBase, IAsyncLifetime
     {
         private readonly UserRepository _sut;
 
@@ -12,6 +12,13 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
         {
             _sut = new UserRepository(_dbConnection);
         }
+
+        public async Task DisposeAsync()
+        {
+            await ResetDatabaseAsync();
+        }
+
+        public Task InitializeAsync() => Task.CompletedTask;
 
         public sealed class InsertAsync : UserRepositoryTests
         {
@@ -96,7 +103,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             public async Task Should_ReturnFalse_WhenPasswordIsIncorrect()
             {
                 // Arrange
-                var user = new User("username2", "email2@jknm.com");
+                var user = new User("username", "email@jknm.com");
                 User addedUser = await _sut.InsertAsync(user, "passwordHash", "salt");
 
                 // Act

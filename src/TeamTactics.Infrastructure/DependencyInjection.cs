@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data;
-using System.Data.Common;
 using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Players;

@@ -12,7 +12,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
             .WithUsername("postgres")
             .WithPassword("postgres")
             .Build();
-
+        
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             base.ConfigureWebHost(builder);

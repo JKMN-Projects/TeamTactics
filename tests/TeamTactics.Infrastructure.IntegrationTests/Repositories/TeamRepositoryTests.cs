@@ -4,44 +4,44 @@ using TeamTactics.Domain.Clubs;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
+using TeamTactics.Domain.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {
-    public abstract class TeamRepositoryTests : TestBase
+    public abstract class TeamRepositoryTests : TestBase, IAsyncLifetime
     {
         private readonly TeamRepository _sut;
+        private readonly DataSeeder _dataSeeder;
 
         protected TeamRepositoryTests(CustomWebApplicationFactory factory) : base(factory)
         {
             _sut = new TeamRepository(_dbConnection);
+            _dataSeeder = new DataSeeder(_dbConnection);
         }
+
+        public async Task DisposeAsync()
+        {
+            await ResetDatabaseAsync();
+        }
+
+        public Task InitializeAsync() => Task.CompletedTask;
 
         private async Task<Team> SeedTeamAsync()
         {
-            int userId = await _dbConnection.SeedUserAsync();
-            int competitionId = await _dbConnection.SeedCompetitonAsync();
-            var tournamentToInsert = new Tournament("Test Tournament", userId, competitionId, description: "A Tournament description");
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
+
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
             var tournamentRepository = GetService<ITournamentRepository>();
             int tournamentId = await tournamentRepository.InsertAsync(tournamentToInsert);
 
-            Queue<Club> clubs = new Queue<Club>(new ClubFaker()
-                .Generate(11));
-            foreach (var club in clubs)
-            {
-                await _dbConnection.SeedClub(club);
-            }
+            Faker faker = new Faker();
+            var availablePlayers = seedResult.Clubs.SelectMany(c => c.Players.Take(2)).ToList();
+            var teamPlayers = faker.PickRandom(availablePlayers, 11).ToList();
 
-            List<Player> players = [];
-            for (int i = 0; i < 11; i++)
-            {
-                var club = clubs.Dequeue();
-                var player = new PlayerFaker(clubs: [club]).Generate();
-                int playerId = await _dbConnection.SeedPlayer(player);
-                players.Add(player);
-            }
-            Team team = new TeamFaker(players: players)
-                .RuleFor(t => t.UserId, userId)
+            Team team = new TeamFaker(players: teamPlayers)
+                .RuleFor(t => t.UserId, user.Id)
                 .RuleFor(t => t.TournamentId, tournamentId)
                 .Generate();
             int teamId = await _sut.InsertAsync(team);
@@ -142,31 +142,31 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 // Arrange
                 Team team = await SeedTeamAsync();
 
-                Team updatedTeam = await _sut.FindByIdAsync(team.Id) ?? throw new Exception("Unable to get the team.");
+                Team updatedTeam = await _sut.FindByIdAsync(team.Id)
+                    ?? throw new Exception("Unable to get the seeded team. Should never happen.");
                 updatedTeam.Rename("Updated Team Name");
 
                 var playerToRemove = updatedTeam.Players.First();
                 updatedTeam.RemovePlayer(playerToRemove.PlayerId);
 
-                Club clubToAdd = new ClubFaker().Generate();
-                await _dbConnection.SeedClub(clubToAdd);
-
+                Club clubToAdd = await _dataSeeder.SeedRandomClubAsync();
                 Player playerToAdd = new PlayerFaker(clubs: [clubToAdd]).Generate();
-                int playerToAddId = await _dbConnection.SeedPlayer(playerToAdd);
+                await _dataSeeder.SeedPlayerAsync(playerToAdd);
+
                 updatedTeam.AddPlayer(playerToAdd);
-                updatedTeam.SetCaptain(playerToAddId);
+                updatedTeam.SetCaptain(playerToAdd.Id);
 
                 // Act
                 await _sut.UpdateAsync(updatedTeam);
 
                 // Assert
-                var result = await _sut.FindByIdAsync(team.Id);
+                var result = await _sut.FindByIdAsync(updatedTeam.Id);
                 Assert.NotNull(result);
-                Assert.Equal(team.Id, result.Id);
+                Assert.Equal(updatedTeam.Id, result.Id);
                 Assert.Equal(updatedTeam.Name, result.Name);
                 Assert.Equal(updatedTeam.Players.Count, result.Players.Count);
                 Assert.DoesNotContain(result.Players, p => p.PlayerId == playerToRemove.PlayerId);
-                Assert.Contains(result.Players, p => p.PlayerId == playerToAddId && p.IsCaptain);
+                Assert.Contains(result.Players, p => p.PlayerId == playerToAdd.Id && p.IsCaptain);
             }
 
             [Fact]
