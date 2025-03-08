@@ -95,7 +95,7 @@ public abstract class TournamentRepositoryTests : TestBase, IAsyncLifetime
         }
 
         [Fact]
-        public async Task Should_Throw_When_TournamentDoesNotExist()
+        public async Task Should_ThrowEntityNotFoundException_When_TournamentDoesNotExist()
         {
             // Arrange
             int tournamentId = 99;
