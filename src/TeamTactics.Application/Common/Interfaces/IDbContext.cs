@@ -26,6 +26,7 @@ namespace TeamTactics.Application.Common.Interfaces
     public interface IUnitOfWork
     {
         public ITransaction BeginTransaction();
+
         public void Commit();
         public void Rollback();
     }
