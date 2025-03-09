@@ -13,7 +13,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
             .WithPassword("postgres")
             .Build();
 
-        public string ConnectionString => postgreSqlContainer.GetConnectionString();
+        public string ConnectionString => postgreSqlContainer.GetConnectionString() + ";Include Error Detail=True";
 
         public async Task InitializeAsync()
         {

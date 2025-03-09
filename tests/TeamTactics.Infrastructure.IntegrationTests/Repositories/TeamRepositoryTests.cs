@@ -6,6 +6,7 @@ using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
 using TeamTactics.Domain.Users;
 using TeamTactics.Infrastructure.Database.Repositories;
+using TeamTactics.Infrastructure.IntegrationTests.Seeding;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {

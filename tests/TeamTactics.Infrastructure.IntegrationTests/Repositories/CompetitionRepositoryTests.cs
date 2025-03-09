@@ -1,5 +1,6 @@
 ﻿using TeamTactics.Domain.Competitions;
 using TeamTactics.Infrastructure.Database.Repositories;
+using TeamTactics.Infrastructure.IntegrationTests.Seeding;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 {

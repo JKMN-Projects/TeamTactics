@@ -3,7 +3,7 @@ using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Users;
 
-namespace TeamTactics.Infrastructure.IntegrationTests
+namespace TeamTactics.Infrastructure.IntegrationTests.Seeding
 {
     public sealed class DataSeeder
     {
@@ -11,7 +11,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests
 
         public DataSeeder(IDbConnection dbConnection)
         {
-            this._dbConnection = dbConnection;
+            _dbConnection = dbConnection;
         }
 
         #region Seed User
@@ -97,15 +97,24 @@ namespace TeamTactics.Infrastructure.IntegrationTests
         public async Task<IEnumerable<Club>> SeedRandomClubsAsync(int count)
         {
             using var transaction = _dbConnection.BeginTransaction();
-            List<Club> clubs = new List<Club>();
-            for (int i = 0; i < count; i++)
+            try
             {
-                Club club = new ClubFaker()
-                    .Generate();
-                await SeedClubAsync(club);
-                clubs.Add(club);
+                List<Club> clubs = new List<Club>();
+                for (int i = 0; i < count; i++)
+                {
+                    Club club = new ClubFaker()
+                        .Generate();
+                    await SeedClubAsync(club);
+                    clubs.Add(club);
+                }
+                transaction.Commit();
+                return clubs;
             }
-            return clubs;
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
         #endregion
 
