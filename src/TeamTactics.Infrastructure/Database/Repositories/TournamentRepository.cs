@@ -22,26 +22,28 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<TournamentDto?> GetTournamentDtoByIdAsync(int tournamentId)
+        public async Task<TournamentDetailsDto> GetTournamentDetailsAsync(int tournamentId)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
 
             string sql = @$"
-        SELECT ut.id, ut.name, ut.description, ut.invite_code, c.name, ua.username, ua.id
-	FROM team_tactics.user_tournament as ut 
-	JOIN team_tactics.competition as c 
-		ON c.id  = ut.competition_id
-	JOIN team_tactics.user_account as ua 
-		ON ua.id = ut.user_account_id
-	WHERE ut.id = @TournamentId";
+        SELECT ut.id, ut.name, ut.description, ut.invite_code, c.name, ua.id, ua.username
+	        FROM team_tactics.user_tournament as ut 
+	        JOIN team_tactics.competition as c 
+		        ON c.id  = ut.competition_id
+	        JOIN team_tactics.user_account as ua 
+		        ON ua.id = ut.user_account_id
+	        WHERE ut.id = @TournamentId";
 
             var parameters = new DynamicParameters();
             parameters.Add("TournamentId", tournamentId);
 
-            var result = await _dbConnection.QuerySingleOrDefaultAsync<(int Id, string Name, string Description, string inviteCode, string competitionName, string ownerUsername, int ownerUserId)>(sql, parameters);
+            var result = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, string description, string inviteCode, string competitionName, int ownerUserId, string ownerUsername)>(sql, parameters);
 
-            return new TournamentDto(result.Id, result.Name, result.Description, result.inviteCode, result.competitionName, result.ownerUsername, result.ownerUserId);
+            return result != default
+                ? new TournamentDetailsDto(result.id, result.name, result.description, result.inviteCode, result.competitionName, result.ownerUserId, result.ownerUsername)
+                : throw EntityNotFoundException.ForEntity<Tournament>(tournamentId, nameof(Tournament.Id));
         }
 
         public async Task<int> InsertAsync(Tournament tournament)
@@ -107,7 +109,8 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var result = await _dbConnection.QueryAsync<(int Id, string Name, string Description, int UserId, int CompId, string InviteCode)>(sql, parameters);
 
             return result.Any()
-                ? result.Select(r => {
+                ? result.Select(r =>
+                {
                     var t = new Tournament(r.Name, r.UserId, r.CompId, r.Description, r.InviteCode);
                     t.SetId(r.Id);
                     t.SetInviteCode(r.InviteCode);
@@ -134,13 +137,26 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var result = await _dbConnection.QueryAsync<(int Id, string Name, string Description, int UserId, int CompId, string InviteCode)>(sql, parameters);
 
             return result.Any()
-                ? result.Select(r => {
+                ? result.Select(r =>
+                {
                     var t = new Tournament(r.Name, r.UserId, r.CompId, r.Description, r.InviteCode);
                     t.SetId(r.Id);
                     t.SetInviteCode(r.InviteCode);
                     return t;
                 })
                 : new List<Tournament>();
+        }
+
+        private async Task<bool> GetIfTournamentExists(int tournamentId)
+        {
+            string sql = "SELECT ut.id FROM team_tactics.user_tournament as ut WHERE ut.id = @TournamentId";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("TournamentId", tournamentId);
+
+            var tourneyId = await _dbConnection.QuerySingleOrDefaultAsync<int?>(sql, parameters);
+
+            return tourneyId.HasValue;
         }
 
         /// <summary>
@@ -152,6 +168,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
+
+            if (! await GetIfTournamentExists(tournamentId))
+                throw EntityNotFoundException.ForEntity<Tournament>(tournamentId, nameof(Tournament.Id));
 
             string sql = @$"
         SELECT 
@@ -168,7 +187,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
 
             return tournamentTeamsResult.Any() ? tournamentTeamsResult.Select(tt => new TournamentTeamsDto(tt.teamId, tt.teamName)) : new List<TournamentTeamsDto>();
         }
-        
+
         public async Task RemoveAsync(int id)
         {
             if (_dbConnection.State != ConnectionState.Open)
