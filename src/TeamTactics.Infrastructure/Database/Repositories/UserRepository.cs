@@ -102,7 +102,6 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
     public async Task<ProfileDto> GetProfileAsync(int id)
     {
         //Get associated tournaments from TournamentRepo
-        throw new NotImplementedException();
 
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
