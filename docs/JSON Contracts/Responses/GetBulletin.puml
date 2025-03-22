@@ -1,0 +1,14 @@
+@startuml Get bulletin response
+allowmixing
+
+agent "GET response \nURI: /api/bulletins/tournaments/{tournamentId}"
+  json "Bulletin" as J {
+    "id": "number",
+    "text": "string",
+    "createdTime": "string",
+    "lastEditedTime": "string",
+    "userId": "number"
+  }
+
+"GET response \nURI: /api/bulletins/tournaments/{tournamentId}" -> J 
+@enduml
