@@ -1,6 +1,8 @@
 ﻿
 using TeamTactics.Application.Competitions;
+using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Competitions;
+using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
 
 namespace TeamTactics.Application.Tournaments
@@ -9,11 +11,13 @@ namespace TeamTactics.Application.Tournaments
     {
         private readonly ITournamentRepository _tournamentRepository;
         private readonly ICompetitionRepository _competitionRepository;
+        private readonly ITeamRepository _teamRepository;
 
-        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository)
+        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository, ITeamRepository teamRepository)
         {
             _tournamentRepository = tournamentRepository;
             _competitionRepository = competitionRepository;
+            _teamRepository = teamRepository;
         }
 
         public async Task<int> CreateTournamentAsync(string name, int competitionId, int createdByUserId)
@@ -78,6 +82,27 @@ namespace TeamTactics.Application.Tournaments
 
             tournament.Update(name, description);
             await _tournamentRepository.UpdateAsync(tournament);
+        }
+
+        /// <summary>
+        /// Finds a tournament by its invite code and creates a new team for the user.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="inviteCode"></param>
+        /// <param name="teamName"></param>
+        /// <returns>The id of the created team</returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        public async Task<int> JoinTournamentAsync(int userId, string inviteCode, string teamName)
+        {
+            int? tournamentId = await _tournamentRepository.FindIdByInviteCodeAsync(inviteCode);
+            if (!tournamentId.HasValue)
+            {
+                throw EntityNotFoundException.ForEntity<Tournament>(inviteCode, nameof(Tournament.InviteCode));
+            }
+
+            Team emptyTeam = new Team(teamName, userId, tournamentId.Value);
+            int teamId = await _teamRepository.InsertAsync(emptyTeam);
+            return teamId;
         }
     }
 }
