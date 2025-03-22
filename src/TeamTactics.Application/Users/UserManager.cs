@@ -117,8 +117,7 @@ namespace TeamTactics.Application.Users
             ProfileDto profile = await _userRepository.GetProfileAsync(id);
             if(profile is not null)
             {
-                // 
-                //profile.co _tournamentRepository.GetJoinedTournamentsAsync(profile.userId)
+                profile.Tournaments = (await _tournamentRepository.GetJoinedTournamentsAsync(profile.Id)).ToList();
 
                 return profile;
             }
