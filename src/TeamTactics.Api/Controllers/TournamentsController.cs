@@ -63,6 +63,21 @@ namespace TeamTactics.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("join")]
+        [Authorize]
+        [ProducesResponseType<int>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> JoinTournament([FromBody] JoinTournamentRequest request)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new UnauthorizedException("User not logged in."));
+            int joinedTeamId = await _tournamentManager.JoinTournamentAsync(userId, request.InviteCode, request.TeamName);
+            return Ok(joinedTeamId);
+        }
+        
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType<TournamentDetailsDto>(StatusCodes.Status200OK)]
