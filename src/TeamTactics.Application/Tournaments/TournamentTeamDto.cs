@@ -1,5 +1,4 @@
 
-
 namespace TeamTactics.Application.Tournaments
 {
     public class TournamentTeamDto

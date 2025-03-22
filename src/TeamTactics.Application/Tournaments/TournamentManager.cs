@@ -1,5 +1,6 @@
 ﻿
 using TeamTactics.Application.Competitions;
+using TeamTactics.Application.Points;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Tournaments;
 
@@ -9,11 +10,13 @@ namespace TeamTactics.Application.Tournaments
     {
         private readonly ITournamentRepository _tournamentRepository;
         private readonly ICompetitionRepository _competitionRepository;
+        private readonly IPointsRepository _pointsRepository;
 
-        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository)
+        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository, IPointsRepository pointsRepository)
         {
             _tournamentRepository = tournamentRepository;
             _competitionRepository = competitionRepository;
+            _pointsRepository = pointsRepository;
         }
 
         public async Task<int> CreateTournamentAsync(string name, int competitionId, int createdByUserId)
@@ -88,6 +91,17 @@ namespace TeamTactics.Application.Tournaments
         public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(int tournamentId)
         {
             return await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+        }
+        
+        public async Task<IEnumerable<UserTournamentTeamDto>> GetTournamentTeamsByUser(int userId)
+        {
+            var tournaments = await _tournamentRepository.GetJoinedTournamentsAsync(userId);
+            foreach (var tournament in tournaments)
+            {
+                var teamPoints = await _pointsRepository.FindTeamPointsAsync(tournament.TeamId);
+                tournament.TotalPoints = teamPoints.TotalPoints;
+            }
+            return tournaments;
         }
     }
 }
