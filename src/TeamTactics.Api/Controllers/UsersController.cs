@@ -49,5 +49,12 @@ namespace TeamTactics.Api.Controllers
             var user = await _userManager.GetProfileAsync(userId);
             return Ok(user);
         }
+
+        [HttpGet("{userId}/tournaments/teams")]
+        public async Task<IActionResult> GetUserTournamentTeams(int userId)
+        {
+            var teams = await _userManager.(userId);
+            return Ok(teams);
+        }
     }
 }

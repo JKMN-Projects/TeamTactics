@@ -7,7 +7,7 @@ agent "GET response \nURI: /api/users/{userId}/tournaments/teams"
     "tournamentId": "number",
     "tournamentName": "string",
     "competitionName": "string",
-    "totalPoints": "string",
+    "totalPoints": "int",
     "startDate": "string",
     "endDate": "string"
   }

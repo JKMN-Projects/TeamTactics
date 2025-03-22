@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Text;
 using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Common.Models;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Users;
 using TeamTactics.Infrastructure.Tokens;
 
@@ -18,12 +19,14 @@ namespace TeamTactics.Application.Users
 
         public UserManager(
             IUserRepository userRepository,
+            ITournamentRepository tournamentRepository,
             IHashingService hashingService,
             PasswordValidator passwordValidator,
             IAuthTokenProvider tokenProvider,
             ILogger<UserManager> logger)
         {
             _userRepository = userRepository;
+            _tournamentRepository = tournamentRepository;
             _hashingService = hashingService;
             _passwordValidator = passwordValidator;
             _tokenProvider = tokenProvider;

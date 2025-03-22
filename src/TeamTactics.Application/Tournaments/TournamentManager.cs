@@ -80,9 +80,9 @@ namespace TeamTactics.Application.Tournaments
             await _tournamentRepository.UpdateAsync(tournament);
         }
 
-        public async Task<> GetJoinedTournaments(int userId)
+        public async Task<IEnumerable<UserTournamentTeamDto>> GetTournamentTeamsByUser(int userId)
         {
-
+            return await _tournamentRepository.GetJoinedTournamentsAsync(userId);
         }
     }
 }
