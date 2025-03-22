@@ -3,9 +3,10 @@ allowmixing
 
 agent "GET response \nURI: /api/users/{userId}/tournaments/teams"
   json "UserTournamentTeam" as J {
-    "teamId": "number",
     "teamName": "string",
+    "tournamentId": "number",
     "tournamentName": "string",
+    "competitionName": "string",
     "totalPoints": "string",
     "startDate": "string",
     "endDate": "string"
