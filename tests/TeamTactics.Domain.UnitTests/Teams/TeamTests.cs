@@ -173,7 +173,7 @@ namespace TeamTactics.Domain.UnitTests.Teams
             {
                 // Arrange
                 Team team = new TeamFaker(playerCount: 5).Generate();
-                int playerId = team.Players.Last().PlayerId;
+                int playerId = team.Players.First(p => !p.IsCaptain).PlayerId;
 
                 // Act
                 team.SetCaptain(playerId);
@@ -209,6 +209,20 @@ namespace TeamTactics.Domain.UnitTests.Teams
 
                 // Assert
                 Assert.Throws<TeamLockedException>(act);
+            }
+
+            [Fact]
+            public void ShouldThrow_PlayerAlreadyCaptainException_When_PlayerIsAlreadyCaptain()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 11).Generate();
+                int playerId = team.Players.First(p => p.IsCaptain).PlayerId;
+
+                // Act
+                Action act = () => team.SetCaptain(playerId);
+
+                // Assert
+                Assert.Throws<PlayerAlreadyCaptainException>(act);
             }
         }
 
