@@ -164,7 +164,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         /// </summary>
         /// <param name="tournamentId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TournamentTeamsDto>> GetTeamsInTournamentAsync(int tournamentId)
+        public async Task<IEnumerable<TournamentTeamDto>> GetTeamsInTournamentAsync(int tournamentId)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
@@ -185,7 +185,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
 
             var tournamentTeamsResult = await _dbConnection.QueryAsync<(int teamId, string teamName)>(sql, parameters);
 
-            return tournamentTeamsResult.Any() ? tournamentTeamsResult.Select(tt => new TournamentTeamsDto(tt.teamId, tt.teamName)) : new List<TournamentTeamsDto>();
+            return tournamentTeamsResult.Any() ? tournamentTeamsResult.Select(tt => new TournamentTeamDto(tt.teamId, tt.teamName)) : new List<TournamentTeamDto>();
         }
 
         public async Task RemoveAsync(int id)

@@ -84,5 +84,10 @@ namespace TeamTactics.Application.Tournaments
         {
             return await _tournamentRepository.GetTournamentDetailsAsync(tournamentId);
         }
+
+        public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(int tournamentId)
+        {
+            return await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+        }
     }
 }
