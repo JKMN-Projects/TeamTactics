@@ -77,5 +77,29 @@ namespace TeamTactics.Api.Controllers
             int joinedTeamId = await _tournamentManager.JoinTournamentAsync(userId, request.InviteCode, request.TeamName);
             return Ok(joinedTeamId);
         }
+        
+        [HttpGet("{id}")]
+        [Authorize]
+        [ProducesResponseType<TournamentDetailsDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTournamentDetails(int id)
+        {
+            var tournament = await _tournamentManager.GetTournamentDetails(id);
+            return Ok(tournament);
+        }
+
+        [HttpGet("{id}/teams")]
+        [Authorize]
+        [ProducesResponseType<IEnumerable<IEnumerable<TournamentTeamDto>>>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTournamentTeams(int id)
+        {
+            var teams = await _tournamentManager.GetTournamentTeamsAsync(id);
+            return Ok(teams);
+        }
     }
 }

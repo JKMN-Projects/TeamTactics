@@ -1,6 +1,7 @@
 ﻿
 using TeamTactics.Application.Competitions;
 using TeamTactics.Application.Teams;
+using TeamTactics.Application.Points;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
@@ -12,12 +13,14 @@ namespace TeamTactics.Application.Tournaments
         private readonly ITournamentRepository _tournamentRepository;
         private readonly ICompetitionRepository _competitionRepository;
         private readonly ITeamRepository _teamRepository;
+        private readonly IPointsRepository _pointsRepository;
 
-        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository, ITeamRepository teamRepository)
+        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository, ITeamRepository teamRepository, IPointsRepository pointsRepository)
         {
             _tournamentRepository = tournamentRepository;
             _competitionRepository = competitionRepository;
-            _teamRepository = teamRepository;
+            _teamRepository = teamRepository;    
+            _pointsRepository = pointsRepository;
         }
 
         public async Task<int> CreateTournamentAsync(string name, int competitionId, int createdByUserId)
@@ -103,6 +106,27 @@ namespace TeamTactics.Application.Tournaments
             Team emptyTeam = new Team(teamName, userId, tournamentId.Value);
             int teamId = await _teamRepository.InsertAsync(emptyTeam);
             return teamId;
+        }
+        
+        public async Task<TournamentDetailsDto> GetTournamentDetails(int tournamentId)
+        {
+            return await _tournamentRepository.GetTournamentDetailsAsync(tournamentId);
+        }
+
+        public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(int tournamentId)
+        {
+            return await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+        }
+        
+        public async Task<IEnumerable<UserTournamentTeamDto>> GetTournamentTeamsByUser(int userId)
+        {
+            var tournaments = await _tournamentRepository.GetJoinedTournamentsAsync(userId);
+            foreach (var tournament in tournaments)
+            {
+                var teamPoints = await _pointsRepository.FindTeamPointsAsync(tournament.TeamId);
+                tournament.TotalPoints = teamPoints.TotalPoints;
+            }
+            return tournaments;
         }
     }
 }
