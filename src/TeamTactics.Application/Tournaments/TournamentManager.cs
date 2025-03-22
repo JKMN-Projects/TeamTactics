@@ -79,5 +79,10 @@ namespace TeamTactics.Application.Tournaments
             tournament.Update(name, description);
             await _tournamentRepository.UpdateAsync(tournament);
         }
+
+        public async Task<TournamentDetailsDto> GetTournamentDetails(int tournamentId)
+        {
+            return await _tournamentRepository.GetTournamentDetailsAsync(tournamentId);
+        }
     }
 }

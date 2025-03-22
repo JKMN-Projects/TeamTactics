@@ -185,4 +185,46 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             Assert.Null(foundTournamentId);
         }
     }
+
+    public sealed class GetTournamentDetailsAsync : TournamentRepositoryTests
+    {
+        public GetTournamentDetailsAsync(PostgresDatabaseFixture factory) : base(factory)
+        {
+        }
+
+        [Fact]
+        public async Task Should_ReturnTournamentDetails_When_TournamentExists()
+        {
+            // Arrange
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            Competition competition = await _dataSeeder.SeedRandomCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, competition.Id, description: "A Tournament description");
+            int tournamentId = await _sut.InsertAsync(tournamentToInsert);
+            // Act
+            var tournamentDetails = await _sut.GetTournamentDetailsAsync(tournamentId);
+            // Assert
+            Assert.NotNull(tournamentDetails);
+            Assert.Equal(tournamentToInsert.Name, tournamentDetails.Name);
+            Assert.Equal(tournamentToInsert.Description, tournamentDetails.Description);
+            Assert.Equal(tournamentToInsert.InviteCode, tournamentDetails.InviteCode);
+            Assert.Equal(competition.Name, tournamentDetails.CompetitionName);
+            Assert.Equal(user.Id, tournamentDetails.OwnerUserId);
+            Assert.Equal(user.Username, tournamentDetails.OwnerUsername);
+        }
+
+        [Fact]
+        public async Task Should_ThrowEntityNotFoundException_When_TournamentDoesNotExist()
+        {
+            // Arrange
+            int tournamentId = 99;
+
+            // Act
+            var act = async () => await _sut.GetTournamentDetailsAsync(tournamentId);
+
+            // Assert
+            var ex = await Assert.ThrowsAsync<EntityNotFoundException>(act);
+            Assert.Equal(nameof(Tournament), ex.EntityType);
+            Assert.Equal(tournamentId, ex.Key);
+        }
+    }
 }

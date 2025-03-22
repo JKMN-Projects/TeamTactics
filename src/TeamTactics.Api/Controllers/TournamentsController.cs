@@ -63,5 +63,14 @@ namespace TeamTactics.Api.Controllers
             await _tournamentManager.UpdateTournamentAsync(id, userId, request.Name, request.Description);
             return NoContent();
         }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType<TournamentDetailsDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTournamentDetails(int id)
+        {
+            var tournament = await _tournamentManager.GetTournamentDetails(id);
+            return Ok(tournament);
+        }
     }
 }
