@@ -173,7 +173,7 @@ namespace TeamTactics.Domain.UnitTests.Teams
             {
                 // Arrange
                 Team team = new TeamFaker(playerCount: 5).Generate();
-                int playerId = team.Players.Last().PlayerId;
+                int playerId = team.Players.First(p => !p.IsCaptain).PlayerId;
 
                 // Act
                 team.SetCaptain(playerId);
