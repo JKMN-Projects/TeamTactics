@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Text;
 using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Common.Models;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Users;
 using TeamTactics.Infrastructure.Tokens;
 

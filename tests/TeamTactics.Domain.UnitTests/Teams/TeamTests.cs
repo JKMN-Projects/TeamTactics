@@ -210,6 +210,20 @@ namespace TeamTactics.Domain.UnitTests.Teams
                 // Assert
                 Assert.Throws<TeamLockedException>(act);
             }
+
+            [Fact]
+            public void ShouldThrow_PlayerAlreadyCaptainException_When_PlayerIsAlreadyCaptain()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 11).Generate();
+                int playerId = team.Players.First(p => p.IsCaptain).PlayerId;
+
+                // Act
+                Action act = () => team.SetCaptain(playerId);
+
+                // Assert
+                Assert.Throws<PlayerAlreadyCaptainException>(act);
+            }
         }
 
         public sealed class Lock : TeamTests

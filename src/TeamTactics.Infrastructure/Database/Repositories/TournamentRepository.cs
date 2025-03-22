@@ -116,31 +116,26 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 : new List<Tournament>();
         }
 
-        public async Task<IEnumerable<Tournament>> GetJoinedTournamentsAsync(string userId)
+        public async Task<IEnumerable<UserTournamentTeamDto>> GetJoinedTournamentsAsync(int userId)
         {
             if (_dbConnection.State != ConnectionState.Open)
                 _dbConnection.Open();
 
             string sql = @"
-                  SELECT ut.id, ut.name, ut.description, ut.user_account_id, ut.competition_id, ut.invite_code 
-                    FROM team_tactics.user_tournament AS ut
-                    JOIN team_tactics.user_team AS team
-                        ON ut.id = team.user_tournament_id
-                    WHERE team.user_account_id = @UserId";
+                  SELECT team.id, team.name, ut.id, ut.name, c.name, c.start_date, c.end_date 
+                      FROM team_tactics.user_tournament AS ut
+                      JOIN team_tactics.user_team AS team
+                          ON ut.id = team.user_tournament_id
+                      JOIN team_tactics.competition as c 
+  	                    ON c.id = ut.competition_id
+                      WHERE team.user_account_id = @UserId";
 
             var parameters = new DynamicParameters();
             parameters.Add("UserId", userId);
 
-            var result = await _dbConnection.QueryAsync<(int Id, string Name, string Description, int UserId, int CompId, string InviteCode)>(sql, parameters);
+            var result = await _dbConnection.QueryAsync<(int teamId, string teamName, int tournamentId, string tournamentName, string competitionName, DateOnly startDate, DateOnly endDate)>(sql, parameters);
 
-            return result.Any()
-                ? result.Select(r => {
-                    var t = new Tournament(r.Name, r.UserId, r.CompId, r.Description, r.InviteCode);
-                    t.SetId(r.Id);
-                    t.SetInviteCode(r.InviteCode);
-                    return t;
-                })
-                : new List<Tournament>();
+            return result.Select(r => new UserTournamentTeamDto(r.teamId, r.teamName, r.tournamentId, r.tournamentName, r.competitionName, r.startDate, r.endDate));
         }
 
         /// <summary>
