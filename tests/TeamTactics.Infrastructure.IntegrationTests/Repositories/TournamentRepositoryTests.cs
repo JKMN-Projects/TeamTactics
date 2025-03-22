@@ -1,9 +1,5 @@
-﻿using System.Data;
-using TeamTactics.Application.Common.Exceptions;
-using TeamTactics.Application.Teams;
-using TeamTactics.Domain.Clubs;
+﻿using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Domain.Competitions;
-using TeamTactics.Domain.Players;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
 using TeamTactics.Domain.Users;
@@ -225,6 +221,73 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             var ex = await Assert.ThrowsAsync<EntityNotFoundException>(act);
             Assert.Equal(nameof(Tournament), ex.EntityType);
             Assert.Equal(tournamentId, ex.Key);
+        }
+    }
+
+    public sealed class GetTeamsInTournamentAsync : TournamentRepositoryTests
+    {
+        public GetTeamsInTournamentAsync(PostgresDatabaseFixture factory) : base(factory)
+        {
+        }
+
+        [Fact]
+        public async Task Should_ReturnTeamsInTournament_When_TournamentExists()
+        {
+            // Arrange
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
+            int tournamentId = await _sut.InsertAsync(tournamentToInsert);
+            var teamRepository = new TeamRepository(_dbConnection);
+            Faker faker = new Faker();
+            for (int i = 0; i < 3; i++)
+            {
+                var availablePlayers = seedResult.Clubs.SelectMany(c => c.Players.OrderBy(_ => Guid.NewGuid()).Take(2)).ToList();
+                var teamPlayers = faker.PickRandom(availablePlayers, 11).ToList();
+                Team team = new TeamFaker(players: teamPlayers)
+                    .RuleFor(t => t.UserId, user.Id)
+                    .RuleFor(t => t.TournamentId, tournamentId)
+                    .Generate();
+                await teamRepository.InsertAsync(team);
+            }
+
+            // Act
+            var teams = await _sut.GetTeamsInTournamentAsync(tournamentId);
+
+            // Assert
+            Assert.NotEmpty(teams);
+            Assert.Equal(3, teams.Count());
+        }
+
+        [Fact]
+        public async Task Should_ThrowEntityNotFoundException_When_TournamentDoesNotExist()
+        {
+            // Arrange
+            int tournamentId = 99;
+
+            // Act
+            var act = async () => await _sut.GetTeamsInTournamentAsync(tournamentId);
+
+            // Assert
+            var ex = await Assert.ThrowsAsync<EntityNotFoundException>(act);
+            Assert.Equal(nameof(Tournament), ex.EntityType);
+            Assert.Equal(tournamentId, ex.Key);
+        }
+
+        [Fact]
+        public async Task Should_ReturnEmptyList_When_NoTeamsInTournament()
+        {
+            // Arrange
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            Competition competition = await _dataSeeder.SeedRandomCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, competition.Id, description: "A Tournament description");
+            int tournamentId = await _sut.InsertAsync(tournamentToInsert);
+
+            // Act
+            var teams = await _sut.GetTeamsInTournamentAsync(tournamentId);
+
+            // Assert
+            Assert.Empty(teams);
         }
     }
 }
