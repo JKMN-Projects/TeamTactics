@@ -83,6 +83,16 @@ namespace TeamTactics.Application.Tournaments
             await _tournamentRepository.UpdateAsync(tournament);
         }
 
+        public async Task<TournamentDetailsDto> GetTournamentDetails(int tournamentId)
+        {
+            return await _tournamentRepository.GetTournamentDetailsAsync(tournamentId);
+        }
+
+        public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(int tournamentId)
+        {
+            return await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+        }
+        
         public async Task<IEnumerable<UserTournamentTeamDto>> GetTournamentTeamsByUser(int userId)
         {
             var tournaments = await _tournamentRepository.GetJoinedTournamentsAsync(userId);
