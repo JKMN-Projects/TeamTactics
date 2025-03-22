@@ -2,11 +2,12 @@
 namespace TeamTactics.Application.Tournaments
 {
     public sealed record UserTournamentTeamDto(
+        int TeamId,
         string TeamName,
         int TournamentId,
         string TournamentName,
         string CompetitionName,
         int TotalPoints,
-        DateTime StartDate,
-        DateTime EndDate);
+        DateOnly StartDate,
+        DateOnly EndDate);
 }

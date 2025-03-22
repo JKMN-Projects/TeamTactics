@@ -19,14 +19,12 @@ namespace TeamTactics.Application.Users
 
         public UserManager(
             IUserRepository userRepository,
-            ITournamentRepository tournamentRepository,
             IHashingService hashingService,
             PasswordValidator passwordValidator,
             IAuthTokenProvider tokenProvider,
             ILogger<UserManager> logger)
         {
             _userRepository = userRepository;
-            _tournamentRepository = tournamentRepository;
             _hashingService = hashingService;
             _passwordValidator = passwordValidator;
             _tokenProvider = tokenProvider;
