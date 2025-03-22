@@ -135,7 +135,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
 
             var result = await _dbConnection.QueryAsync<(int teamId, string teamName, int tournamentId, string tournamentName, string competitionName, DateOnly startDate, DateOnly endDate)>(sql, parameters);
 
-            return result.Select(r => new UserTournamentTeamDto(r.teamId, r.teamName, r.tournamentId, r.tournamentName, r.competitionName, 0, r.startDate, r.endDate));
+            return result.Select(r => new UserTournamentTeamDto(r.teamId, r.teamName, r.tournamentId, r.tournamentName, r.competitionName, r.startDate, r.endDate));
         }
 
         /// <summary>

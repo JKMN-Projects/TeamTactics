@@ -7,7 +7,9 @@ namespace TeamTactics.Application.Tournaments
         int TournamentId,
         string TournamentName,
         string CompetitionName,
-        int TotalPoints,
         DateOnly StartDate,
-        DateOnly EndDate);
+        DateOnly EndDate)
+    {
+        public decimal TotalPoints { get; set; }
+    };
 }
