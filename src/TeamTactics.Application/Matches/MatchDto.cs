@@ -6,6 +6,6 @@
         int HomeTeamScore,
         int AwayTeamScore,
         string CompetitionName,
-        DateOnly MatchDate
+        DateTime MatchDate
     );
 }
