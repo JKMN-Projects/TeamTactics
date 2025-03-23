@@ -7,7 +7,8 @@ agent "GET response \nURI: /api/tournaments/{tournamentId}/bulletins"
     "text": "string",
     "createdTime": "string",
     "lastEditedTime": "string",
-    "userId": "number"
+    "userId": "number",
+    "username": "string"
   }
 
 "GET response \nURI: /api/tournaments/{tournamentId}/bulletins" -> J 

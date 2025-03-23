@@ -119,5 +119,19 @@ namespace TeamTactics.Api.Controllers
             int bulletinId = await _bulletinManager.CreateBulletinAsync(request.Text, id, userId);
             return Ok(bulletinId);
         }
+
+        [HttpGet("{id}/bulletins")]
+        [Authorize]
+        [ProducesResponseType<IEnumerable<BulletinDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetBulletins(int id)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new UnauthorizedException("User not logged in."));
+            var bulletins = await _bulletinManager.GetBulletinsForTournamentAsync(userId, id);
+            return Ok(bulletins);
+        }
     }
 }

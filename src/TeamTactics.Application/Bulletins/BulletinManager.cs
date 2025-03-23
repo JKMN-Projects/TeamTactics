@@ -18,6 +18,15 @@ namespace TeamTactics.Application.Bulletins
             _timeProvider = timeProvider;
         }
 
+        /// <summary>
+        /// Creates a bulletin in a tournament
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="tournamentId"></param>
+        /// <param name="userId"></param>
+        /// <returns>The id of the created bulletin</returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="UnauthorizedException"></exception>
         public async Task<int> CreateBulletinAsync(string text, int tournamentId, int userId)
         {
             Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
@@ -38,6 +47,30 @@ namespace TeamTactics.Application.Bulletins
                 userId: userId);
 
             return await _bulletinRepository.InsertAsync(bulletin);
+        }
+
+        /// <summary>
+        /// Gets all bulletins in a tournament
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="tournamentId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="UnauthorizedException"></exception>
+        public async Task<IEnumerable<BulletinDto>> GetBulletinsForTournamentAsync(int userId, int tournamentId)
+        {
+            Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
+            if (tournament == null)
+            {
+                throw EntityNotFoundException.ForEntity<Tournament>("Tournament does not exist");
+            }
+
+            if (await _tournamentRepository.IsOwnedOrJoinedAsync(userId, tournamentId) == false)
+            {
+                throw new UnauthorizedException("User is not authorized to view bulletins in this tournament");
+            }
+
+            return await _bulletinRepository.FindInTournamentAsync(tournamentId);
         }
     }
 }
