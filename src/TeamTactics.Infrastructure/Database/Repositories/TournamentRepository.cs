@@ -241,5 +241,10 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             if (rowsAffected == 0)
                 throw EntityNotFoundException.ForEntity<Tournament>(tournamentId + " | " + previousOwnerId, "TournamentId and UserAccountId");
         }
+
+        public Task<bool> IsOwnedOrJoinedAsync(int userId, int tournamentId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

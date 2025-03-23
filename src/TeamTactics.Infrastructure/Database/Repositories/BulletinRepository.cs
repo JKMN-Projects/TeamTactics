@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using TeamTactics.Application.Bulletins;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TeamTactics.Application.Bulletins;
 using TeamTactics.Domain.Bulletins;
 using Dapper;
 using System.Data;
-using System.Data.Common;
 
 namespace TeamTactics.Infrastructure.Database.Repositories;
 
@@ -25,7 +19,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT id, text, created_time, last_edited_time, user_tournament_id, user_account_id FROM bulletin WHERE id = @Id";
+        string sql = @"SELECT id, text, created_time, last_edited_time, user_tournament_id, user_account_id FROM team_tactics.bulletin WHERE id = @Id";
 
         var parameters = new DynamicParameters();
         parameters.Add("Id", id);
@@ -57,7 +51,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT * FROM bulletin WHERE id = @BulletinId AND user_account_id = @UserId";
+        string sql = @"SELECT * FROM team_tactics.bulletin WHERE id = @BulletinId AND user_account_id = @UserId";
 
         var parameters = new DynamicParameters();
         parameters.Add("BulletinId", bulletinId);
@@ -72,7 +66,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"INSERT INTO bulletin (text, created_time, user_tournament_id, user_account_id)
+        string sql = @"INSERT INTO team_tactics.bulletin (text, created_time, user_tournament_id, user_account_id)
                   VALUES (@Text, @CreatedTime, @TournamentId, @UserId)
                   RETURNING id";
 
@@ -91,7 +85,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"DELETE FROM bulletin WHERE id = @Id";
+        string sql = @"DELETE FROM team_tactics.bulletin WHERE id = @Id";
 
         var parameters = new DynamicParameters();
         parameters.Add("Id", id);
@@ -105,7 +99,7 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
             _dbConnection.Open();
 
         string sql = @"
-                  UPDATE bulletin SET 
+                  UPDATE team_tactics.bulletin SET 
                     text = @Text, 
                     last_edited_time = @LastEditTime
                   WHERE id = @Id";

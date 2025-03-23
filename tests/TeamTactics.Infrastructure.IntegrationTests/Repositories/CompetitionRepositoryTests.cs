@@ -11,8 +11,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         protected CompetitionRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
         {
-            _sut = new CompetitionRepository(_dbConnection);
-            _dataSeeder = new DataSeeder(_dbConnection);
+            _sut = new CompetitionRepository(DbConnection);
+            _dataSeeder = new DataSeeder(DbConnection);
         }
 
         public override async Task DisposeAsync()

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TeamTactics.Api.Requests.Tournaments;
+using TeamTactics.Application.Bulletins;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Tournaments;
 
@@ -12,10 +13,12 @@ namespace TeamTactics.Api.Controllers
     public class TournamentsController : ControllerBase
     {
         private readonly TournamentManager _tournamentManager;
+        private readonly BulletinManager _bulletinManager;
 
-        public TournamentsController(TournamentManager tournamentManager)
+        public TournamentsController(TournamentManager tournamentManager, BulletinManager bulletinManager)
         {
             _tournamentManager = tournamentManager;
+            _bulletinManager = bulletinManager;
         }
 
         [HttpPost]
@@ -100,6 +103,21 @@ namespace TeamTactics.Api.Controllers
         {
             var teams = await _tournamentManager.GetTournamentTeamsAsync(id);
             return Ok(teams);
+        }
+
+        [HttpPost("{id}/create-bulletin")]
+        [Authorize]
+        [ProducesResponseType<int>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CreateBulletin(int id, [FromBody] CreateBulletinRequest request)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new UnauthorizedException("User not logged in."));
+            int bulletinId = await _bulletinManager.CreateBulletinAsync(request.Text, id, userId);
+            return Ok(bulletinId);
         }
     }
 }

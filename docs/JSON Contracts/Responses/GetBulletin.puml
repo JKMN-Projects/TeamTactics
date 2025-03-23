@@ -1,7 +1,7 @@
 @startuml Get bulletin response
 allowmixing
 
-agent "GET response \nURI: /api/bulletins/tournaments/{tournamentId}"
+agent "GET response \nURI: /api/tournaments/{tournamentId}/bulletins"
   json "Bulletin" as J {
     "id": "number",
     "text": "string",
@@ -10,5 +10,5 @@ agent "GET response \nURI: /api/bulletins/tournaments/{tournamentId}"
     "userId": "number"
   }
 
-"GET response \nURI: /api/bulletins/tournaments/{tournamentId}" -> J 
+"GET response \nURI: /api/tournaments/{tournamentId}/bulletins" -> J 
 @enduml

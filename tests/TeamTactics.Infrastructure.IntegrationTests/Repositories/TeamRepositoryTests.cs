@@ -17,8 +17,8 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         protected TeamRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
         {
-            _sut = new TeamRepository(_dbConnection);
-            _dataSeeder = new DataSeeder(_dbConnection);
+            _sut = new TeamRepository(DbConnection);
+            _dataSeeder = new DataSeeder(DbConnection);
         }
 
         public override async Task DisposeAsync()
@@ -35,7 +35,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
 
             var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
-            var tournamentRepository = new TournamentRepository(_dbConnection);
+            var tournamentRepository = new TournamentRepository(DbConnection);
             int tournamentId = await tournamentRepository.InsertAsync(tournamentToInsert);
 
             Faker faker = new Faker();
@@ -211,7 +211,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                     SELECT player_id
                     FROM team_tactics.player_user_team
                     WHERE user_team_id = @TeamId";
-                var playerIds = await _dbConnection.QueryAsync<int>(verifyPlayerDeletionSql, parameters);
+                var playerIds = await DbConnection.QueryAsync<int>(verifyPlayerDeletionSql, parameters);
                 Assert.Empty(playerIds);
             }
 

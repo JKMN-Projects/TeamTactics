@@ -9,7 +9,7 @@ public abstract class PointsRepositoryTests : RepositoryTestBase, IAsyncLifetime
 
     protected PointsRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
     {
-        _pointsRepository = new PointRepository(_dbConnection);
+        _pointsRepository = new PointRepository(DbConnection);
     }
 
     public override async Task DisposeAsync()
@@ -39,7 +39,7 @@ public abstract class PointsRepositoryTests : RepositoryTestBase, IAsyncLifetime
             string insertInactivePointCategorySql = @"
                 INSERT INTO team_tactics.point_category (name, description, point_amount, active) 
                 VALUES (@Name, @Description, @PointAmount, @Active)";
-            await _dbConnection.ExecuteAsync(insertInactivePointCategorySql, parameters);
+            await DbConnection.ExecuteAsync(insertInactivePointCategorySql, parameters);
 
             // Act
             var actual = await _pointsRepository.FindAllActiveAsync();

@@ -9,17 +9,17 @@ public class Bulletin : Entity
     public int TournamentId { get; private set; }
     public int UserId { get; private set; }
 
-    public Bulletin(string text, DateTime createdTime, DateTime? lastEditedTime, int tournamentId, int userId)
+    public Bulletin(string text, DateTime createdTime, int tournamentId, int userId)
     {
         Text = text;
         CreatedTime = createdTime;
-        LastEditedTime = lastEditedTime;
         TournamentId = tournamentId;
         UserId = userId;
     }
 
-    public Bulletin(int id, string text, DateTime createdTime, DateTime? lastEditedTime, int tournamentId, int userId) : this(text, createdTime, lastEditedTime, tournamentId, userId)
+    public Bulletin(int id, string text, DateTime createdTime, DateTime? lastEditedTime, int tournamentId, int userId) : this(text, createdTime, tournamentId, userId)
     {
+        LastEditedTime = lastEditedTime;
         SetId(id); 
     }
 }

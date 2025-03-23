@@ -10,7 +10,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         protected UserRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
         {
-            _sut = new UserRepository(_dbConnection);
+            _sut = new UserRepository(DbConnection);
         }
 
         public override async Task DisposeAsync()
