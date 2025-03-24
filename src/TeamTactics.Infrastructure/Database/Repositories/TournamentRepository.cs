@@ -125,7 +125,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 _dbConnection.Open();
 
             string sql = @"
-                  SELECT team.id, team.name, ut.id, ut.name, c.name, c.start_date, c.end_date 
+                  SELECT team.id,team.locked_date, team.name, ut.id, ut.name, c.name, c.start_date, c.end_date 
                       FROM team_tactics.user_tournament AS ut
                       JOIN team_tactics.user_team AS team
                           ON ut.id = team.user_tournament_id
@@ -136,9 +136,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("UserId", userId);
 
-            var result = await _dbConnection.QueryAsync<(int teamId, string teamName, int tournamentId, string tournamentName, string competitionName, DateOnly startDate, DateOnly endDate)>(sql, parameters);
+            var result = await _dbConnection.QueryAsync<(int teamId,DateOnly locked_date ,string teamName, int tournamentId, string tournamentName, string competitionName, DateOnly startDate, DateOnly endDate)>(sql, parameters);
 
-            return result.Select(r => new UserTournamentTeamDto(r.teamId, r.teamName, r.tournamentId, r.tournamentName, r.competitionName, r.startDate, r.endDate));
+            return result.Select(r => new UserTournamentTeamDto(r.teamId,r.locked_date, r.teamName, r.tournamentId, r.tournamentName, r.competitionName, r.startDate, r.endDate));
         }
 
         private async Task<bool> GetIfTournamentExists(int tournamentId)

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using TeamTactics.Application.Points;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Points;
@@ -47,9 +48,9 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
         parameters.Add("TeamId", teamId);
 
         var categoryTotals = await _dbConnection.QueryAsync<decimal>(sql, parameters);
-        decimal totalPoints = categoryTotals.Sum();
-
-        return new TeamPointsDto(totalPoints);
+        return categoryTotals.Any()
+            ? new TeamPointsDto(categoryTotals.Sum())
+            : new TeamPointsDto(0);
     }
 
     public async Task<IEnumerable<PointResultDto>> GetPointResultFromMatchIdsync(int matchId)
