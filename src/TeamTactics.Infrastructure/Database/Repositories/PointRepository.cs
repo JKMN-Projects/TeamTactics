@@ -53,7 +53,7 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
             : new TeamPointsDto(0);
     }
 
-    public async Task<IEnumerable<PointResultDto>> GetPointResultFromMatchIdsync(int matchId)
+    public async Task<IEnumerable<PointResultDto>> GetPointResultFromMatchIdAsync(int matchId)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
@@ -88,7 +88,7 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
         return results.Select(r => new PointResultDto(r.playerName, r.clubName, r.pointCategoryName, r.occurrences, r.totalPoints));
     }
 
-    public async Task<IEnumerable<PointResultDto>> GetPointResultFromTeamIdsync(int teamId)
+    public async Task<IEnumerable<PointResultDto>> GetPointResultFromTeamIdAsync(int teamId)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
