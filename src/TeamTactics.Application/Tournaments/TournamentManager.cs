@@ -26,9 +26,18 @@ namespace TeamTactics.Application.Tournaments
             _matchRepository = matchRepository;
         }
 
-        public async Task<int> CreateTournamentAsync(string name, int competitionId, int createdByUserId)
+        /// <summary>
+        /// Create a new tournament and a team for the user.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="teamName"></param>
+        /// <param name="competitionId"></param>
+        /// <param name="createdByUserId"></param>
+        /// <returns>The id of the created tournament</returns>
+        public async Task<int> CreateTournamentAsync(string name, string teamName, int competitionId, int createdByUserId)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+            ArgumentException.ThrowIfNullOrWhiteSpace(teamName, nameof(teamName));
             ArgumentOutOfRangeException.ThrowIfLessThan(competitionId, 1, nameof(competitionId));
             ArgumentOutOfRangeException.ThrowIfLessThan(createdByUserId, 1, nameof(createdByUserId));
 
@@ -41,6 +50,10 @@ namespace TeamTactics.Application.Tournaments
 
             var tournament = new Tournament(name, competitionId, createdByUserId);
             await _tournamentRepository.InsertAsync(tournament);
+
+            Team team = new Team(teamName, createdByUserId, tournament.Id);
+            await _teamRepository.InsertAsync(team);
+
             return tournament.Id;
         }
 

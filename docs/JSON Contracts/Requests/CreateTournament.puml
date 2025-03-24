@@ -5,9 +5,8 @@ agent "POST request \nURI: /api/tournaments"
   json "CreateTournament" as J {
     "name": "string",
     "description": "string",
-    "teamName": "string"
-    "competitionId": "number",
-    "userId": "number"
+    "teamName": "string",
+    "competitionId": "number"
   }
 
 "POST request \nURI: /api/tournaments" -> J 
