@@ -22,7 +22,10 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Run Migration Verification
+    - name: Test Database Migration
+      run: dotnet run --project tools/DbMigrator "${{ secrets.DB_CONNECTION }}" "--verify"
+
+    - name: Run Database Migration
       run: dotnet run --project tools/DbMigrator "${{ secrets.DB_CONNECTION }}"
 
     - uses: actions/checkout@v4
