@@ -24,6 +24,14 @@ public class Tournament : Entity
         CompetitionId = competitionId;
         InviteCode = inviteCode;
     }
+    public Tournament(int id, string name, int createdByUserId, int competitionId, string description, string inviteCode): base(id)
+    {
+        Name = name;
+        CreatedByUserId = createdByUserId;
+        CompetitionId = competitionId;
+        Description = description;
+        InviteCode = inviteCode;
+    }
 
     public void SetInviteCode(string newCode) => this.InviteCode = newCode;
 

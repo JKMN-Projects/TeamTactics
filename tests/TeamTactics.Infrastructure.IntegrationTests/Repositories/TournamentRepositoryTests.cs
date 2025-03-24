@@ -290,4 +290,44 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             Assert.Empty(teams);
         }
     }
+
+    public sealed class FindByIdAsync : TournamentRepositoryTests
+    {
+        public FindByIdAsync(PostgresDatabaseFixture factory) : base(factory)
+        {
+        }
+
+        [Fact]
+        public async Task Should_ReturnTournament_When_ItExists()
+        {
+            // Arrange
+            User user = await _dataSeeder.SeedRandomUserAsync();
+            Competition competition = await _dataSeeder.SeedRandomCompetitionAsync();
+            var tournamentToInsert = new Tournament("Test Tournament", user.Id, competition.Id, description: "A Tournament description");
+            int tournamentId = await _sut.InsertAsync(tournamentToInsert);
+
+            // Act
+            Tournament? foundTournament = await _sut.FindByIdAsync(tournamentId);
+
+            // Assert
+            Assert.NotNull(foundTournament);
+            Assert.Equal(tournamentToInsert.Name, foundTournament.Name);
+            Assert.Equal(tournamentToInsert.Description, foundTournament.Description);
+            Assert.Equal(tournamentToInsert.CreatedByUserId, foundTournament.CreatedByUserId);
+            Assert.Equal(tournamentToInsert.CompetitionId, foundTournament.CompetitionId);
+        }
+
+        [Fact]
+        public async Task Should_ReturnNull_When_InviteCodeDoesNotExist()
+        {
+            // Arrange
+            int inviteCode = 99;
+
+            // Act
+            var foundTournament = await _sut.FindByIdAsync(inviteCode);
+
+            // Assert
+            Assert.Null(foundTournament);
+        }
+    }
 }

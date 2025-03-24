@@ -17,9 +17,30 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Tournament?> FindByIdAsync(int id)
+        public async Task<Tournament?> FindByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            string sql = @$"
+        SELECT 
+            ut.id, 
+            ut.name, 
+            ut.user_account_id,
+            ut.competition_id,
+            ut.description, 
+            ut.invite_code
+	    FROM team_tactics.user_tournament as ut 
+	    WHERE ut.id = @TournamentId";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("TournamentId", id);
+
+            var result = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, int ownerUserId, int competitionId, string description, string inviteCode)> (sql, parameters);
+
+            return result != default
+                ? new Tournament(result.id, result.name, result.ownerUserId, result.competitionId, result.description, result.inviteCode)
+                : null;
         }
 
         public async Task<TournamentDetailsDto> GetTournamentDetailsAsync(int tournamentId)
