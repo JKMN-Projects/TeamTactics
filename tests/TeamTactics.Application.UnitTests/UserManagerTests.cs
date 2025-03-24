@@ -12,7 +12,7 @@ using TeamTactics.Domain.Users;
 using TeamTactics.Fixtures;
 using TeamTactics.Infrastructure.Tokens;
 
-namespace TeamTactics.Application.UnitTests.Users
+namespace TeamTactics.Application.UnitTests
 {
     public abstract class UserManagerTests : TestBase
     {
@@ -35,7 +35,6 @@ namespace TeamTactics.Application.UnitTests.Users
             _authTokenProviderMock = Substitute.For<IAuthTokenProvider>();
             _logger = Substitute.For<ILogger<UserManager>>();
 
-
             _sut = new UserManager(
                 _userRepositoryMock,
                 _tournamentRepository,
@@ -55,7 +54,7 @@ namespace TeamTactics.Application.UnitTests.Users
                 string username = faker.Internet.UserName();
                 string email = faker.Internet.Email();
                 string password = faker.Internet.Password(prefix: "1aA!");
-                Byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
                 _hashingServiceMock.GenerateSalt().Returns(faker.Random.Bytes(32));
                 _hashingServiceMock.Hash(Arg.Any<byte[]>(), Arg.Any<byte[]>()).Returns(faker.Random.Bytes(32));
@@ -165,7 +164,7 @@ namespace TeamTactics.Application.UnitTests.Users
                     .Returns(new AuthenticationToken(_faker.Random.Guid().ToString(), "JWT", 3600));
 
                 // Act
-                AuthenticationToken token = await _sut.GetAuthenticationTokenAsync(user.Email, _faker.Internet.Password() );
+                AuthenticationToken token = await _sut.GetAuthenticationTokenAsync(user.Email, _faker.Internet.Password());
 
                 // Assert
                 Assert.NotNull(token);
