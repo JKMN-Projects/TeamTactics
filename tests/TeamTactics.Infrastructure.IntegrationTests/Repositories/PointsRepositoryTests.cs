@@ -1,5 +1,7 @@
-﻿using TeamTactics.Domain.Points;
+﻿using TeamTactics.Application.Matches;
+using TeamTactics.Domain.Points;
 using TeamTactics.Infrastructure.Database.Repositories;
+using TeamTactics.Infrastructure.IntegrationTests.Seeding;
 
 namespace TeamTactics.Infrastructure.IntegrationTests.Repositories;
 
@@ -49,4 +51,5 @@ public abstract class PointsRepositoryTests : RepositoryTestBase, IAsyncLifetime
             Assert.DoesNotContain(actual, x => x.Name == inactivePointCategory.Name);
         }
     }
+
 }

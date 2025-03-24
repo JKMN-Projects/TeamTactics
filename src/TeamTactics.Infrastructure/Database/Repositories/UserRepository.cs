@@ -111,26 +111,17 @@ internal class UserRepository(IDbConnection dbConnection) : IUserRepository
 
         // Get user account info
         string userSql = @"
-    SELECT username, email
+    SELECT id, username, email
     FROM team_tactics.user_account
     WHERE id = @UserId";
 
-        var userInfo = await _dbConnection.QuerySingleOrDefaultAsync<(string Username, string Email)>(userSql, userParams);
+        var userInfo = await _dbConnection.QuerySingleOrDefaultAsync<(int userId, string Username, string Email)>(userSql, userParams);
 
         if (userInfo == default)
-            throw new Application.Common.Exceptions.EntityNotFoundException("Profile", id); // User not found
-
-        // Get tournaments associated with this user
-        string tournamentSql = @"
-    SELECT t.id, t.name
-    FROM team_tactics.user_tournament ut
-    JOIN team_tactics.tournament t ON ut.competition_id = t.id
-    WHERE ut.user_account_id = @UserId";
-
-        var tournamentsResult = await _dbConnection.QueryAsync<(int tourneyId, string tourneyName)>(tournamentSql, userParams);
+            throw new EntityNotFoundException("Profile", id); // User not found
 
         // Create and return the DTO
-        return new ProfileDto(userInfo.Username, userInfo.Email, tournamentsResult.Select(t => new ProfileDto.Tournament(t.tourneyId, t.tourneyName)).ToList());
+        return new ProfileDto(userInfo.userId, userInfo.Username, userInfo.Email);
     }
 
 
