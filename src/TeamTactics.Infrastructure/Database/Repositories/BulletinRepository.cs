@@ -29,21 +29,24 @@ internal class BulletinRepository(IDbConnection dbConnection) : IBulletinReposit
         return bulletinsResult.HasValue ? new Bulletin(bulletinsResult.Value.id, bulletinsResult.Value.text, bulletinsResult.Value.createdTime, bulletinsResult.Value.lastEditedTime, bulletinsResult.Value.tourneyId, bulletinsResult.Value.userId) : null;
     }
 
-    public async Task<IEnumerable<Bulletin>> FindInTournamentAsync(int tournamentId)
+    public async Task<IEnumerable<BulletinDto>> FindInTournamentAsync(int tournamentId)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
-        string sql = @"SELECT id, text, created_time, last_edited_time, user_tournament_id, user_account_id 
-                  FROM bulletin WHERE user_tournament_id = @TournamentId
+        string sql = @"SELECT b.id, b.text, b.created_time, b.last_edited_time, b.user_account_id, ua.username
+                  FROM team_tactics.bulletin as b 
+                    JOIN team_tactics.user_account as ua
+                        ON ua.id = b.user_account_id
+                  WHERE b.user_tournament_id = @TournamentId
                   ORDER BY created_time DESC";
 
         var parameters = new DynamicParameters();
         parameters.Add("TournamentId", tournamentId);
 
-        var bulletinsResult = await _dbConnection.QueryAsync<(int id, string text, DateTime createdTime, DateTime lastEditedTime, int tourneyId, int userId)>(sql, parameters);
+        var bulletinsResult = await _dbConnection.QueryAsync<(int b_id, string b_text, DateTime b_createdTime, DateTime? b_lastEditedTime, int ua_id, string ua_username)>(sql, parameters);
 
-        return bulletinsResult.Any() ? bulletinsResult.Select(b => new Bulletin(b.id, b.text, b.createdTime, b.lastEditedTime, b.tourneyId, b.userId)) : new List<Bulletin>();
+        return bulletinsResult.Select(r => new BulletinDto(r.b_id, r.b_text, r.b_createdTime, r.b_lastEditedTime, r.ua_id, r.ua_username));
     }
 
     public async Task<bool> GetIfBulletinOwner(int userId, int bulletinId)
