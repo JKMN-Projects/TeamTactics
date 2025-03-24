@@ -131,14 +131,22 @@ namespace TeamTactics.Application.Tournaments
 
         public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(int tournamentId)
         {
-            return await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+            var tournamentTeams = await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+
+            foreach (var tournamentTeam in tournamentTeams)
+            {
+                var teamPoints = await _pointsRepository.FindTeamPointsAsync(tournamentTeam.TeamId);
+                tournamentTeam.TotalPoints = teamPoints.TotalPoints;
+            }
+
+            return tournamentTeams;
         }
         
         public async Task<IEnumerable<UserTournamentTeamDto>> GetTournamentTeamsByUser(int userId)
         {
-            var tournaments = await _tournamentRepository.GetJoinedTournamentsAsync(userId);
+            var tournamentTeams = await _tournamentRepository.GetJoinedTournamentsAsync(userId);
             
-            foreach (var tournamentTeam in tournaments)
+            foreach (var tournamentTeam in tournamentTeams)
             {
                 if(tournamentTeam.LockedDate == DateOnly.MinValue)
                 {
@@ -147,7 +155,7 @@ namespace TeamTactics.Application.Tournaments
                 var teamPoints = await _pointsRepository.FindTeamPointsAsync(tournamentTeam.TeamId);
                 tournamentTeam.TotalPoints = teamPoints.TotalPoints;
             }
-            return tournaments;
+            return tournamentTeams;
         }
     }
 }
