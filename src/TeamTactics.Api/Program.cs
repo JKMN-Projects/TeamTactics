@@ -10,10 +10,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("logs/app.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
-
 try
 {
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
     string? connString = builder.Configuration.GetConnectionString("Postgres");
 
@@ -50,6 +49,12 @@ try
 
     builder.Services.SetupCors();
 
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
+    });
+
     var app = builder.Build();
 
     app.UseCors(CorsSetup.CORS_POLICY);
@@ -78,6 +83,8 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
+    if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        throw;
 }
 finally
 {
