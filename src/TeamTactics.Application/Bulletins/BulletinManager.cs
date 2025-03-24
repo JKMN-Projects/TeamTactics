@@ -26,7 +26,10 @@ namespace TeamTactics.Application.Bulletins
                 throw EntityNotFoundException.ForEntity<Tournament>("Tournament does not exist");
             }
 
-            if(await _tournamentRepository.IsOwnedOrJoinedAsync(userId, tournamentId) == false)
+            bool isCreatorOrAttendee = tournament.CreatedByUserId == userId
+                || (await _tournamentRepository.GetJoinedTournamentsAsync(userId)).Any(t => t.TournamentId == tournamentId);
+
+            if (!isCreatorOrAttendee)
             {
                 throw new UnauthorizedException("User is not authorized to create a bulletin in this tournament");
             }
