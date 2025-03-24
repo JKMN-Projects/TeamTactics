@@ -39,7 +39,7 @@ namespace TeamTactics.Infrastructure
             });
 
             // Repositories
-            //services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<ICompetitionRepository, CompetitionRepository>();
             services.AddScoped<ITournamentRepository, TournamentRepository>();
