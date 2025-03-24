@@ -5,6 +5,7 @@ using TeamTactics.Application.Points;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
+using TeamTactics.Application.Matches;
 
 namespace TeamTactics.Application.Tournaments
 {
@@ -14,13 +15,15 @@ namespace TeamTactics.Application.Tournaments
         private readonly ICompetitionRepository _competitionRepository;
         private readonly ITeamRepository _teamRepository;
         private readonly IPointsRepository _pointsRepository;
+        private readonly IMatchRepository _matchRepository;
 
-        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository, ITeamRepository teamRepository, IPointsRepository pointsRepository)
+        public TournamentManager(ITournamentRepository tournamentRepository, ICompetitionRepository competitionRepository, ITeamRepository teamRepository, IPointsRepository pointsRepository, IMatchRepository matchRepository)
         {
             _tournamentRepository = tournamentRepository;
             _competitionRepository = competitionRepository;
-            _teamRepository = teamRepository;    
+            _teamRepository = teamRepository;
             _pointsRepository = pointsRepository;
+            _matchRepository = matchRepository;
         }
 
         public async Task<int> CreateTournamentAsync(string name, int competitionId, int createdByUserId)

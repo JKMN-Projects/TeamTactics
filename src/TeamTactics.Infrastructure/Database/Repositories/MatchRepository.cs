@@ -19,7 +19,7 @@ class MatchRepository(IDbConnection dbConnection) : IMatchRepository
         throw new NotImplementedException();
     }
 
-    public async Task<Match?> GetMatchesByTournamentIdAsync(int tournamentId)
+    public async Task<IEnumerable<MatchDto>> GetMatchesByTournamentIdAsync(int tournamentId)
     {
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
@@ -41,13 +41,13 @@ class MatchRepository(IDbConnection dbConnection) : IMatchRepository
 		ON hc.id = mr.home_club_id
 	JOIN team_tactics.club AS ac
 		ON ac.id = mr.away_club_id
-	WHERE ut.id = 1";
+	WHERE ut.id = @TournamentId";
 
         var parameters = new DynamicParameters();
         parameters.Add("TournamentId", tournamentId);
 
-        var result = await _dbConnection.QuerySingleOrDefaultAsync<(string HClubName, string AClubName, int HClubScore, int AClubScore, string competitionName, DateTime utcTimestamp)?>(sql, parameters);
+        var results = await _dbConnection.QueryAsync<(string hClubName, string aClubName, int hClubScore, int aClubScore, string competitionName, DateTime utcTimestamp)>(sql, parameters);
 
-        return result.HasValue ? new Match(result.Value.HClubName, result.Value.AClubName, result.Value.HClubScore, result.Value.AClubScore, result.Value.competitionName, result.Value.utcTimestamp) : null;
+        return results.Select(r => new MatchDto(r.hClubName, r.aClubName, r.hClubScore, r.aClubScore, r.competitionName, r.utcTimestamp));
     }
 }

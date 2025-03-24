@@ -4,6 +4,7 @@ using System.Security.Claims;
 using TeamTactics.Api.Requests.Tournaments;
 using TeamTactics.Application.Bulletins;
 using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Application.Matches;
 using TeamTactics.Application.Tournaments;
 
 namespace TeamTactics.Api.Controllers
@@ -13,11 +14,13 @@ namespace TeamTactics.Api.Controllers
     public class TournamentsController : ControllerBase
     {
         private readonly TournamentManager _tournamentManager;
+        private readonly MatchManager _matchManager;
         private readonly BulletinManager _bulletinManager;
 
-        public TournamentsController(TournamentManager tournamentManager, BulletinManager bulletinManager)
+        public TournamentsController(TournamentManager tournamentManager, MatchManager matchManager, BulletinManager bulletinManager)
         {
             _tournamentManager = tournamentManager;
+            _matchManager = matchManager;
             _bulletinManager = bulletinManager;
         }
 
@@ -103,6 +106,18 @@ namespace TeamTactics.Api.Controllers
         {
             var teams = await _tournamentManager.GetTournamentTeamsAsync(id);
             return Ok(teams);
+        }
+
+        [HttpGet("{id}/matches")]
+        [Authorize]
+        [ProducesResponseType<IEnumerable<MatchDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTournamentMatches(int id)
+        {
+            var matches = await _matchManager.GetTournamentMatches(id);
+            return Ok(matches);
         }
 
         [HttpPost("{id}/create-bulletin")]

@@ -6,6 +6,7 @@ using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Common.Interfaces;
 using TeamTactics.Application.Common.Models;
 using TeamTactics.Application.Common.Options;
+using TeamTactics.Application.Tournaments;
 using TeamTactics.Application.Users;
 using TeamTactics.Domain.Users;
 using TeamTactics.Fixtures;
@@ -16,6 +17,7 @@ namespace TeamTactics.Application.UnitTests.Users
     public abstract class UserManagerTests : TestBase
     {
         private readonly IUserRepository _userRepositoryMock;
+        private readonly ITournamentRepository _tournamentRepository;
         private readonly IHashingService _hashingServiceMock;
         private readonly PasswordValidator _passwordValidatorMock;
         private readonly IAuthTokenProvider _authTokenProviderMock;
@@ -25,6 +27,7 @@ namespace TeamTactics.Application.UnitTests.Users
         public UserManagerTests()
         {
             _userRepositoryMock = Substitute.For<IUserRepository>();
+            _tournamentRepository = Substitute.For<ITournamentRepository>();
             _hashingServiceMock = Substitute.For<IHashingService>();
             PasswordSecurityOptions passwordSecurityOptions = new PasswordSecurityOptions();
             IOptions<PasswordSecurityOptions> passwordSecurityOptionsMock = Options.Create(passwordSecurityOptions);
@@ -32,8 +35,10 @@ namespace TeamTactics.Application.UnitTests.Users
             _authTokenProviderMock = Substitute.For<IAuthTokenProvider>();
             _logger = Substitute.For<ILogger<UserManager>>();
 
+
             _sut = new UserManager(
                 _userRepositoryMock,
+                _tournamentRepository,
                 _hashingServiceMock,
                 _passwordValidatorMock,
                 _authTokenProviderMock,

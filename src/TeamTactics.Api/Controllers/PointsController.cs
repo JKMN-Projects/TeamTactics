@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TeamTactics.Application.Points;
 
 namespace TeamTactics.Api.Controllers;
@@ -20,5 +21,17 @@ public sealed class PointsController : ControllerBase
     {
         var pointCategories = await _pointsManager.GetActivePointCategoriesAsync();
         return Ok(pointCategories);
+    }
+
+    [HttpGet("mathces/{matchId}")]
+    [Authorize]
+    [ProducesResponseType<IEnumerable<PointResultDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetTeamPoints(int matchId)
+    {
+        var points = await _pointsManager.GetMatchPoints(matchId);
+        return Ok(points);
     }
 }

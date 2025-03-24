@@ -84,7 +84,7 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
 
         var results = await _dbConnection.QueryAsync<(string playerName, string clubName, string pointCategoryName, int occurrences, decimal totalPoints)>(sql, parameters);
 
-        return results.Any() ? results.Select(r => new PointResultDto(r.playerName, r.clubName, r.pointCategoryName, r.occurrences, r.totalPoints)) : new List<PointResultDto>();
+        return results.Select(r => new PointResultDto(r.playerName, r.clubName, r.pointCategoryName, r.occurrences, r.totalPoints));
     }
 
     public async Task<IEnumerable<PointResultDto>> GetPointResultFromTeamIdsync(int teamId)
