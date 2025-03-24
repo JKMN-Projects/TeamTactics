@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TeamTactics.Api.Requests.Teams;
 using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Application.Points;
 using TeamTactics.Application.Teams;
 using TeamTactics.Domain.Teams.Exceptions;
 using TeamTactics.Domain.Tournaments.Exceptions;
@@ -48,8 +49,10 @@ namespace TeamTactics.Api.Controllers
 
         [HttpGet("{teamId}/Points")]
         [Authorize]
-        [ProducesResponseType<TeamPointsDto>(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<IEnumerable<PointResultDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetTeamPoints(int teamId)
         {
             var team = await _teamManager.GetTeamPointsAsync(teamId);

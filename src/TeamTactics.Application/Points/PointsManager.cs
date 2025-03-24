@@ -16,7 +16,7 @@ public sealed class PointsManager
 
     public async Task<IEnumerable<PointResultDto>> GetMatchPoints(int matchId)
     {
-        return await _pointsRepository.GetPointResultFromMatchIdsync(matchId);
+        return await _pointsRepository.GetPointResultFromMatchIdAsync(matchId);
     }
 
 }

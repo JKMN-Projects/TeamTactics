@@ -44,6 +44,7 @@ namespace TeamTactics.Application.Teams
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="EntityNotFoundException" />
+        /// <exception cref="AlreadyJoinedTournamentException" />
         public async Task<int> CreateTeamAsync(string name, int userId, string inviteCode)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
@@ -117,9 +118,9 @@ namespace TeamTactics.Application.Teams
             _logger.LogInformation("Team '{teamId}' deleted", teamId);
         }
 
-        public async Task<TeamPointsDto> GetTeamPointsAsync(int teamId)
+        public async Task<IEnumerable<PointResultDto>> GetTeamPointsAsync(int teamId)
         {
-            var teamPoints = await _pointRepository.FindTeamPointsAsync(teamId);
+            var teamPoints = await _pointRepository.GetPointResultFromTeamIdAsync(teamId);
             return teamPoints;
         }
 

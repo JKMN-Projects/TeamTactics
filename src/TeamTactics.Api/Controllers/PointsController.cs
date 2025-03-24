@@ -23,13 +23,13 @@ public sealed class PointsController : ControllerBase
         return Ok(pointCategories);
     }
 
-    [HttpGet("mathces/{matchId}")]
+    [HttpGet("matches/{matchId}")]
     [Authorize]
     [ProducesResponseType<IEnumerable<PointResultDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTeamPoints(int matchId)
+    public async Task<IActionResult> GetMatchPoints(int matchId)
     {
         var points = await _pointsManager.GetMatchPoints(matchId);
         return Ok(points);
