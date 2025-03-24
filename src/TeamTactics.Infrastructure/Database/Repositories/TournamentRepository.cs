@@ -169,7 +169,8 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             string sql = @$"
         SELECT 
             team.id, 
-            team.name
+            team.name,
+            team.user_account_id
         FROM team_tactics.user_team team
         WHERE team.user_tournament_id = @TournamentId
         ORDER BY team.name";
@@ -177,9 +178,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("TournamentId", tournamentId);
 
-            var tournamentTeamsResult = await _dbConnection.QueryAsync<(int teamId, string teamName)>(sql, parameters);
+            var tournamentTeamsResult = await _dbConnection.QueryAsync<(int teamId, string teamName, int userAccountId)>(sql, parameters);
 
-            return tournamentTeamsResult.Select(tt => new TournamentTeamDto(tt.teamId, tt.teamName));
+            return tournamentTeamsResult.Select(tt => new TournamentTeamDto(tt.teamId, tt.teamName, tt.userAccountId));
         }
 
         public async Task RemoveAsync(int id)
