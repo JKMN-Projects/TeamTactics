@@ -50,6 +50,12 @@ try
 
     builder.Services.SetupCors();
 
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
+    });
+
     var app = builder.Build();
 
     app.UseCors(CorsSetup.CORS_POLICY);
