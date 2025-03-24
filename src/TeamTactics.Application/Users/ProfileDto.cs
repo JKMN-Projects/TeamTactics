@@ -3,16 +3,13 @@ using TeamTactics.Domain.Common;
 
 namespace TeamTactics.Application.Users;
 
-public class ProfileDto : Entity
+public class ProfileDto
 {
-    public string Username;
-    public string Email;
-    public List<UserTournamentTeamDto> Tournaments;
+    public string Username { get; set; }
+    public string Email { get; set; }
 
-    public ProfileDto(int id, string username, string email) : base(id)
-    {
+    public ProfileDto(int id, string username, string email) { 
         Username = username;
         Email = email;
-        Tournaments = new List<UserTournamentTeamDto>();
     }
 }
