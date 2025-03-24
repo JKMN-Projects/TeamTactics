@@ -137,10 +137,15 @@ namespace TeamTactics.Application.Tournaments
         public async Task<IEnumerable<UserTournamentTeamDto>> GetTournamentTeamsByUser(int userId)
         {
             var tournaments = await _tournamentRepository.GetJoinedTournamentsAsync(userId);
-            foreach (var tournament in tournaments)
+            
+            foreach (var tournamentTeam in tournaments)
             {
-                var teamPoints = await _pointsRepository.FindTeamPointsAsync(tournament.TeamId);
-                tournament.TotalPoints = teamPoints.TotalPoints;
+                if(tournamentTeam.LockedDate == DateOnly.MinValue)
+                {
+                    continue;
+                }
+                var teamPoints = await _pointsRepository.FindTeamPointsAsync(tournamentTeam.TeamId);
+                tournamentTeam.TotalPoints = teamPoints.TotalPoints;
             }
             return tournaments;
         }

@@ -3,6 +3,7 @@ namespace TeamTactics.Application.Tournaments
 {
     public sealed record UserTournamentTeamDto(
         int TeamId,
+        DateOnly LockedDate,
         string TeamName,
         int TournamentId,
         string TournamentName,
