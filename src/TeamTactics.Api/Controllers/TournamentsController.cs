@@ -35,8 +35,12 @@ namespace TeamTactics.Api.Controllers
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? throw new UnauthorizedException("User not logged in."));
-            int tournamentId = await _tournamentManager.CreateTournamentAsync(request.Name, request.CompetitionId, userId);
-            return StatusCode(StatusCodes.Status201Created, new { id = tournamentId });
+            int tournamentId = await _tournamentManager.CreateTournamentAsync(
+                request.Name,
+                request.TeamName,
+                request.CompetitionId,
+                userId);
+            return CreatedAtAction(nameof(GetTournamentDetails), new { id = tournamentId }, tournamentId);
         }
 
         [HttpDelete("{id}")]
