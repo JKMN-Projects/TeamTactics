@@ -5,7 +5,8 @@ agent "GET response \nURI: /api/tournaments/{tournamentId}/teams"
   json "TournamentTeam" as J {
     "teamId": "number",
     "teamName": "string",
-    "totalPoints": "string"
+    "totalPoints": "string",
+    "userId": "number"
   }
 
 "GET response \nURI: /api/tournaments/{tournamentId}/teams" -> J 
