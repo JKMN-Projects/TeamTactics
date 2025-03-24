@@ -48,7 +48,7 @@ namespace TeamTactics.Application.Tournaments
                 throw EntityNotFoundException.ForEntity<Competition>(competitionId, nameof(Competition.Id));
             }
 
-            var tournament = new Tournament(name, competitionId, createdByUserId);
+            var tournament = new Tournament(name, createdByUserId, competitionId);
             await _tournamentRepository.InsertAsync(tournament);
 
             Team team = new Team(teamName, createdByUserId, tournament.Id);
