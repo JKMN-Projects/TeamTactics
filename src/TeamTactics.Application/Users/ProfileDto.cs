@@ -1,6 +1,18 @@
-﻿namespace TeamTactics.Application.Users;
+﻿using TeamTactics.Application.Tournaments;
+using TeamTactics.Domain.Common;
 
-public record ProfileDto(string Username, string Email, List<ProfileDto.Tournament> Competitions)
+namespace TeamTactics.Application.Users;
+
+public class ProfileDto : Entity
 {
-    public record Tournament(int Id, string Name);
+    public string Username;
+    public string Email;
+    public List<UserTournamentTeamDto> Tournaments;
+
+    public ProfileDto(int id, string username, string email) : base(id)
+    {
+        Username = username;
+        Email = email;
+        Tournaments = new List<UserTournamentTeamDto>();
+    }
 }

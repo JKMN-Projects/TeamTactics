@@ -12,6 +12,7 @@ namespace TeamTactics.Application.Users
     public sealed class UserManager
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITournamentRepository _tournamentRepository;
         private readonly IHashingService _hashingService;
         private readonly PasswordValidator _passwordValidator;
         private readonly IAuthTokenProvider _tokenProvider;
@@ -19,12 +20,14 @@ namespace TeamTactics.Application.Users
 
         public UserManager(
             IUserRepository userRepository,
+            ITournamentRepository tournamentRepository,
             IHashingService hashingService,
             PasswordValidator passwordValidator,
             IAuthTokenProvider tokenProvider,
             ILogger<UserManager> logger)
         {
             _userRepository = userRepository;
+            _tournamentRepository = tournamentRepository;
             _hashingService = hashingService;
             _passwordValidator = passwordValidator;
             _tokenProvider = tokenProvider;
@@ -114,6 +117,8 @@ namespace TeamTactics.Application.Users
             ProfileDto profile = await _userRepository.GetProfileAsync(id);
             if(profile is not null)
             {
+                profile.Tournaments = (await _tournamentRepository.GetJoinedTournamentsAsync(profile.Id)).ToList();
+
                 return profile;
             }
 

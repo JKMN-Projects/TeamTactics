@@ -121,6 +121,15 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             await UpsertAsync(team);
         }
 
+        private async Task<DateOnly?> GetTeamLockedDate(int teamId)
+        {
+            string sql = "SELECT t.locked_date FROM team_tactics.user_team as t WHERE t.id = @TeamId";
+            var parameters = new DynamicParameters();
+            parameters.Add("TeamId", teamId);
+            var lockedDate = await _dbConnection.QuerySingleOrDefaultAsync<DateOnly?>(sql, parameters);
+            return lockedDate;
+        }
+
         private async Task<int> UpsertAsync(Team team)
         {
             if (_dbConnection.State != ConnectionState.Open)
@@ -132,9 +141,10 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             {
                 DateOnly? lockedDate = null;
 
-                // TODO: This sets the locked whenever the team is updated, should only be set when the status is changed to locked.
-                // This should be handled in the domian lock method.
-                if (team.Status == TeamStatus.Locked)
+                if (team.Id > 0)
+                    lockedDate = await GetTeamLockedDate(team.Id);
+
+                if (team.Status == TeamStatus.Locked && !lockedDate.HasValue)
                 {
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
@@ -165,7 +175,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     RETURNING id";
                 }
 
-                //parameters.Add("Id", model.Id > 0 ? model.Id : (object)DBNull.Value);
                 parameters.Add("Name", team.Name);
                 parameters.Add("Status", (int)team.Status);
                 parameters.Add("LockedDate", lockedDate);
