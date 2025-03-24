@@ -91,6 +91,36 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             return tourneyTeamsResults.Any() ? tourneyTeamsResults.Select(tt => new TeamTournamentsDto(tt.teamId, tt.teamName, tt.tourneyId, tt.tourneyName)) : new List<TeamTournamentsDto>();
         }
 
+        public async Task<IEnumerable<TeamPlayerDto>> GetTeamPlayersByTeamIdAsync(int teamId)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+            var parameters = new DynamicParameters();
+            parameters.Add("TeamId", teamId);
+
+            string sql = $@"
+            SELECT 
+                p.id,
+                p.first_name,
+                p.last_name,
+                tp.captain,
+	            c.id as club_id,
+                c.name as club_name,
+                pos.id,
+                pos.name
+            FROM 
+                team_tactics.player_user_team tp
+            INNER JOIN team_tactics.player p ON tp.player_id = p.id
+            INNER JOIN team_tactics.player_contract pc ON p.id = pc.player_id and pc.active = true
+            INNER JOIN team_tactics.club c ON pc.club_id = c.id
+            INNER JOIN team_tactics.player_position pos ON p.player_position_id = pos.id
+            WHERE 
+                tp.user_team_id = @TeamId";
+            var result = await _dbConnection.QueryAsync<TeamPlayerDto>(sql, parameters);
+            return result;
+
+        }
+
         public async Task<int> InsertAsync(Team team)
         {
             return await UpsertAsync(team);

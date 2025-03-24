@@ -67,6 +67,16 @@ namespace TeamTactics.Application.Teams
         }
 
         /// <summary>
+        /// Used to return all players on a team
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TeamPlayerDto>> GetTeamPlayersAsync(int teamId)
+        {
+            var teamPlayers = await _teamRepository.GetTeamPlayersByTeamIdAsync(teamId);
+            return teamPlayers;
+        }
+        /// <summary>
         /// Add player to team if both player and team exists. Throws <see cref="EntityNotFoundException"/> if either player or team does not exist."/>
         /// </summary>
         /// <param name="teamId">The id of the team to add the player to.</param>
