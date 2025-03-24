@@ -15,6 +15,7 @@ using TeamTactics.Infrastructure.Hashing;
 using TeamTactics.Infrastructure.Tokens;
 using TeamTactics.Application.Bulletins;
 using TeamTactics.Application.Points;
+using TeamTactics.Application.Matches;
 
 namespace TeamTactics.Infrastructure
 {
@@ -45,6 +46,7 @@ namespace TeamTactics.Infrastructure
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IBulletinRepository, BulletinRepository>();
             services.AddScoped<IPointsRepository, PointRepository>();
+            services.AddScoped<IMatchRepository, MatchRepository>();
 
             services.AddScoped<IScraperRepository,ScraperRepository>();
             return services;
