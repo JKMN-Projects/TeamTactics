@@ -123,7 +123,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
 
         private async Task<DateOnly?> GetTeamLockedDate(int teamId)
         {
-            string sql = "SELECT t.locked_date FROM team_tactics.team as t WHERE t.id = @TeamId";
+            string sql = "SELECT t.locked_date FROM team_tactics.user_team as t WHERE t.id = @TeamId";
             var parameters = new DynamicParameters();
             parameters.Add("TeamId", teamId);
             var lockedDate = await _dbConnection.QuerySingleOrDefaultAsync<DateOnly?>(sql, parameters);
