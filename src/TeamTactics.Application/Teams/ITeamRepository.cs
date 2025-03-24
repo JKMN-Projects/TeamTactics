@@ -7,5 +7,6 @@ namespace TeamTactics.Application.Teams
     public interface ITeamRepository : ICrudRepository<Team, int>
     {
         Task<IEnumerable<TeamTournamentsDto>> GetAllTeamsByUserId(int userId);
+        Task<IEnumerable<TeamPlayerDto>> GetTeamPlayersByTeamIdAsync(int teamId);
     }
 }

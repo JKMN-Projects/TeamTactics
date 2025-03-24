@@ -1,4 +1,5 @@
 ﻿using TeamTactics.Application.Common.Exceptions;
+using TeamTactics.Application.Teams;
 using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Clubs;
 using TeamTactics.Domain.Players;
@@ -51,10 +52,30 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             return team;
         }
 
+        public sealed class GetTeamPlayersByTeamIdAsync : TeamRepositoryTests
+        {
+            public GetTeamPlayersByTeamIdAsync(PostgresDatabaseFixture factory) : base(factory)
+            {
+            }
+            [Fact]
+            public async Task Should_ReturnTeamPlayers_When_TeamPlayersExists()
+            {
+                //Arrange
+                Team team = await SeedTeamAsync();
+
+                //act
+                IEnumerable<TeamPlayerDto> players = await _sut.GetTeamPlayersByTeamIdAsync(team.Id);
+
+                //assert
+
+                Assert.NotEmpty(players);
+            }
+        }
         public sealed class FindByIdAsync : TeamRepositoryTests
         {
             public FindByIdAsync(PostgresDatabaseFixture factory) : base(factory)
             {
+
             }
 
             [Fact]
