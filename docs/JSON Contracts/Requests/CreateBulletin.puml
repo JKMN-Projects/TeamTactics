@@ -1,12 +1,12 @@
 @startuml Create bulletin request
 allowmixing
 
-agent "POST request \nURI: /api/bulletins/tournaments/{tournamentId}"
+agent "POST request \nURI: /api/tournaments/{tournamentId}/create-bulletin"
   json "CreateBulletin" as J {
     "text": "string",
     "tournamentId": "number",
     "userId": "number"
   }
 
-"POST request \nURI: /api/bulletins/tournaments/{tournamentId}" -> J 
+"POST request \nURI: /api/tournaments/{tournamentId}/create-bulletin" -> J 
 @enduml

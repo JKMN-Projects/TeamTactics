@@ -15,8 +15,8 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
 
     protected TournamentRepositoryTests(PostgresDatabaseFixture factory) : base(factory)
     {
-        _sut = new TournamentRepository(_dbConnection);
-        _dataSeeder = new DataSeeder(_dbConnection);
+        _sut = new TournamentRepository(DbConnection);
+        _dataSeeder = new DataSeeder(DbConnection);
     }
 
     public override async Task DisposeAsync()
@@ -46,7 +46,7 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
 
             // Assert
             //var tournament = await _sut.FindByIdAsync(tournamentId);
-            var tournament = await _dbConnection.QuerySingleOrDefaultAsync<Tournament>($@"
+            var tournament = await DbConnection.QuerySingleOrDefaultAsync<Tournament>($@"
     SELECT id, name, description, user_account_id as CreatedByUserId, competition_id as CompetitionId
     FROM team_tactics.user_tournament
     WHERE id = @Id", 
@@ -79,9 +79,9 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             await _sut.RemoveAsync(tournamentId);
 
             // Assert
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-            var tournament = await _dbConnection.QuerySingleOrDefaultAsync<Tournament>($@"
+            if (DbConnection.State != ConnectionState.Open)
+                DbConnection.Open();
+            var tournament = await DbConnection.QuerySingleOrDefaultAsync<Tournament>($@"
     SELECT id, name, description, user_account_id as CreatedByUserId, competition_id as CompetitionId
     FROM team_tactics.user_tournament
     WHERE id = @Id",
@@ -114,7 +114,7 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
             var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
-            var teamRepository = new TeamRepository(_dbConnection);
+            var teamRepository = new TeamRepository(DbConnection);
 
             Faker faker = new Faker();
             for (int i = 0; i < 3; i++)
@@ -140,7 +140,7 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             var parameters = new DynamicParameters();
             parameters.Add("TournamentId", tournamentId);
 
-            var teamIds = await _dbConnection.QueryAsync<int>(verifyTeamDeletionSql, parameters);
+            var teamIds = await DbConnection.QueryAsync<int>(verifyTeamDeletionSql, parameters);
 
             Assert.Empty(teamIds);
         }
@@ -238,7 +238,7 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
             var tournamentToInsert = new Tournament("Test Tournament", user.Id, seedResult.Competition.Id, description: "A Tournament description");
             int tournamentId = await _sut.InsertAsync(tournamentToInsert);
-            var teamRepository = new TeamRepository(_dbConnection);
+            var teamRepository = new TeamRepository(DbConnection);
             Faker faker = new Faker();
             for (int i = 0; i < 3; i++)
             {

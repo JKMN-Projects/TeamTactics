@@ -5,25 +5,25 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Configuration
 {
     public abstract class RepositoryTestBase : IClassFixture<PostgresDatabaseFixture>, IAsyncLifetime
     {   
-        protected NpgsqlConnection _dbConnection { get; private set; } = default!;
+        protected NpgsqlConnection DbConnection { get; private set; } = default!;
 
         private Respawner _respawner = null!;
 
         protected RepositoryTestBase(PostgresDatabaseFixture dbFixture)
         {
-            _dbConnection = new NpgsqlConnection(dbFixture.ConnectionString);
+            DbConnection = new NpgsqlConnection(dbFixture.ConnectionString);
         }
 
         protected async Task ResetDatabaseAsync()
         {
-            await _respawner.ResetAsync(_dbConnection); 
+            await _respawner.ResetAsync(DbConnection); 
         }
 
         public virtual async Task InitializeAsync()
         {
-            if (_dbConnection.State != ConnectionState.Open)
-                _dbConnection.Open();
-            _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
+            if (DbConnection.State != ConnectionState.Open)
+                DbConnection.Open();
+            _respawner = await Respawner.CreateAsync(DbConnection, new RespawnerOptions
             {
                 DbAdapter = DbAdapter.Postgres,
                 SchemasToInclude = new[]
