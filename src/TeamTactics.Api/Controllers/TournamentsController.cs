@@ -148,17 +148,5 @@ namespace TeamTactics.Api.Controllers
             var bulletins = await _bulletinManager.GetBulletinsForTournamentAsync(userId, id);
             return Ok(bulletins);
         }
-
-        [HttpGet("{id}/matches")]
-        [Authorize]
-        [ProducesResponseType<IEnumerable<MatchDto>>(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTournamentMatches(int id)
-        {
-            var matches = await _matchManager.GetTournamentMatches(id);
-            return Ok(matches);
-        }
     }
 }
