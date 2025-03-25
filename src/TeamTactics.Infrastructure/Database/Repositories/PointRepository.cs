@@ -39,7 +39,7 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
 
         string lockedSql = @"
     SELECT (ut.locked_date IS NOT NULL) AS is_locked
-        FROM team_tactics.user_team AS ut½
+        FROM team_tactics.user_team AS ut
         WHERE ut.id = @TeamId";
 
         bool locked = await _dbConnection.QuerySingleAsync<bool>(lockedSql, parameters);
