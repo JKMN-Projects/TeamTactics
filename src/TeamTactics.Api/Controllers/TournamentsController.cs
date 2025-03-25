@@ -40,7 +40,7 @@ namespace TeamTactics.Api.Controllers
                 request.TeamName,
                 request.CompetitionId,
                 userId);
-            return CreatedAtAction(nameof(GetTournamentDetails), new { id = tournamentId }, tournamentId);
+            return CreatedAtAction(nameof(GetTournamentDetails), new { id = tournamentId }, new { id = tournamentId });
         }
 
         [HttpDelete("{id}")]
