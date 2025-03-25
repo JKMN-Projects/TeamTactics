@@ -26,7 +26,10 @@ var builder = WebApplication.CreateBuilder(args);
             DatabaseMigrator.MigrateDatabase(connString);
 
     // Serilog to ASPNET
-    builder.Services.AddSerilog();
+    builder.Services.AddSerilog(options =>
+    {
+        options.ReadFrom.Configuration(builder.Configuration);
+    });
 
     // Health Checks
     builder.Services.AddHealthChecks()
