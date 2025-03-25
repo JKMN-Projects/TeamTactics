@@ -102,7 +102,7 @@ namespace TeamTactics.Api.Controllers
 
         [HttpGet("{id}/teams")]
         [Authorize]
-        [ProducesResponseType<IEnumerable<IEnumerable<TournamentTeamDto>>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<IEnumerable<TournamentTeamDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
