@@ -34,8 +34,20 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
         if (_dbConnection.State != ConnectionState.Open)
             _dbConnection.Open();
 
+        var parameters = new DynamicParameters();
+        parameters.Add("TeamId", teamId);
+
+        string lockedSql = @"
+    SELECT (ut.locked_date IS NOT NULL) AS is_locked
+        FROM team_tactics.user_team AS ut½
+        WHERE ut.id = @TeamId";
+
+        bool locked = await _dbConnection.QuerySingleAsync<bool>(lockedSql, parameters);
+
+        if (!locked) return new TeamPointsDto(0);
+
         string sql = @"
-    SELECT SUM(pc.point_amount * mpp.occurrences)
+    SELECT SUM(COALESCE(pc.point_amount * mpp.occurrences, 0))
     FROM team_tactics.player_user_team put
     JOIN team_tactics.match_player_point mpp 
     	ON put.player_id = mpp.player_id
@@ -43,9 +55,6 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
     	ON mpp.point_category_id = pc.id
     WHERE put.user_team_id = @TeamId
         AND pc.active = true";
-
-        var parameters = new DynamicParameters();
-        parameters.Add("TeamId", teamId);
 
         var categoryTotals = await _dbConnection.QueryAsync<decimal>(sql, parameters);
         return categoryTotals.Any()

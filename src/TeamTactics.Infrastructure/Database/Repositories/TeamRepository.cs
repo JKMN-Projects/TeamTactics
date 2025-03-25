@@ -30,6 +30,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         t.id, 
         t.name, 
         t.status, 
+        t.formation
         t.user_account_id, 
         t.user_tournament_id,
         tp.player_id,
@@ -45,7 +46,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     WHERE 
         t.id = @Id";
 
-            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
+            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, string teamFormation, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
 
             if (!results.Any())
                 return null;
@@ -57,7 +58,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             {
                 if (row.teamPlayerId.HasValue && row.clubId.HasValue && row.teamPlayerIsCaptain.HasValue)
                     teamPlayers.Add(new TeamPlayer(row.teamPlayerId.Value, row.clubId.Value, row.teamPlayerIsCaptain.Value));
-
             }
 
             // Get the first row to populate team details
@@ -66,7 +66,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             // Parse team status
             Enum.TryParse(firstRow.teamStatus.ToString(), out TeamStatus teamStatus);
 
-            Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
+            Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamFormation, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
 
             return team;
         }
