@@ -6,13 +6,7 @@ agent "GET response \nURI: /api/teams/{teamId}"
     "id": "number",
     "name": "string",
     "locked": "boolean",
-    "formation": {
-        "id": "number",
-        "name": "string",
-        "attackerAmount": "number",
-        "midfielderAmount": "number",
-        "defenderAmount": "number"
-    },
+    "formation": "string",
     "players": [{
         "id": "number",
         "firstName": "string",

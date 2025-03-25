@@ -12,7 +12,7 @@ namespace TeamTactics.Application.Teams
         public int Id { get; set; }
         public string Name { get; private set; }
         public TeamStatus Status { get; private set; }
-        public bool IsLocked { get { return this.Status == TeamStatus.Locked; } }
+        public bool IsLocked => this.Status == TeamStatus.Locked;
         public string Formation { get; private set; }
         public int UserId { get; private set; }
         public int TournamentId { get; private set; }

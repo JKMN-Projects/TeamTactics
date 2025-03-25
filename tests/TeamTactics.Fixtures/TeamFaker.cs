@@ -20,7 +20,7 @@ namespace TeamTactics.Fixtures
 
             FinishWith((f, t) =>
             {
-                if (playerCount == 0) return;
+                if (!players.Any()) return;
 
                 foreach (var player in players)
                 {

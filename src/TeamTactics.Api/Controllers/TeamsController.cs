@@ -241,5 +241,17 @@ namespace TeamTactics.Api.Controllers
                     statusCode: StatusCodes.Status400BadRequest);
             }
         }
+
+        [HttpGet("{id:int}")]
+        [Authorize]
+        [ProducesResponseType<TeamDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetTeam(int id)
+        {
+            var team = await _teamManager.GetTeamById(id);
+            return Ok(team);
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
         public override Task InitializeAsync() => base.InitializeAsync();
 
-        private async Task<Team> SeedTeamAsync()
+        private async Task<Team> SeedTeamAsync(int playerCount = 11)
         {
             User user = await _dataSeeder.SeedRandomUserAsync();
             var seedResult = await _dataSeeder.SeedFullCompetitionAsync();
@@ -39,9 +39,13 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
             var tournamentRepository = new TournamentRepository(DbConnection);
             int tournamentId = await tournamentRepository.InsertAsync(tournamentToInsert);
 
-            Faker faker = new Faker();
-            var availablePlayers = seedResult.Clubs.SelectMany(c => c.Players.Take(2)).ToList();
-            var teamPlayers = faker.PickRandom(availablePlayers, 11).ToList();
+            List<Player> teamPlayers = [];
+            if (playerCount > 0)
+            {
+                Faker faker = new Faker();
+                var availablePlayers = seedResult.Clubs.SelectMany(c => c.Players.Take(2)).ToList();
+                teamPlayers = faker.PickRandom(availablePlayers, playerCount).ToList();
+            }
 
             Team team = new TeamFaker(players: teamPlayers)
                 .RuleFor(t => t.UserId, user.Id)
@@ -71,6 +75,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 Assert.NotEmpty(players);
             }
         }
+
         public sealed class FindByIdAsync : TeamRepositoryTests
         {
             public FindByIdAsync(PostgresDatabaseFixture factory) : base(factory)
@@ -102,6 +107,27 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                     Assert.Equal(player.ClubId, resultPlayer.ClubId);
                     Assert.Equal(player.IsCaptain, resultPlayer.IsCaptain);
                 });
+            }
+
+
+            [Fact]
+            public async Task Should_ReturnTeam_When_TeamHasNoPlayers()
+            {
+                // Arrange
+                Team team = await SeedTeamAsync(playerCount: 0);
+
+                // Act
+                Team? result = await _sut.FindByIdAsync(team.Id);
+
+                // Assert
+                Assert.NotNull(result);
+                Assert.Equal(team.Id, result.Id);
+                Assert.Equal(team.Name, result.Name);
+                Assert.Equal(team.Status, result.Status);
+                Assert.Equal(team.UserId, result.UserId);
+                Assert.Equal(team.TournamentId, result.TournamentId);
+                Assert.Equal(team.Players.Count, result.Players.Count);
+                Assert.Empty(team.Players);
             }
 
             [Fact]
@@ -249,5 +275,74 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 await Assert.ThrowsAsync<EntityNotFoundException>(act);
             }
         }
+
+        public sealed class GetTeamDtoByIdAsync : TeamRepositoryTests
+        {
+            public GetTeamDtoByIdAsync(PostgresDatabaseFixture factory) : base(factory)
+            {
+
+            }
+
+            [Fact]
+            public async Task Should_ReturnTeam_When_TeamExists()
+            {
+                // Arrange
+                Team team = await SeedTeamAsync();
+
+                // Act
+                TeamDto? result = await _sut.GetTeamDtoByIdAsync(team.Id);
+
+                // Assert
+                Assert.NotNull(result);
+                Assert.Equal(team.Id, result.Id);
+                Assert.Equal(team.Name, result.Name);
+                Assert.Equal(team.Status, result.Status);
+                Assert.Equal(team.UserId, result.UserId);
+                Assert.Equal(team.TournamentId, result.TournamentId);
+                Assert.Equal(team.Players.Count, result.Players.Count);
+                Assert.All(team.Players, (player) =>
+                {
+                    var resultPlayer = result.Players.Single(p => p.Id == player.PlayerId);
+                    Assert.Equal(player.PlayerId, resultPlayer.Id);
+                    Assert.Equal(player.ClubId, resultPlayer.ClubId);
+                    Assert.Equal(player.IsCaptain, resultPlayer.Captain);
+                });
+            }
+
+
+            [Fact]
+            public async Task Should_ReturnTeam_When_TeamHasNoPlayers()
+            {
+                // Arrange
+                Team team = await SeedTeamAsync(playerCount: 0);
+
+                // Act
+                TeamDto? result = await _sut.GetTeamDtoByIdAsync(team.Id);
+
+                // Assert
+                Assert.NotNull(result);
+                Assert.Equal(team.Id, result.Id);
+                Assert.Equal(team.Name, result.Name);
+                Assert.Equal(team.Status, result.Status);
+                Assert.Equal(team.UserId, result.UserId);
+                Assert.Equal(team.TournamentId, result.TournamentId);
+                Assert.Equal(team.Players.Count, result.Players.Count);
+                Assert.Empty(team.Players);
+            }
+
+            [Fact]
+            public async Task Should_ReturnNull_When_TeamDoesNotExist()
+            {
+                // Arrange
+                int teamId = 99;
+
+                // Act
+                TeamDto? result = await _sut.GetTeamDtoByIdAsync(teamId);
+
+                // Assert
+                Assert.Null(result);
+            }
+        }
+
     }
 }
