@@ -36,13 +36,15 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         tp.player_id,
         tp.captain,
 	    c.id as club_id
-    FROM 
-        team_tactics.user_team t
-    LEFT JOIN 
-        team_tactics.player_user_team tp ON t.id = tp.user_team_id
-    INNER JOIN team_tactics.player p ON tp.player_id = p.id
-    INNER JOIN team_tactics.player_contract pc ON p.id = pc.player_id and pc.active = true
-    INNER JOIN team_tactics.club c ON pc.club_id = c.id
+    FROM team_tactics.user_team AS t
+    LEFT JOIN team_tactics.player_user_team AS tp 
+        ON t.id = tp.user_team_id
+    LEFT JOIN team_tactics.player AS p 
+        ON tp.player_id = p.id
+    LEFT JOIN team_tactics.player_contract AS pc 
+        ON p.id = pc.player_id and pc.active = true
+    LEFT JOIN team_tactics.club AS c 
+        ON pc.club_id = c.id
     WHERE t.id = @Id";
 
             var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, string teamFormation, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
@@ -66,6 +68,68 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             Enum.TryParse(firstRow.teamStatus.ToString(), out TeamStatus teamStatus);
 
             Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamFormation, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
+
+            return team;
+        }
+
+        public async Task<TeamDto?> GetTeamDtoByIdAsync(int id)
+        {
+            if (_dbConnection.State != ConnectionState.Open)
+                _dbConnection.Open();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", id);
+
+            string sql = $@"
+    SELECT 
+        t.id, 
+        t.name, 
+        t.status, 
+        t.formation,
+        t.user_account_id, 
+        t.user_tournament_id,
+        tp.player_id,
+        p.first_name,
+        p.last_name,
+        tp.captain,
+	    c.id AS club_id,
+        c.name AS club_name,
+        pp.id AS position_id,
+        pp.name AS position_name
+    FROM team_tactics.user_team AS t
+    LEFT JOIN team_tactics.player_user_team AS tp 
+        ON t.id = tp.user_team_id
+    LEFT JOIN team_tactics.player AS p 
+        ON tp.player_id = p.id
+    LEFT JOIN team_tactics.player_contract AS pc 
+        ON p.id = pc.player_id and pc.active = true
+    LEFT JOIN team_tactics.club AS c 
+        ON pc.club_id = c.id
+    LEFT JOIN team_tactics.player_position AS pp
+        ON p.player_position_id = pp.id
+    WHERE t.id = @Id";
+
+            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, string teamFormation, int teamUserId, int teamTourneyId, int? teamPlayerId, string? playerFirstName, string? playerLastName, bool? teamPlayerIsCaptain, int? clubId, string? clubName, int? posId, string? position)>(sql, parameters);
+
+            if (!results.Any())
+                return null;
+
+            var teamPlayers = new List<TeamPlayerDto>();
+
+            // Add players (if any)
+            foreach (var row in results)
+            {
+                if (row.teamPlayerId.HasValue && row.clubId.HasValue && row.teamPlayerIsCaptain.HasValue && row.posId.HasValue)
+                    teamPlayers.Add(new TeamPlayerDto(row.teamPlayerId.Value, row.playerFirstName, row.playerLastName, row.teamPlayerIsCaptain.Value, row.clubId.Value, row.clubName, row.clubName, row.posId.Value, row.position));
+            }
+
+            // Get the first row to populate team details
+            var firstRow = results.First();
+
+            // Parse team status
+            Enum.TryParse(firstRow.teamStatus.ToString(), out TeamStatus teamStatus);
+
+            TeamDto team = new TeamDto(id, firstRow.teamName, teamStatus, firstRow.teamFormation, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
 
             return team;
         }
