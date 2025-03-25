@@ -29,18 +29,22 @@ namespace TeamTactics.Application.Bulletins
         /// <exception cref="UnauthorizedException"></exception>
         public async Task<int> CreateBulletinAsync(string text, int tournamentId, int userId)
         {
-            Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
-            if (tournament == null)
-            {
-                throw EntityNotFoundException.ForEntity<Tournament>("Tournament does not exist");
-            }
+            //Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
+            //if (tournament == null)
+            //{
+            //    throw EntityNotFoundException.ForEntity<Tournament>("Tournament does not exist");
+            //}
 
-            bool isCreatorOrAttendee = tournament.CreatedByUserId == userId
-                || (await _tournamentRepository.GetJoinedTournamentsAsync(userId)).Any(t => t.TournamentId == tournamentId);
+            //bool isCreatorOrAttendee = tournament.CreatedByUserId == userId
+            //    || (await _tournamentRepository.GetJoinedTournamentsAsync(userId)).Any(t => t.TournamentId == tournamentId);
 
-            if (!isCreatorOrAttendee)
+            //if (!isCreatorOrAttendee)
+            //{
+            //    throw new UnauthorizedException("User is not authorized to create a bulletin in this tournament");
+            //}
+            if (!await _tournamentRepository.IsUserTournamentMember(userId, tournamentId))
             {
-                throw new UnauthorizedException("User is not authorized to create a bulletin in this tournament");
+                throw new UnauthorizedException("User is not authorized to view bulletins in this tournament");
             }
 
             var bulletin = new Bulletin(
@@ -62,16 +66,20 @@ namespace TeamTactics.Application.Bulletins
         /// <exception cref="UnauthorizedException"></exception>
         public async Task<IEnumerable<BulletinDto>> GetBulletinsForTournamentAsync(int userId, int tournamentId)
         {
-            Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
-            if (tournament == null)
-            {
-                throw EntityNotFoundException.ForEntity<Tournament>("Tournament does not exist");
-            }
+            //Tournament? tournament = await _tournamentRepository.FindByIdAsync(tournamentId);
+            //if (tournament == null)
+            //{
+            //    throw EntityNotFoundException.ForEntity<Tournament>("Tournament does not exist");
+            //}
 
-            bool isCreatorOrAttendee = tournament.CreatedByUserId == userId
-                || (await _tournamentRepository.GetJoinedTournamentsAsync(userId)).Any(t => t.TournamentId == tournamentId);
+            //bool isCreatorOrAttendee = tournament.CreatedByUserId == userId
+            //    || (await _tournamentRepository.GetJoinedTournamentsAsync(userId)).Any(t => t.TournamentId == tournamentId);
 
-            if (!isCreatorOrAttendee)
+            //if (!isCreatorOrAttendee)
+            //{
+            //    throw new UnauthorizedException("User is not authorized to view bulletins in this tournament");
+            //}
+            if (!await _tournamentRepository.IsUserTournamentMember(userId, tournamentId))
             {
                 throw new UnauthorizedException("User is not authorized to view bulletins in this tournament");
             }

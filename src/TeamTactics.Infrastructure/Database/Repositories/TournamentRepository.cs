@@ -242,5 +242,38 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             if (rowsAffected == 0)
                 throw EntityNotFoundException.ForEntity<Tournament>(tournamentId + " | " + previousOwnerId, "TournamentId and UserAccountId");
         }
+
+        public async Task<bool> IsUserTournamentMember(int userId, int tournamentId)
+        {
+            string sql = @$"
+       SELECT 
+            (
+                EXISTS (
+                    -- Check if user is the tournament owner
+                    SELECT 1
+                    FROM team_tactics.user_tournament
+                    WHERE id = @TournamentId
+                    AND user_account_id = @UserId
+                )
+                OR
+                EXISTS (
+                    -- Check if user has a team in the tournament
+                    SELECT 1
+                    FROM team_tactics.user_team
+                    WHERE user_tournament_id = @TournamentId
+                    AND user_account_id = @UserId
+                )
+            ) AS has_access;";
+            //Second query is only run if first is false
+
+
+            var parameters = new DynamicParameters();
+            parameters.Add("UserId", userId);
+            parameters.Add("TournamentId", tournamentId);
+
+            bool isMember = await _dbConnection.QuerySingleAsync<bool>(sql, parameters);
+
+            return isMember;
+        }
     }
 }
