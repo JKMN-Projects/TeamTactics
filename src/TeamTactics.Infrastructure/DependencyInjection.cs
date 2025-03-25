@@ -32,6 +32,7 @@ namespace TeamTactics.Infrastructure
             // Register Dapper TypeHandlers
             Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
             Dapper.SqlMapper.AddTypeHandler(new DateOnlyNullableTypeHandler());
+            Dapper.SqlMapper.AddTypeHandler(new DateTimeTypeHandler());
 
             services.AddScoped<IDbConnection>(sp => {
                 var connection = new Npgsql.NpgsqlConnection(configuration.GetConnectionString("Postgres"));
