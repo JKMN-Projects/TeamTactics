@@ -1,0 +1,8 @@
+﻿- When created Ids to pass to as parameters makes sure they are not the same within the same test so the tests will catch any wrongly passed parameters.
+- When passing Ids to a constructor or method, dont use magic numbers, create a const or named variable for the Ids.
+- There exist Fakers for the Domain entities, use them to create the entities for the tests.
+  Use the RuleFor method to set the properties of the entity that is relavant in the tests.
+- Skip any method just returning an Dto from a repository.
+- Also dont use the var keyword.
+- Dont test logger mock.
+- When a mock should return a null value, use the ! operator to make it explicit and silence warnings.

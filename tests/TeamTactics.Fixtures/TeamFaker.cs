@@ -5,7 +5,7 @@ namespace TeamTactics.Fixtures
 {
     public class TeamFaker : Faker<Team>
     {
-        public TeamFaker(int playerCount = 5, IEnumerable<Player>? players = null)
+        public TeamFaker(int playerCount = 11, IEnumerable<Player>? players = null)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(playerCount, 0, nameof(playerCount));
             ArgumentOutOfRangeException.ThrowIfGreaterThan(playerCount, 11, nameof(playerCount));
