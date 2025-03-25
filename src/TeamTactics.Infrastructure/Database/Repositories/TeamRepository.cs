@@ -179,6 +179,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
 
+                if (string.IsNullOrWhiteSpace(team.Formation))
+                    team.SetFormation("4-4-2");
+
                 var parameters = new DynamicParameters();
                 string teamSql;
                 if (team.Id == 0)

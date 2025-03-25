@@ -141,6 +141,11 @@ namespace TeamTactics.Domain.Teams
             player.SetCaptain();
         }
 
+        public void SetFormation(string formation)
+        {
+            this.Formation = formation;
+        }
+
         /// <summary>
         /// Lock the team and prevent any further mutations.
         /// </summary>
