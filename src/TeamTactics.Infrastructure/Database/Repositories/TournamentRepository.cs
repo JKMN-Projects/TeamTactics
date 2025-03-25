@@ -28,21 +28,29 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 _dbConnection.Open();
 
             string sql = @$"
-        SELECT ut.id, ut.name, ut.description, ut.invite_code, c.name, ua.id, ua.username
-	        FROM team_tactics.user_tournament as ut 
-	        JOIN team_tactics.competition as c 
-		        ON c.id  = ut.competition_id
-	        JOIN team_tactics.user_account as ua 
-		        ON ua.id = ut.user_account_id
-	        WHERE ut.id = @TournamentId";
+        SELECT 
+            ut.id, 
+            ut.name, 
+            ut.description, 
+            ut.invite_code,
+            ut.competition_id,
+            c.name, 
+            ua.id, 
+            ua.username
+	    FROM team_tactics.user_tournament as ut 
+	    JOIN team_tactics.competition as c 
+		    ON c.id  = ut.competition_id
+	    JOIN team_tactics.user_account as ua 
+		    ON ua.id = ut.user_account_id
+	    WHERE ut.id = @TournamentId";
 
             var parameters = new DynamicParameters();
             parameters.Add("TournamentId", tournamentId);
 
-            var result = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, string description, string inviteCode, string competitionName, int ownerUserId, string ownerUsername)>(sql, parameters);
+            var result = await _dbConnection.QuerySingleOrDefaultAsync<(int id, string name, string description, string inviteCode, int competitionId, string competitionName, int ownerUserId, string ownerUsername)>(sql, parameters);
 
             return result != default
-                ? new TournamentDetailsDto(result.id, result.name, result.description, result.inviteCode, result.competitionName, result.ownerUserId, result.ownerUsername)
+                ? new TournamentDetailsDto(result.id, result.name, result.description, result.inviteCode, result.competitionId, result.competitionName, result.ownerUserId, result.ownerUsername)
                 : throw EntityNotFoundException.ForEntity<Tournament>(tournamentId, nameof(Tournament.Id));
         }
 
