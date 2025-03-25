@@ -177,10 +177,11 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             INNER JOIN team_tactics.player_contract pc ON p.id = pc.player_id and pc.active = true
             INNER JOIN team_tactics.club c ON pc.club_id = c.id
             INNER JOIN team_tactics.player_position pos ON p.player_position_id = pos.id
-            WHERE 
-                tp.user_team_id = @TeamId";
-            var result = await _dbConnection.QueryAsync<TeamPlayerDto>(sql, parameters);
-            return result;
+            WHERE tp.user_team_id = @TeamId";
+
+            var results = await _dbConnection.QueryAsync<(int id, string firstName, string lastName, bool captain, int clubId, string clubName, int positionId, string position)>(sql, parameters);
+
+            return results.Select(r => new TeamPlayerDto(r.id, r.firstName, r.lastName, r.captain, r.clubId, r.clubName, r.clubName, r.positionId, r.position));
 
         }
 
