@@ -204,6 +204,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
 
                 updatedTeam.AddPlayer(playerToAdd);
                 updatedTeam.SetCaptain(playerToAdd.Id);
+                updatedTeam.SetFormation("3-5-2");
 
                 // Act
                 await _sut.UpdateAsync(updatedTeam);
@@ -213,6 +214,7 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 Assert.NotNull(result);
                 Assert.Equal(updatedTeam.Id, result.Id);
                 Assert.Equal(updatedTeam.Name, result.Name);
+                Assert.Equal(updatedTeam.Formation, result.Formation);
                 Assert.Equal(updatedTeam.Players.Count, result.Players.Count);
                 Assert.DoesNotContain(result.Players, p => p.PlayerId == playerToRemove.PlayerId);
                 Assert.Contains(result.Players, p => p.PlayerId == playerToAdd.Id && p.IsCaptain);

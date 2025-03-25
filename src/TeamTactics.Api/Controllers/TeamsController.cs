@@ -228,5 +228,29 @@ namespace TeamTactics.Api.Controllers
             var team = await _teamManager.GetTeamById(id);
             return Ok(team);
         }
+
+        [HttpPut("{id}/formations")]
+        [Authorize]
+        [ProducesResponseType<TeamDto>(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AssignFormation(int id, AssignFormationRequest request)
+        {
+            try
+            {
+                await _teamManager.AssignFormation(id, request.Name);
+                return NoContent();
+            }
+            catch (TeamLockedException ex)
+            {
+                return Problem(
+                    title: "Team is locked.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+        }
+
     }
 }

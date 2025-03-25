@@ -1,8 +1,10 @@
 @startuml Assign formation request
 allowmixing
 
-json "PUT request \nURI: /api/teams/{teamId}/formations/{formationId}" as setTeamCaptainRequest {
-    
-}
+agent "PUT request \nURI: /api/teams/{teamId}/formations"
+    json "AssignFormationRequest" as J {
+        "name": "string"
+    }
 
+"PUT request \nURI: /api/teams/{teamId}/formations" -> J 
 @enduml
