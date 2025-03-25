@@ -1,0 +1,14 @@
+@startuml Get formation response
+allowmixing
+
+agent "GET response \nURI: /api/teams/formations"
+  json "Formation" as J {
+    "id": "number",
+    "name": "string",
+    "attackerAmount": "number",
+    "midfielderAmount": "number",
+    "defenderAmount": "number"
+  }
+
+"GET response \nURI: /api/teams/formations" -> J 
+@enduml

@@ -1,0 +1,8 @@
+@startuml Assign formation request
+allowmixing
+
+json "PUT request \nURI: /api/teams/{teamId}/formations/{formationId}" as setTeamCaptainRequest {
+    
+}
+
+@enduml

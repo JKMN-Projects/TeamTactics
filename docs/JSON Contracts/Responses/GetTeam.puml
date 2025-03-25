@@ -1,0 +1,30 @@
+@startuml Get team response
+allowmixing
+
+agent "GET response \nURI: /api/teams/{teamId}"
+  json "Team" as J {
+    "id": "number",
+    "name": "string",
+    "locked": "boolean",
+    "formation": {
+        "id": "number",
+        "name": "string",
+        "attackerAmount": "number",
+        "midfielderAmount": "number",
+        "defenderAmount": "number"
+    },
+    "players": [{
+        "id": "number",
+        "firstName": "string",
+        "lastName": "string",
+        "captain": "boolean",
+        "clubId": "number",
+        "clubName": "string",
+        "clubShorthand": "string",
+        "positionId": "number",
+        "positionName": "string"
+    }]
+  }
+
+"GET response \nURI: /api/teams/{teamId}" -> J 
+@enduml
