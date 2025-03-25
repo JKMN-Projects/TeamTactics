@@ -30,6 +30,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         t.id, 
         t.name, 
         t.status, 
+        t.formation,
         t.user_account_id, 
         t.user_tournament_id,
         tp.player_id,
@@ -45,7 +46,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     WHERE 
         t.id = @Id";
 
-            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
+            var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, string teamFormation, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
 
             if (!results.Any())
                 return null;
@@ -57,7 +58,6 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             {
                 if (row.teamPlayerId.HasValue && row.clubId.HasValue && row.teamPlayerIsCaptain.HasValue)
                     teamPlayers.Add(new TeamPlayer(row.teamPlayerId.Value, row.clubId.Value, row.teamPlayerIsCaptain.Value));
-
             }
 
             // Get the first row to populate team details
@@ -66,7 +66,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
             // Parse team status
             Enum.TryParse(firstRow.teamStatus.ToString(), out TeamStatus teamStatus);
 
-            Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
+            Team team = new Team(id, firstRow.teamName, teamStatus, firstRow.teamFormation, firstRow.teamUserId, firstRow.teamTourneyId, teamPlayers);
 
             return team;
         }
@@ -179,15 +179,18 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                     lockedDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
 
+                if (string.IsNullOrWhiteSpace(team.Formation))
+                    team.SetFormation("4-4-2");
+
                 var parameters = new DynamicParameters();
                 string teamSql;
                 if (team.Id == 0)
                 {
                     teamSql = @"
     INSERT INTO team_tactics.user_team
-        (name, status, locked_date, user_account_id, user_tournament_id)
+        (name, status, locked_date, formation, user_account_id, user_tournament_id)
     VALUES
-        (@Name, @Status, @LockedDate, @UserId, @TournamentId)
+        (@Name, @Status, @LockedDate, @Formation, @UserId, @TournamentId)
     RETURNING id";
                 }
                 else
@@ -198,6 +201,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         name = @Name,
         status = @Status,
         locked_date = @LockedDate,
+        formation = @Formation,
         user_account_id = @UserId,
         user_tournament_id = @TournamentId
     WHERE
@@ -208,6 +212,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 parameters.Add("Name", team.Name);
                 parameters.Add("Status", (int)team.Status);
                 parameters.Add("LockedDate", lockedDate);
+                parameters.Add("Formation", team.Formation);
                 parameters.Add("UserId", team.UserId);
                 parameters.Add("TournamentId", team.TournamentId);
 

@@ -9,6 +9,8 @@ namespace TeamTactics.Domain.Teams
         private const int MAX_PLAYERS_PER_CLUB = 2;
         public string Name { get; private set; }
         public TeamStatus Status { get; private set; }
+        public bool IsLocked { get { return this.Status == TeamStatus.Locked; } }
+        public string Formation { get; private set; }
         public int UserId { get; private set; }
         public int TournamentId { get; private set; }
 
@@ -24,10 +26,11 @@ namespace TeamTactics.Domain.Teams
         }
 
         //database constructor
-        public Team(int id, string name, TeamStatus status, int userId, int tournamentId, List<TeamPlayer> players) : base(id)
+        public Team(int id, string name, TeamStatus status, string formation, int userId, int tournamentId, List<TeamPlayer> players) : base(id)
         {
             Name = name;
             Status = status;
+            Formation = formation;
             UserId = userId;
             TournamentId = tournamentId;
             _players = players;
@@ -136,6 +139,11 @@ namespace TeamTactics.Domain.Teams
             }
 
             player.SetCaptain();
+        }
+
+        public void SetFormation(string formation)
+        {
+            this.Formation = formation;
         }
 
         /// <summary>
