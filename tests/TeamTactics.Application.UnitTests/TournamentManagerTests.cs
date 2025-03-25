@@ -7,6 +7,7 @@ using TeamTactics.Application.Tournaments;
 using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
+using TeamTactics.Domain.Tournaments.Exceptions;
 using TeamTactics.Fixtures;
 
 namespace TeamTactics.Application.UnitTests
@@ -211,6 +212,24 @@ namespace TeamTactics.Application.UnitTests
 
                 // Act & Assert
                 await Assert.ThrowsAsync<EntityNotFoundException>(() => _sut.JoinTournamentAsync(userId, inviteCode, teamName));
+            }
+
+
+            [Fact]
+            public async Task Should_AlreadyJoinedTournamentException_When_AlreadyJoinedTouranment()
+            {
+                // Arrange
+                var userId = 1;
+                var inviteCode = "InviteCode";
+                var teamName = "TeamName";
+                var tournamentId = 1;
+
+                _tournamentRepositoryMock.FindIdByInviteCodeAsync(inviteCode).Returns(tournamentId);
+                await _sut.JoinTournamentAsync(userId, inviteCode, teamName);
+                _tournamentRepositoryMock.IsUserTournamentMember(userId, tournamentId).Returns(true);
+
+                // Act & Assert
+                await Assert.ThrowsAsync<AlreadyJoinedTournamentException>(() => _sut.JoinTournamentAsync(userId, inviteCode, teamName));
             }
         }
     }

@@ -6,6 +6,7 @@ using TeamTactics.Application.Bulletins;
 using TeamTactics.Application.Common.Exceptions;
 using TeamTactics.Application.Matches;
 using TeamTactics.Application.Tournaments;
+using TeamTactics.Domain.Tournaments.Exceptions;
 
 namespace TeamTactics.Api.Controllers
 {
@@ -84,8 +85,18 @@ namespace TeamTactics.Api.Controllers
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? throw new UnauthorizedException("User not logged in."));
-            int joinedTeamId = await _tournamentManager.JoinTournamentAsync(userId, request.InviteCode, request.TeamName);
-            return Ok(joinedTeamId);
+            try
+            {
+                int joinedTeamId = await _tournamentManager.JoinTournamentAsync(userId, request.InviteCode, request.TeamName);
+                return Ok(joinedTeamId);
+            }
+            catch (AlreadyJoinedTournamentException ex)
+            {
+                return Problem(
+                    title: "User already joined the tournament.",
+                    detail: ex.Description,
+                    statusCode: StatusCodes.Status409Conflict);
+            }
         }
         
         [HttpGet("{id}")]

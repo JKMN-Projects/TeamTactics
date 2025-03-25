@@ -21,31 +21,6 @@ namespace TeamTactics.Api.Controllers
             _teamManager = teamManager;
         }
 
-        [HttpPost]
-        [Authorize]
-        [ProducesResponseType<int>(StatusCodes.Status201Created)]
-        [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-        [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> CreateTeam([FromBody] CreateTeamRequest request)
-        {
-            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? throw new UnauthorizedException("User not logged in."));
-            try
-            {
-                int teamId = await _teamManager.CreateTeamAsync(request.Name, userId, request.InviteCode);
-                return Created("", teamId);
-            }
-            catch (AlreadyJoinedTournamentException ex)
-            {
-                return Problem(
-                    title: "User already joined the tournament.",
-                    detail: ex.Description,
-                    statusCode: StatusCodes.Status409Conflict);
-            }
-        }
 
         [HttpGet("{teamId}/Points")]
         [Authorize]

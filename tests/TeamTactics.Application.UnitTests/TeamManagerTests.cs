@@ -36,59 +36,6 @@ namespace TeamTactics.Application.UnitTests
                 _loggerMock);
         }
 
-        public sealed class CreateTeamAsync : TeamManagerTests
-        {
-            [Fact]
-            public async Task Should_AddTeamToRepository_When_TournamentExists()
-            {
-                // Arrange
-                const string name = "TeamName";
-                const int userId = 1;
-                const string inviteCode = "InviteCode";
-                const int tournamentId = 2;
-
-                _tournamentRepositoryMock.FindIdByInviteCodeAsync(inviteCode).Returns(tournamentId);
-                _teamRepositoryMock.GetAllTeamsByUserId(userId).Returns(Enumerable.Empty<TeamTournamentsDto>());
-
-                // Act
-                int result = await _sut.CreateTeamAsync(name, userId, inviteCode);
-
-                // Assert
-                await _teamRepositoryMock.Received(1).InsertAsync(Arg.Is<Team>(t => t.Name == name && t.UserId == userId && t.TournamentId == tournamentId));
-            }
-
-            [Fact]
-            public async Task Should_ThrowEntityNotFoundException_When_TournamentDoesNotExist()
-            {
-                // Arrange
-                const string name = "TeamName";
-                const int userId = 1;
-                const string inviteCode = "InviteCode";
-
-                _tournamentRepositoryMock.FindIdByInviteCodeAsync(inviteCode).Returns((int?)null);
-
-                // Act & Assert
-                await Assert.ThrowsAsync<EntityNotFoundException>(() => _sut.CreateTeamAsync(name, userId, inviteCode));
-            }
-
-            [Fact]
-            public async Task Should_ThrowAlreadyJoinedTournamentException_When_UserAlreadyJoinedTournament()
-            {
-                // Arrange
-                const string name = "TeamName";
-                const int userId = 1;
-                const string inviteCode = "InviteCode";
-                const int tournamentId = 2;
-                IEnumerable<TeamTournamentsDto> teams = new List<TeamTournamentsDto> { new TeamTournamentsDto(1, "Team1", tournamentId, "Tournament1") };
-
-                _tournamentRepositoryMock.FindIdByInviteCodeAsync(inviteCode).Returns(tournamentId);
-                _teamRepositoryMock.GetAllTeamsByUserId(userId).Returns(teams);
-
-                // Act & Assert
-                await Assert.ThrowsAsync<AlreadyJoinedTournamentException>(() => _sut.CreateTeamAsync(name, userId, inviteCode));
-            }
-        }
-
         public sealed class AddPlayerToTeamAsync : TeamManagerTests
         {
             [Fact]
