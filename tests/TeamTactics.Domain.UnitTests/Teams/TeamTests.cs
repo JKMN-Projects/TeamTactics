@@ -319,5 +319,36 @@ namespace TeamTactics.Domain.UnitTests.Teams
                 Assert.Throws<TeamLockedException>(act);
             }
         }
+
+        public sealed class SetFormation : TeamTests
+        {
+            [Fact]
+            public void Should_SetFormation()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 11).Generate();
+                string formation = "3-5-2";
+
+                // Act
+                team.SetFormation(formation);
+
+                // Assert
+                Assert.Equal(formation, team.Formation);
+            }
+            [Fact]
+            public void ShouldThrow_TeamLockedException_When_TeamIsLocked()
+            {
+                // Arrange
+                Team team = new TeamFaker(playerCount: 11).Generate();
+                team.Lock();
+                string formation = "3-5-2";
+
+                // Act
+                Action act = () => team.SetFormation(formation);
+
+                // Assert
+                Assert.Throws<TeamLockedException>(act);
+            }
+        }
     }
 }

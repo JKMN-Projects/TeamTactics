@@ -21,6 +21,7 @@ namespace TeamTactics.Domain.Teams
         {
             Name = name;
             UserId = userId;
+            Formation = "4-4-2";
             TournamentId = tournamentId;
             Status = TeamStatus.Draft;
         }
@@ -141,8 +142,17 @@ namespace TeamTactics.Domain.Teams
             player.SetCaptain();
         }
 
+        /// <summary>
+        /// Set the formation of the team
+        /// </summary>
+        /// <param name="formation"></param>
+        /// <exception cref="TeamLockedException"></exception>
         public void SetFormation(string formation)
         {
+            if (Status == TeamStatus.Locked) {
+                throw new TeamLockedException();
+            }
+
             this.Formation = formation;
         }
 

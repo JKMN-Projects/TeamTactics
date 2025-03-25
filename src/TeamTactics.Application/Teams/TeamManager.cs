@@ -212,5 +212,26 @@ namespace TeamTactics.Application.Teams
             }
             return team;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="formation"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>"
+        /// <exception cref="TeamLockedException"></exception>"
+        public async Task AssignFormation(int teamId, string formation)
+        {
+            Team? team = await _teamRepository.FindByIdAsync(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+
+            team.SetFormation(formation);
+            await _teamRepository.UpdateAsync(team);
+            _logger.LogInformation("Formation '{formation}' assigned to team '{teamId}'", formation, teamId);
+        }
     }
 }
