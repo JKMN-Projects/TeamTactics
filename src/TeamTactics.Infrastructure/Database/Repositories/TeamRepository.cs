@@ -30,7 +30,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         t.id, 
         t.name, 
         t.status, 
-        t.formation
+        t.formation,
         t.user_account_id, 
         t.user_tournament_id,
         tp.player_id,
@@ -185,9 +185,9 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 {
                     teamSql = @"
     INSERT INTO team_tactics.user_team
-        (name, status, locked_date, user_account_id, user_tournament_id)
+        (name, status, locked_date, formation, user_account_id, user_tournament_id)
     VALUES
-        (@Name, @Status, @LockedDate, @UserId, @TournamentId)
+        (@Name, @Status, @LockedDate, @Formation, @UserId, @TournamentId)
     RETURNING id";
                 }
                 else
@@ -198,6 +198,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
         name = @Name,
         status = @Status,
         locked_date = @LockedDate,
+        formation = @Formation,
         user_account_id = @UserId,
         user_tournament_id = @TournamentId
     WHERE
@@ -208,6 +209,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 parameters.Add("Name", team.Name);
                 parameters.Add("Status", (int)team.Status);
                 parameters.Add("LockedDate", lockedDate);
+                parameters.Add("Formation", team.Formation);
                 parameters.Add("UserId", team.UserId);
                 parameters.Add("TournamentId", team.TournamentId);
 
