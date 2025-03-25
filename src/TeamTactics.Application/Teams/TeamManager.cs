@@ -230,5 +230,21 @@ namespace TeamTactics.Application.Teams
             await _teamRepository.UpdateAsync(team);
             _logger.LogInformation("Team '{teamId}' renamed to '{name}'", teamId, name);
         }
+
+        /// <summary>
+        /// Get a team by id.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException" />"
+        public async Task<TeamDto> GetTeamById(int teamId)
+        {
+            var team = await _teamRepository.GetTeamDtoByIdAsync(teamId);
+            if (team == null)
+            {
+                throw EntityNotFoundException.ForEntity<Team>(teamId, nameof(Team.Id));
+            }
+            return team;
+        }
     }
 }

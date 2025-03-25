@@ -13,4 +13,21 @@ public class TeamPlayerDto
     public string ClubShorthand { get; set; }
     public int PositionId { get; set; }
     public string PositionName { get; set; }
+
+    public TeamPlayerDto()
+    {
+    }
+
+    public TeamPlayerDto(int id, string firstName, string lastName, bool captain, int clubId, string clubName, string clubShorthand, int positionId, string positionName)
+    {
+        Id = id;
+        FirstName = firstName;
+        LastName = lastName;
+        Captain = captain;
+        ClubId = clubId;
+        ClubName = clubName;
+        ClubShorthand = clubShorthand;
+        PositionId = positionId;
+        PositionName = positionName;
+    }
 }
