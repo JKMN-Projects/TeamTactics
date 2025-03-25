@@ -10,8 +10,8 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("logs/app.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
-try
-{
+//try
+//{
 var builder = WebApplication.CreateBuilder(args);
 
     string? connString = builder.Configuration.GetConnectionString("Postgres");
@@ -82,16 +82,16 @@ var builder = WebApplication.CreateBuilder(args);
     app.MapControllers();
 
     app.Run();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application terminated unexpectedly");
-    if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-        throw;
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+//}
+//catch (Exception ex)
+//{
+//    Log.Fatal(ex, "Application terminated unexpectedly");
+//    if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+//        throw;
+//}
+//finally
+//{
+//    Log.CloseAndFlush();
+//}
 
 public partial class Program;
