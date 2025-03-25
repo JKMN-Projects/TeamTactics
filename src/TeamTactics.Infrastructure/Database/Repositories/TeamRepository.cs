@@ -42,8 +42,7 @@ namespace TeamTactics.Infrastructure.Database.Repositories
     INNER JOIN team_tactics.player p ON tp.player_id = p.id
     INNER JOIN team_tactics.player_contract pc ON p.id = pc.player_id and pc.active = true
     INNER JOIN team_tactics.club c ON pc.club_id = c.id
-    WHERE 
-        t.id = @Id";
+    WHERE t.id = @Id";
 
             var results = await _dbConnection.QueryAsync<(int teamId, string teamName, string teamStatus, int teamUserId, int teamTourneyId, int? teamPlayerId, bool? teamPlayerIsCaptain, int? clubId)>(sql, parameters);
 
