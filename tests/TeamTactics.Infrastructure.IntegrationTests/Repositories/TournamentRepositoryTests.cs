@@ -203,6 +203,7 @@ public abstract class TournamentRepositoryTests : RepositoryTestBase, IAsyncLife
             Assert.Equal(tournamentToInsert.Name, tournamentDetails.Name);
             Assert.Equal(tournamentToInsert.Description, tournamentDetails.Description);
             Assert.Equal(tournamentToInsert.InviteCode, tournamentDetails.InviteCode);
+            Assert.Equal(tournamentToInsert.CompetitionId, tournamentDetails.CompetitionId);
             Assert.Equal(competition.Name, tournamentDetails.CompetitionName);
             Assert.Equal(user.Id, tournamentDetails.OwnerUserId);
             Assert.Equal(user.Username, tournamentDetails.OwnerUsername);

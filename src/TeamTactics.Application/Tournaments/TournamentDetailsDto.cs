@@ -5,6 +5,7 @@
         string Name,
         string Description,
         string InviteCode,
+        int CompetitionId,
         string CompetitionName,
         int OwnerUserId,
         string OwnerUsername);
