@@ -6,6 +6,7 @@ using TeamTactics.Domain.Competitions;
 using TeamTactics.Domain.Teams;
 using TeamTactics.Domain.Tournaments;
 using TeamTactics.Application.Matches;
+using TeamTactics.Domain.Tournaments.Exceptions;
 
 namespace TeamTactics.Application.Tournaments
 {
@@ -117,6 +118,12 @@ namespace TeamTactics.Application.Tournaments
             if (!tournamentId.HasValue)
             {
                 throw EntityNotFoundException.ForEntity<Tournament>(inviteCode, nameof(Tournament.InviteCode));
+            }
+
+            bool isUserAlreadyMember = await _tournamentRepository.IsUserTournamentMember(userId, tournamentId.Value);
+            if (isUserAlreadyMember)
+            {
+                throw new AlreadyJoinedTournamentException(userId, tournamentId.Value);
             }
 
             Team emptyTeam = new Team(teamName, userId, tournamentId.Value);

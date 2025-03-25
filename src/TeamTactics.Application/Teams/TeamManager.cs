@@ -34,40 +34,6 @@ namespace TeamTactics.Application.Teams
         }
 
         /// <summary>
-        /// Checks if the tournament invite code is correct and inserts a new team into the database.
-        /// </summary>
-        /// <param name="name">The name of the team. Must be unique in the tournament.</param>
-        /// <param name="userId">The user id of the user creating the team.</param>
-        /// <param name="inviteCode">The invite code for the tournament the team should join.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="ArgumentOutOfRangeException" />
-        /// <exception cref="EntityNotFoundException" />
-        /// <exception cref="AlreadyJoinedTournamentException" />
-        public async Task<int> CreateTeamAsync(string name, int userId, string inviteCode)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(userId, nameof(userId));
-            ArgumentException.ThrowIfNullOrWhiteSpace(inviteCode, nameof(inviteCode));
-
-            int? tournamentId = await _tournamentRepository.FindIdByInviteCodeAsync(inviteCode);
-            if (!tournamentId.HasValue)
-            {
-                throw EntityNotFoundException.ForEntity<Tournament>(inviteCode, nameof(Tournament.InviteCode));
-            }
-
-            IEnumerable<TeamTournamentsDto> teams = await _teamRepository.GetAllTeamsByUserId(userId);
-            if (teams.Any(t => t.TournamentId == tournamentId.Value))
-            {
-                throw new AlreadyJoinedTournamentException(userId, tournamentId.Value);
-            }
-
-            Team team = new Team(name, userId, tournamentId.Value);
-            return await _teamRepository.InsertAsync(team);
-        }
-
-        /// <summary>
         /// Used to return all players on a team
         /// </summary>
         /// <param name="teamId"></param>
