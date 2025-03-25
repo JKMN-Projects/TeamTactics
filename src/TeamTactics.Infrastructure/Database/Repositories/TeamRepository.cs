@@ -171,12 +171,15 @@ namespace TeamTactics.Infrastructure.Database.Repositories
                 c.name as club_name,
                 pos.id,
                 pos.name
-            FROM 
-                team_tactics.player_user_team tp
-            INNER JOIN team_tactics.player p ON tp.player_id = p.id
-            INNER JOIN team_tactics.player_contract pc ON p.id = pc.player_id and pc.active = true
-            INNER JOIN team_tactics.club c ON pc.club_id = c.id
-            INNER JOIN team_tactics.player_position pos ON p.player_position_id = pos.id
+            FROM team_tactics.player_user_team AS tp
+            INNER JOIN team_tactics.player AS p 
+                ON tp.player_id = p.id
+            INNER JOIN team_tactics.player_contract AS pc 
+                ON p.id = pc.player_id AND pc.active = true
+            INNER JOIN team_tactics.club AS c 
+                ON pc.club_id = c.id
+            INNER JOIN team_tactics.player_position AS pos 
+                ON p.player_position_id = pos.id
             WHERE tp.user_team_id = @TeamId";
 
             var results = await _dbConnection.QueryAsync<(int id, string firstName, string lastName, bool captain, int clubId, string clubName, int positionId, string position)>(sql, parameters);
