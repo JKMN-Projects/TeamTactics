@@ -50,6 +50,7 @@ namespace TeamTactics.Infrastructure
             services.AddScoped<IMatchRepository, MatchRepository>();
 
             services.AddScoped<IScraperRepository,ScraperRepository>();
+
             return services;
         }
     }
