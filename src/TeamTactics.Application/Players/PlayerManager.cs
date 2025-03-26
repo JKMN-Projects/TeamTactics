@@ -33,7 +33,7 @@ public sealed class PlayerManager
     {
         var scraperManager = new ScraperManager();
         IEnumerable<Webscraper.ScraperModels.Club> clubs = await scraperManager.GetClubs();
-        var clubScrapes = clubs.Select(c => new ClubScrape(c.Name, (c.Link = c.Link.Replace("https://fbref.com/en/squads/", "").Replace("-stats", "").Split("/")[0])));
+        var clubScrapes = clubs.Select(c => new ClubScrape(c.Name, (c.Link = c.Link.Replace("/en/squads/", "").Replace("-stats", "").Split("/")[0])));
         await _scraperRepository.InsertClubsAndClubCompetitionsBulk(clubScrapes, externalCompetitionId);
     }
     public async Task LoadFixtures(int competitionId, DateTime loadToDate)
