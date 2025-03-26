@@ -82,6 +82,9 @@ namespace TeamTactics.Api.Controllers
         [HttpPut("{teamId:int}/players/{playerId:int}/remove")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> RemovePlayerFromTeam(int teamId, int playerId)
         {
             try
