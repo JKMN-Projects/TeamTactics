@@ -1,0 +1,2 @@
+ALTER TABLE team_tactics.bulletin DROP CONSTRAINT bulletin_user_tournament_id_fkey;
+ALTER TABLE team_tactics.bulletin ADD CONSTRAINT bulletin_user_tournament_id_fkey FOREIGN KEY (user_tournament_id) REFERENCES team_tactics.user_tournament(id) ON DELETE CASCADE;
