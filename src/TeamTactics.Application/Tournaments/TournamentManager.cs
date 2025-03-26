@@ -138,7 +138,7 @@ namespace TeamTactics.Application.Tournaments
 
         public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(int tournamentId)
         {
-            var tournamentTeams = await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId);
+            var tournamentTeams = (await _tournamentRepository.GetTeamsInTournamentAsync(tournamentId)).ToList();
 
             foreach (var tournamentTeam in tournamentTeams)
             {
