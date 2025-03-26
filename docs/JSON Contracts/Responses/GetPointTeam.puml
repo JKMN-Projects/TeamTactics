@@ -6,6 +6,7 @@ agent "GET response \nURI: /api/points/teams/{teamId}"
     "playerName": "string",
     "clubName": "string",
     "pointCategoryName": "string",
+    "pointAmount": "number",
     "occurrences": "number",
     "totalPoints": "number"
   }
