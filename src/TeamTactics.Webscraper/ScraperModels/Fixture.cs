@@ -44,7 +44,7 @@ public class Fixture
 
     [Selector(xpath: ".//td[@data-stat='away_team']/a")]
     public string AwayTeam { get; set; }
-    [Selector(xpath: ".//td[@data-stat='home_team']/a", attribute: "href")]
+    [Selector(xpath: ".//td[@data-stat='away_team']/a", attribute: "href")]
     public string AwayTeamId
     {
         get { return awayTeamId; }
@@ -55,12 +55,12 @@ public class Fixture
         }
     }
     [Selector(xpath: ".//td[@data-stat='score']/a")]
-    internal string Score
+    public string Score
     {
         set
         {
-            homeScore = int.Parse(value.Split("-")[0]);
-            awayScore = int.Parse(value.Split("-")[1]);
+            homeScore = int.Parse(value.Split("&ndash;")[0]);
+            awayScore = int.Parse(value.Split("&ndash;")[1]);
         }
     }
 
