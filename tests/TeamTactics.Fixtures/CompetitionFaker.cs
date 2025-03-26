@@ -1,5 +1,4 @@
-﻿
-using TeamTactics.Domain.Competitions;
+﻿using TeamTactics.Domain.Competitions;
 
 namespace TeamTactics.Fixtures
 {
@@ -41,7 +40,5 @@ namespace TeamTactics.Fixtures
                 endDate
             ));
         }
-
-
     }
 }

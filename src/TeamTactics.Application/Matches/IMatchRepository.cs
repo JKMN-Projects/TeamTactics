@@ -1,4 +1,5 @@
 ﻿using TeamTactics.Application.Common.Interfaces;
+using TeamTactics.Domain.Matches;
 
 namespace TeamTactics.Application.Matches;
 

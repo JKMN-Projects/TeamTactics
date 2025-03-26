@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using System.Data;
-using TeamTactics.Application.Teams;
 using TeamTactics.Application.Matches;
+using TeamTactics.Domain.Matches;
 
 namespace TeamTactics.Infrastructure.Database.Repositories;
 
