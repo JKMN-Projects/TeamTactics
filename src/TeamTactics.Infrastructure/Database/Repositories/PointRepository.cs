@@ -56,10 +56,8 @@ class PointRepository(IDbConnection dbConnection) : IPointsRepository
     WHERE put.user_team_id = @TeamId
         AND pc.active = true";
 
-        var categoryTotals = await _dbConnection.QueryAsync<decimal>(sql, parameters);
-        return categoryTotals.Any()
-            ? new TeamPointsDto(categoryTotals.Sum())
-            : new TeamPointsDto(0);
+        decimal pointSum = await _dbConnection.QuerySingleOrDefaultAsync<decimal>(sql, parameters);
+        return new TeamPointsDto(pointSum);
     }
 
     public async Task<IEnumerable<PointResultDto>> GetPointResultFromMatchIdAsync(int matchId)
