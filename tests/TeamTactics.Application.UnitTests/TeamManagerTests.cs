@@ -189,9 +189,9 @@ namespace TeamTactics.Application.UnitTests
             public async Task Should_SetTeamCaptain_When_TeamExists()
             {
                 // Arrange
-                const int teamId = 1;
-                const int playerId = 2;
                 Team team = new TeamFaker().Generate();
+                const int teamId = 1;
+                int playerId = team.Players.Where(p => !p.IsCaptain).First().PlayerId;
 
                 _teamRepositoryMock.FindByIdAsync(teamId).Returns(team);
 
