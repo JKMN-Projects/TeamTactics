@@ -1,4 +1,4 @@
-@startuml Patch team request
+@startuml Patch user request
 allowmixing
 
 agent "PATCH request \nURI: /api/users/{userId}"

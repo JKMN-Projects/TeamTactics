@@ -128,6 +128,7 @@ public abstract class PointsRepositoryTests : RepositoryTestBase, IAsyncLifetime
 
             // Assert
             Assert.NotNull(actual);
+            Assert.NotEqual(0, actual.TotalPoints); 
             Assert.Equal(expectedPoints, actual.TotalPoints);
         }
     }
