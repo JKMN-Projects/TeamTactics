@@ -63,6 +63,9 @@ namespace TeamTactics.Infrastructure.IntegrationTests.Repositories
                 // Assert
                 var removedUser = await _sut.FindByIdAsync(addedUser.Id);
                 Assert.Null(removedUser);
+
+                var user2 = new User("username", "email@jknm.com");
+                User addedUser2 = await _sut.InsertAsync(user2, "passwordHash", "salt");
             }
 
             [Fact]
